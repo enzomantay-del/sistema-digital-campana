@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sistema Digital de Campaña Electoral</title>
+  <meta name="author" content="Enzo Gabriel Mantay">
+  <meta name="copyright" content="© 2026 Enzo Gabriel Mantay. Todos los derechos reservados.">
+  <link rel="author" href="mailto:enzomantay@gmail.com">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 
@@ -1096,10 +1099,34 @@
 
 <!-- ══ FOOTER ══════════════════════════════════════════════════════════════ -->
 <div style="background:#0f1f4e; color:rgba(255,255,255,0.5); text-align:center; padding:20px 40px; font-size:0.78rem; border-top:1px solid rgba(255,255,255,0.08);">
-  Desarrollado por <strong style="color:rgba(255,255,255,0.8);">Enzo Gabriel Mantay</strong>
+  © 2026 &nbsp;·&nbsp; Desarrollado por <strong style="color:rgba(255,255,255,0.8);">Enzo Gabriel Mantay</strong>
   &nbsp;·&nbsp; enzomantay@gmail.com
   &nbsp;·&nbsp; Cel: 3743 483429
+  &nbsp;·&nbsp; <span style="color:rgba(255,255,255,0.35);">Todos los derechos reservados. Reproducción no autorizada prohibida.</span>
 </div>
 
+<script>
+// © 2026 Enzo Gabriel Mantay — Todos los derechos reservados
+// Este documento es confidencial y su reproducción no autorizada está prohibida.
+(function(){
+  // Bloquear clic derecho
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  // Bloquear teclas de desarrollador y ver código fuente
+  document.addEventListener('keydown', function(e){
+    if (
+      e.key === 'F12' ||
+      (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'K')) ||
+      (e.ctrlKey && (e.key === 'U' || e.key === 'S'))
+    ) {
+      e.preventDefault();
+      return false;
+    }
+  });
+  // Bloquear selección de texto
+  document.addEventListener('selectstart', function(e){ e.preventDefault(); });
+  // Bloquear arrastrar imágenes/elementos
+  document.addEventListener('dragstart', function(e){ e.preventDefault(); });
+})();
+</script>
 </body>
 </html>
