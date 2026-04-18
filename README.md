@@ -5,7 +5,9 @@ Sitio estático listo para publicar en **GitHub Pages**. La propuesta está en `
 ## Opción rápida (Windows)
 
 1. Creá en GitHub un repo **vacío** llamado por ejemplo `propuesta-kozlowski-tienda` (sin README ni .gitignore al crearlo).
-2. En esta carpeta del proyecto, ejecutá **`publicar-en-github.ps1`** (PowerShell). Te pide tu usuario y el nombre del repo, y hace `git push`.
+2. En esta carpeta del proyecto, abrí PowerShell y ejecutá:
+   `powershell -ExecutionPolicy Bypass -File .\publicar-en-github.ps1`  
+   (Te pide usuario y nombre del repo, y hace `git push`.)
 3. Si Git pide contraseña, usá un **Personal Access Token** de GitHub (no la clave de la web).
 
 ## Publicar en GitHub Pages (manual)
