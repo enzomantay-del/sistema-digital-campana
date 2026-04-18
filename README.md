@@ -2,7 +2,13 @@
 
 Sitio estático listo para publicar en **GitHub Pages**. La propuesta está en `docs/index.html` para poder usar la carpeta `docs` como origen del sitio.
 
-## Publicar en GitHub Pages
+## Opción rápida (Windows)
+
+1. Creá en GitHub un repo **vacío** llamado por ejemplo `propuesta-kozlowski-tienda` (sin README ni .gitignore al crearlo).
+2. En esta carpeta del proyecto, ejecutá **`publicar-en-github.ps1`** (PowerShell). Te pide tu usuario y el nombre del repo, y hace `git push`.
+3. Si Git pide contraseña, usá un **Personal Access Token** de GitHub (no la clave de la web).
+
+## Publicar en GitHub Pages (manual)
 
 1. Creá un repositorio nuevo en GitHub (puede ser privado o público).
 2. Subí el contenido de esta carpeta de proyecto (incluida la carpeta `docs`).
