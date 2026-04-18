@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Propuesta Ferretería Kozlowski: tienda online, impulso comercial, WhatsApp, retiro, envíos, ofertas, métricas, Google Business y mantenimiento. Jardín América, Misiones." />
+  <meta name="theme-color" content="#1e1e1e" />
+  <meta property="og:title" content="Propuesta Tienda Virtual – Ferretería Kozlowski" />
+  <meta property="og:description" content="Tienda online Ferretería Kozlowski: impulso comercial, WhatsApp, retiro, envíos, ofertas, métricas y Google Business. Acompañamiento continuo." />
+  <meta property="og:type" content="website" />
+  <title>Propuesta Tienda Virtual – Ferretería Kozlowski</title>
+  <style>
+    /* ─── Reset & base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --naranja:   #e8600a;
+      --naranja-cl:#ff8c38;
+      --gris-osc:  #1e1e1e;
+      --gris-med:  #2c2c2c;
+      --gris-cl:   #f4f4f4;
+      --blanco:    #ffffff;
+      --texto:     #333333;
+      --sombra:    0 4px 24px rgba(0,0,0,.12);
+      --nav-h:     52px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--gris-cl);
+      color: var(--texto);
+      line-height: 1.6;
+    }
+
+    /* ─── Accesibilidad ─── */
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      z-index: 9999;
+      padding: 12px 20px;
+      background: var(--naranja);
+      color: var(--blanco);
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 0 0 8px 0;
+    }
+    .skip-link:focus {
+      left: 0;
+      top: 0;
+      outline: 3px solid var(--blanco);
+      outline-offset: 2px;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--naranja);
+      outline-offset: 2px;
+    }
+
+    a:focus:not(:focus-visible) { outline: none; }
+
+    /* ─── Navegación ─── */
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(30, 30, 30, 0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 2px 16px rgba(0,0,0,.15);
+    }
+    .site-nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+      min-height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+    }
+    .site-nav a {
+      color: rgba(255,255,255,.85);
+      text-decoration: none;
+      font-size: .82rem;
+      font-weight: 600;
+      padding: 10px 12px;
+      border-radius: 6px;
+      transition: background .15s, color .15s;
+    }
+    .site-nav a:hover {
+      color: var(--blanco);
+      background: rgba(255,255,255,.08);
+    }
+    .site-nav a[aria-current="page"] {
+      color: var(--naranja-cl);
+    }
+
+    @media (max-width: 640px) {
+      .site-nav-inner { justify-content: flex-start; padding: 8px 16px; }
+      .site-nav a { font-size: .78rem; padding: 8px 10px; }
+    }
+
+    /* ─── Tipografía ─── */
+    h1, h2, h3 { line-height: 1.2; }
+
+    /* ─── HERO ─── */
+    header {
+      background: linear-gradient(135deg, var(--gris-osc) 0%, var(--gris-med) 60%, #3a2000 100%);
+      color: var(--blanco);
+      padding: 56px 24px 64px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    header > * { position: relative; z-index: 1; }
+
+    .hero-tag {
+      display: inline-block;
+      background: var(--naranja);
+      color: var(--blanco);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 99px;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    header h1 span { color: var(--naranja-cl); }
+
+    header .hero-lead {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      max-width: 640px;
+      margin: 0 auto 12px;
+      opacity: .9;
+    }
+    header .hero-note {
+      font-size: .95rem;
+      max-width: 520px;
+      margin: 0 auto 32px;
+      opacity: .65;
+      font-weight: 500;
+    }
+
+    .btn-hero {
+      display: inline-block;
+      background: var(--naranja);
+      color: var(--blanco);
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 16px 36px;
+      border-radius: 8px;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(232,96,10,.4);
+      transition: background .2s, transform .15s;
+    }
+    .btn-hero:hover { background: var(--naranja-cl); transform: translateY(-2px); }
+
+    /* ─── Resultados esperados ─── */
+    #resultados { background: var(--gris-cl); }
+
+    .resultados-intro {
+      font-size: 1.05rem;
+      color: #555;
+      max-width: 640px;
+      margin-bottom: 28px;
+    }
+    .resultados-list {
+      list-style: none;
+      max-width: 720px;
+    }
+    .resultados-list li {
+      position: relative;
+      padding: 14px 0 14px 40px;
+      border-bottom: 1px solid #e5e5e5;
+      font-size: 1rem;
+      color: var(--texto);
+    }
+    .resultados-list li:last-child { border-bottom: none; }
+    .resultados-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      top: 14px;
+      width: 28px;
+      height: 28px;
+      background: rgba(232, 96, 10, 0.15);
+      color: var(--naranja);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: .85rem;
+    }
+
+    /* ─── Flujo del cliente ─── */
+    #flujo-cliente { background: var(--blanco); }
+
+    .flujo-caja {
+      max-width: 640px;
+      margin: 0 auto;
+      background: var(--gris-cl);
+      border-radius: 12px;
+      padding: 28px 32px;
+      border-left: 4px solid var(--naranja);
+    }
+    .flujo-caja ol {
+      margin: 0;
+      padding-left: 22px;
+      color: #444;
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+    .flujo-caja li { margin-bottom: 10px; }
+    .flujo-caja li:last-child { margin-bottom: 0; }
+    .flujo-nota {
+      margin-top: 18px;
+      font-size: .92rem;
+      color: #666;
+    }
+
+    /* ─── Alcance (incluye / no incluye) ─── */
+    #alcance { background: var(--blanco); }
+
+    .alcance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 28px;
+      margin-top: 8px;
+    }
+    .alcance-bloque {
+      border-radius: 12px;
+      padding: 26px 24px;
+      border: 1px solid #e8e8e8;
+    }
+    .alcance-bloque.si {
+      background: rgba(232, 96, 10, 0.06);
+      border-color: rgba(232, 96, 10, 0.25);
+    }
+    .alcance-bloque.no {
+      background: #fafafa;
+    }
+    .alcance-bloque h3 {
+      font-size: 1.05rem;
+      margin-bottom: 16px;
+      color: var(--gris-osc);
+    }
+    .alcance-bloque.si h3 { color: var(--naranja); }
+    .alcance-bloque ul {
+      list-style: none;
+      font-size: .95rem;
+      color: #444;
+      line-height: 1.65;
+    }
+    .alcance-bloque li {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+      padding-left: 22px;
+      position: relative;
+    }
+    .alcance-bloque li:last-child { border-bottom: none; }
+    .alcance-bloque.si li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--naranja);
+      font-weight: 800;
+    }
+    .alcance-bloque.no li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: #999;
+    }
+
+    /* ─── Franja confianza ─── */
+    .trust-strip {
+      background: var(--blanco);
+      border-bottom: 1px solid #e8e8e8;
+      padding: 28px 24px;
+    }
+    .trust-grid {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      text-align: center;
+    }
+    .trust-item strong {
+      display: block;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--gris-osc);
+      margin-bottom: 4px;
+    }
+    .trust-item span {
+      font-size: .88rem;
+      color: #666;
+    }
+
+    /* ─── Secciones generales ─── */
+    section { padding: 72px 24px; }
+    .container { max-width: 1000px; margin: 0 auto; }
+
+    .section-label {
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--naranja);
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 800;
+      margin-bottom: 16px;
+      color: var(--gris-osc);
+    }
+    .section-sub {
+      font-size: 1.05rem;
+      color: #555;
+      max-width: 580px;
+      margin-bottom: 48px;
+    }
+
+    /* ─── PROBLEMA ─── */
+    #problema { background: var(--blanco); }
+
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+    .pain-card {
+      background: var(--gris-cl);
+      border-left: 4px solid var(--naranja);
+      border-radius: 8px;
+      padding: 24px;
+    }
+    .pain-card .icon { font-size: 2rem; margin-bottom: 12px; }
+    .pain-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+    .pain-card p { font-size: .93rem; color: #555; }
+
+    /* ─── SOLUCIÓN / FUNCIONES ─── */
+    #solucion { background: var(--gris-cl); }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+    }
+    .feat-card {
+      background: var(--blanco);
+      border-radius: 12px;
+      padding: 30px 28px;
+      box-shadow: var(--sombra);
+      transition: transform .2s;
+    }
+    .feat-card:hover { transform: translateY(-4px); }
+    .feat-icon {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, var(--naranja), var(--naranja-cl));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+    }
+    .feat-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+    .feat-card p { font-size: .92rem; color: #555; }
+
+    /* ─── CÓMO FUNCIONA ─── */
+    #proceso { background: var(--gris-osc); color: var(--blanco); }
+    #proceso .section-title { color: var(--blanco); }
+    #proceso .section-sub { color: rgba(255,255,255,.65); }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 32px;
+      counter-reset: steps;
+    }
+    .step { text-align: center; }
+    .step-num {
+      width: 56px; height: 56px;
+      background: var(--naranja);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; font-weight: 800;
+      margin: 0 auto 16px;
+      color: var(--blanco);
+    }
+    .step h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .step p { font-size: .88rem; color: rgba(255,255,255,.65); }
+
+    /* ─── NECESITAMOS DE VOS ─── */
+    #necesidad { background: var(--blanco); }
+
+    .need-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-top: 16px;
+    }
+    .need-list li {
+      background: var(--gris-cl);
+      border-radius: 10px;
+      padding: 20px 22px;
+      display: flex; align-items: flex-start; gap: 14px;
+      font-size: .95rem;
+    }
+    .need-list li .num {
+      min-width: 32px; height: 32px;
+      background: var(--naranja);
+      color: var(--blanco);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: .9rem;
+    }
+
+    /* ─── INVERSIÓN ─── */
+    #inversion { background: var(--gris-cl); }
+
+    .planes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+    }
+    .plan {
+      background: var(--blanco);
+      border-radius: 14px;
+      padding: 36px 30px;
+      box-shadow: var(--sombra);
+      position: relative;
+      border: 2px solid transparent;
+      transition: border-color .2s;
+    }
+    .plan.destacado {
+      border-color: var(--naranja);
+    }
+    .badge-pop {
+      position: absolute;
+      top: -14px; left: 50%; transform: translateX(-50%);
+      background: var(--naranja);
+      color: var(--blanco);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 5px 18px;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+    .plan h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 12px; }
+    .plan-precio {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--gris-osc);
+      margin-bottom: 6px;
+      line-height: 1.1;
+    }
+    .plan-precio small {
+      display: block;
+      font-size: .78rem;
+      font-weight: 600;
+      color: #777;
+      margin-top: 8px;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .plan .plan-pago {
+      font-size: .88rem;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    .plan ul { list-style: none; margin-bottom: 28px; }
+    .plan ul li {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+      font-size: .92rem;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .plan ul li::before {
+      content: '✓';
+      color: var(--naranja);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .plan .cta-plan {
+      display: block;
+      text-align: center;
+      background: var(--gris-osc);
+      color: var(--blanco);
+      padding: 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background .2s;
+    }
+    .plan.destacado .cta-plan { background: var(--naranja); }
+    .plan .cta-plan:hover { opacity: .9; }
+
+    .plan.servicio-mensual {
+      border-color: rgba(232, 96, 10, 0.35);
+      background: linear-gradient(180deg, #fffefb 0%, var(--blanco) 100%);
+    }
+    .badge-oblig {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--gris-osc);
+      background: rgba(232, 96, 10, 0.15);
+      padding: 6px 14px;
+      border-radius: 99px;
+      margin-bottom: 14px;
+    }
+    .precios-nota {
+      max-width: 720px;
+      margin: 0 auto 36px;
+      padding: 20px 22px;
+      background: var(--blanco);
+      border-radius: 10px;
+      border: 1px solid #e5e5e5;
+      font-size: .95rem;
+      color: #444;
+      line-height: 1.65;
+    }
+    .precios-nota strong { color: var(--gris-osc); }
+
+    /* ─── No los dejamos solos ─── */
+    .acompania-banner {
+      background: linear-gradient(135deg, rgba(232, 96, 10, 0.12) 0%, rgba(255, 140, 56, 0.08) 100%);
+      border-bottom: 1px solid rgba(232, 96, 10, 0.22);
+      padding: 24px 24px 26px;
+    }
+    .acompania-banner p {
+      max-width: 920px;
+      margin: 0 auto;
+      text-align: center;
+      font-size: 1.06rem;
+      color: var(--gris-osc);
+      line-height: 1.6;
+    }
+    .acompania-banner strong { color: var(--naranja); }
+
+    /* ─── Impulso comercial (ventas) ─── */
+    #impulso-ventas { background: var(--blanco); }
+
+    .objetivo-caja {
+      background: linear-gradient(135deg, rgba(232, 96, 10, 0.1) 0%, rgba(30, 30, 30, 0.05) 100%);
+      border-left: 4px solid var(--naranja);
+      border-radius: 12px;
+      padding: 22px 26px;
+      margin-bottom: 28px;
+      max-width: 760px;
+    }
+    .objetivo-caja p { margin: 0; font-size: 1.06rem; color: #444; line-height: 1.55; }
+
+    .metricas-caja {
+      background: var(--gris-cl);
+      border-radius: 12px;
+      padding: 22px 26px;
+      margin-bottom: 36px;
+      border: 1px solid #e8e8e8;
+    }
+    .metricas-caja h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: var(--gris-osc);
+    }
+    .metricas-caja ul {
+      margin: 0;
+      padding-left: 22px;
+      color: #555;
+      font-size: .95rem;
+      line-height: 1.65;
+    }
+
+    .ventas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(248px, 1fr));
+      gap: 18px;
+    }
+    .venta-card {
+      background: var(--gris-cl);
+      border-radius: 12px;
+      padding: 18px 20px;
+      border: 1px solid #eaeaea;
+    }
+    .venta-card h3 { font-size: .95rem; font-weight: 700; margin: 8px 0 10px; color: var(--gris-osc); }
+    .venta-card p { font-size: .88rem; color: #555; line-height: 1.55; margin: 0; }
+    .venta-tag {
+      display: inline-block;
+      font-size: .62rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      padding: 4px 9px;
+      border-radius: 4px;
+    }
+    .venta-tag--base { background: rgba(232, 96, 10, 0.22); color: #8a3d00; }
+    .venta-tag--mes { background: rgba(30, 30, 30, 0.12); color: var(--gris-osc); }
+    .venta-tag--opt { background: #ddd; color: #444; }
+
+    .alcance-bloque.opt {
+      background: #f9f9f9;
+      border-color: #ccc;
+    }
+    .alcance-bloque.opt h3 { color: var(--gris-med); }
+    .alcance-bloque.opt li::before {
+      content: '◆';
+      color: var(--naranja);
+      font-size: .65rem;
+      top: 12px;
+    }
+
+    /* ─── POR QUÉ ELEGIRNOS ─── */
+    #porque { background: var(--blanco); }
+
+    .razones {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+    }
+    .razon {
+      text-align: center;
+      padding: 28px 20px;
+      border-radius: 12px;
+      background: var(--gris-cl);
+    }
+    .razon .icon { font-size: 2.4rem; margin-bottom: 12px; }
+    .razon h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .razon p { font-size: .88rem; color: #555; }
+
+    /* ─── FAQ ─── */
+    #faq { background: var(--gris-cl); }
+
+    .faq-list {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    details.faq-item {
+      background: var(--blanco);
+      border-radius: 10px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      border: 1px solid #eee;
+      overflow: hidden;
+    }
+    details.faq-item[open] {
+      box-shadow: var(--sombra);
+    }
+    .faq-item summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      font-weight: 700;
+      font-size: .98rem;
+      color: var(--gris-osc);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after {
+      content: '+';
+      font-size: 1.4rem;
+      font-weight: 300;
+      color: var(--naranja);
+      line-height: 1;
+    }
+    details.faq-item[open] summary::after {
+      content: '−';
+    }
+    .faq-item summary:hover {
+      background: rgba(232, 96, 10, 0.06);
+    }
+    .faq-item .faq-body {
+      padding: 0 22px 18px;
+      font-size: .93rem;
+      color: #555;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 14px;
+    }
+
+    /* ─── CTA FINAL ─── */
+    #cta-final {
+      background: linear-gradient(135deg, var(--naranja) 0%, #c44d00 100%);
+      color: var(--blanco);
+      text-align: center;
+      padding: 80px 24px;
+    }
+    #cta-final h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 16px; }
+    #cta-final p { font-size: 1.1rem; opacity: .9; max-width: 540px; margin: 0 auto 36px; }
+
+    .btn-cta {
+      display: inline-block;
+      background: var(--blanco);
+      color: var(--naranja);
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 16px 40px;
+      border-radius: 8px;
+      text-decoration: none;
+      margin: 8px;
+      transition: transform .15s;
+    }
+    .btn-cta:hover { transform: translateY(-2px); }
+    .btn-cta.outline {
+      background: transparent;
+      color: var(--blanco);
+      border: 2px solid rgba(255,255,255,.7);
+    }
+
+    .contacto-info {
+      margin-top: 40px;
+      opacity: .85;
+      font-size: .95rem;
+    }
+    .contacto-info a { color: var(--blanco); text-decoration: underline; }
+
+    /* ─── Volver arriba ─── */
+    .to-top {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 90;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--gris-osc);
+      color: var(--blanco);
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      box-shadow: var(--sombra);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s, transform .15s;
+    }
+    .to-top.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .to-top:hover { transform: translateY(-2px); background: var(--gris-med); }
+
+    /* ─── Footer ─── */
+    footer {
+      background: var(--gris-osc);
+      color: rgba(255,255,255,.4);
+      text-align: center;
+      padding: 24px;
+      font-size: .8rem;
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 900px) {
+      .site-nav-inner {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 10px 12px;
+        gap: 2px;
+        min-height: auto;
+      }
+      .site-nav-inner::-webkit-scrollbar { display: none; }
+      .site-nav a {
+        flex-shrink: 0;
+        white-space: nowrap;
+        padding: 12px 14px;
+        font-size: .8rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 0 16px; }
+      header { padding: 44px 16px 52px; }
+      .hero-lead, .hero-note { padding: 0 4px; }
+      .section-sub { max-width: none; margin-bottom: 32px; }
+      .trust-strip { padding: 22px 16px; }
+      .trust-grid { gap: 18px; }
+      .acompania-banner { padding: 20px 16px; }
+      .acompania-banner p { font-size: 1rem; text-align: left; }
+      .flujo-caja { padding: 22px 18px; margin: 0 -4px; }
+      .precios-nota { padding: 18px 16px; font-size: .92rem; }
+      .objetivo-caja, .metricas-caja { padding: 18px 18px; }
+      .ventas-grid { grid-template-columns: 1fr; }
+      .alcance-grid { grid-template-columns: 1fr; }
+      .planes { grid-template-columns: 1fr; }
+      .plan-precio { font-size: 1.65rem; }
+      #cta-final {
+        padding: 56px 16px 64px;
+        padding-bottom: max(64px, env(safe-area-inset-bottom, 0px) + 48px);
+      }
+      #cta-final p { font-size: 1rem; padding: 0 8px; }
+      .btn-cta {
+        display: flex;
+        width: calc(100% - 8px);
+        max-width: 340px;
+        margin: 8px auto;
+        justify-content: center;
+        box-sizing: border-box;
+      }
+      .contacto-info { font-size: .88rem; padding: 0 8px; }
+      .contacto-info p { line-height: 1.65; }
+      .to-top {
+        bottom: max(16px, env(safe-area-inset-bottom, 0px) + 8px);
+        right: max(16px, env(safe-area-inset-right, 0px));
+      }
+    }
+
+    @media (max-width: 480px) {
+      header { padding: 40px 14px 48px; }
+      section { padding: 44px 14px; }
+      .pain-grid, .features-grid, .razones { gap: 16px; }
+      .feat-card, .pain-card { padding: 22px 18px; }
+      .need-list { grid-template-columns: 1fr; }
+      .steps { gap: 24px; }
+      .faq-item summary { padding: 16px 16px; font-size: .93rem; }
+      .faq-item .faq-body { padding: 0 16px 16px; font-size: .9rem; }
+      .plan { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+
+<!-- ══════════ HERO ══════════ -->
+<header>
+  <div class="hero-tag">Propuesta exclusiva</div>
+  <h1>Ferretería Kozlowski<br><span>con tienda online</span></h1>
+  <p class="hero-lead">Vender solo en el local es limitarse. Esta propuesta es <strong>desarrollo del sistema de tienda online</strong> más <strong>mantenimiento mensual con acompañamiento</strong>: no es hacer la página y desaparecer, es seguir al lado de Ferretería Kozlowski.</p>
+  <p class="hero-note">No es un catálogo chico: hace falta un sistema que aguante cientos de ítems, <strong>asesoramiento</strong> para quienes recién empiezan, y un plan de <strong>impulso comercial</strong> (WhatsApp, retiro, ofertas, métricas, Google Business) además de la presencia en <strong>Google</strong> y <strong>redes</strong>.</p>
+  <a href="#cta-final" class="btn-hero">Quiero saber más</a>
+</header>
+
+<nav class="site-nav" aria-label="Secciones de la propuesta">
+  <div class="site-nav-inner">
+    <a href="#resultados">Qué lográs</a>
+    <a href="#problema">Contexto</a>
+    <a href="#solucion">La tienda</a>
+    <a href="#flujo-cliente">Cómo compra</a>
+    <a href="#impulso-ventas">Impulso comercial</a>
+    <a href="#proceso">Pasos</a>
+    <a href="#necesidad">Qué necesitamos</a>
+    <a href="#alcance">Incluye / no incluye</a>
+    <a href="#inversion">Inversión</a>
+    <a href="#faq">Preguntas</a>
+    <a href="#cta-final">Contacto</a>
+  </div>
+</nav>
+
+<div class="trust-strip" aria-hidden="true">
+  <div class="trust-grid">
+    <div class="trust-item">
+      <strong>24/7</strong>
+      <span>Catálogo y pedidos cuando el local está cerrado</span>
+    </div>
+    <div class="trust-item">
+      <strong>100+</strong>
+      <span>Catálogo pensado para muchos productos, no para una lista corta</span>
+    </div>
+    <div class="trust-item">
+      <strong>Juntos</strong>
+      <span>No los dejamos solos: seguimos después del lanzamiento</span>
+    </div>
+  </div>
+</div>
+
+<div class="acompania-banner">
+  <p><strong>No los dejamos solos.</strong> No es “te entregamos la tienda y te las arreglás”. El acuerdo incluye <strong>acompañamiento</strong> y <strong>asesoramiento</strong> mes a mes, más el trabajo para <strong>posicionar la web en Google</strong> y ordenar la <strong>presencia en redes</strong>, dentro de lo previsto en el mantenimiento.</p>
+</div>
+
+<main id="contenido">
+
+<!-- ══════════ RESULTADOS ESPERADOS ══════════ -->
+<section id="resultados" aria-labelledby="titulo-resultados">
+  <div class="container">
+    <p class="section-label">En pocas palabras</p>
+    <h2 id="titulo-resultados" class="section-title">Qué puede mejorar con la tienda online</h2>
+    <p class="resultados-intro">No prometemos números mágicos: cada negocio es distinto. Una ferretería necesita mostrar <strong>muchos productos</strong> (no menos de un centenar para que la tienda tenga sentido). Con el sistema y el mantenimiento mensual —incluido el acompañamiento y el trabajo de visibilidad en Google y redes—, estos son los cambios que buscamos para Ferretería Kozlowski.</p>
+    <ul class="resultados-list">
+      <li>Un catálogo grande y ordenado: el cliente encuentra tornillos, pinturas, herramientas… sin depender solo del mostrador.</li>
+      <li>Más consultas y pedidos armados aunque el local esté cerrado.</li>
+      <li>Menos mensajes sueltos: el cliente ve precio, foto y deja el pedido ordenado.</li>
+      <li>Ustedes no quedan a ciegas: hay <strong>acompañamiento</strong> fijo y alguien que los <strong>asesora</strong> cuando surgen dudas de venta online.</li>
+      <li>Listas de precios y productos actualizadas con ayuda mensual, sin que tengan que resolver todo solos desde el primer día.</li>
+      <li>Menos idas y vueltas por WhatsApp para saber si hay stock o cuánto sale.</li>
+      <li>La relación con el cliente queda en Ferretería Kozlowski, sin depender de páginas de terceros.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════ PROBLEMA ══════════ -->
+<section id="problema" aria-labelledby="titulo-problema">
+  <div class="container">
+    <p class="section-label">El contexto actual</p>
+    <h2 id="titulo-problema" class="section-title">¿Qué pasa hoy sin presencia online?</h2>
+    <p class="section-sub">Cada día más personas buscan productos de ferretería en Google o redes antes de salir de su casa. Si no encuentran a Ferretería Kozlowski ahí, suelen ir con quien sí aparece.</p>
+
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="icon" aria-hidden="true">📱</div>
+        <h3>El cliente busca en el celular</h3>
+        <p>Si Ferretería Kozlowski no aparece en una búsqueda, ese cliente va a la competencia que sí está online.</p>
+      </div>
+      <div class="pain-card">
+        <div class="icon" aria-hidden="true">🕔</div>
+        <h3>El local cierra, la demanda no</h3>
+        <p>Los pedidos y consultas llegan a cualquier hora. Sin tienda virtual, se pierden o quedan solo en mensajes sueltos.</p>
+      </div>
+      <div class="pain-card">
+        <div class="icon" aria-hidden="true">📦</div>
+        <h3>Sin catálogo digital es difícil mostrar todo</h3>
+        <p>Miles de productos que el cliente no ve porque no entró al local ese día.</p>
+      </div>
+      <div class="pain-card">
+        <div class="icon" aria-hidden="true">💸</div>
+        <h3>Ventas que se van a otras opciones</h3>
+        <p>Compradores de Misiones y zonas cercanas que podrían elegir Ferretería Kozlowski si pudieran ver stock y hacer el pedido a distancia.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SOLUCIÓN ══════════ -->
+<section id="solucion" aria-labelledby="titulo-solucion">
+  <div class="container">
+    <p class="section-label">La solución</p>
+    <h2 id="titulo-solucion" class="section-title">Todo lo que incluye la tienda virtual</h2>
+    <p class="section-sub">Una tienda pensada para ferreterías: <strong>muchísimos productos</strong> (en la práctica, cientos), pedidos claros y una pantalla sencilla para el día a día. Los dueños no necesitan saber de venta online de antemano: el sistema está pensado para aprender usándolo, con <strong>acompañamiento</strong> y <strong>asesoramiento</strong> en el mantenimiento mensual —incluido el trabajo para que la tienda se encuentre mejor en Google y para alinear la ferretería con lo que publican en redes.</p>
+
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon" aria-hidden="true">🤝</div>
+        <h3>Acompañamiento, no abandono</h3>
+        <p>La relación no termina cuando la tienda queda en línea: seguimos disponibles para dudas, cambios y decisiones. No es “hicimos la web y cada uno a lo suyo”.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" aria-hidden="true">🛒</div>
+        <h3>Catálogo grande y carrito</h3>
+        <p>Mostrá muchos productos con foto, precio, texto y stock. Una ferretería sin al menos un centenar de ítems publicados no aprovecha la tienda: por eso el sistema está pensado para escala, no para diez productos.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" aria-hidden="true">🔍</div>
+        <h3>Buscador y categorías</h3>
+        <p>Herramientas, fijaciones, pinturas, plomería… El cliente encuentra lo que necesita en pocos toques.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" aria-hidden="true">👤</div>
+        <h3>Cuentas de clientes y pedidos</h3>
+        <p>El cliente puede registrarse, ver qué compró antes y cómo va su pedido.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" aria-hidden="true">📊</div>
+        <h3>Pantalla para el negocio</h3>
+        <p>Un solo lugar donde ver ventas del día, cargar o cambiar productos, mirar pedidos y datos de clientes. Pensado para usarlo sin ser experto en computación.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" aria-hidden="true">📱</div>
+        <h3>Se adapta al celular</h3>
+        <p>Se ve bien en celular, tablet o computadora.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" aria-hidden="true">🔒</div>
+        <h3>Tu tienda, tus clientes</h3>
+        <p>No hace falta depender de Mercado Libre ni de sitios que se quedan con el contacto. La tienda es de Ferretería Kozlowski.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FLUJO DEL CLIENTE ══════════ -->
+<section id="flujo-cliente" aria-labelledby="titulo-flujo">
+  <div class="container">
+    <p class="section-label">Desde el celular del cliente</p>
+    <h2 id="titulo-flujo" class="section-title">Cómo sería comprar en la tienda de Ferretería Kozlowski</h2>
+    <p class="section-sub">Un recorrido simple, en lenguaje de todos los días. Los detalles de pago y entrega los ajustamos con ustedes antes de publicar.</p>
+
+    <div class="flujo-caja">
+      <ol>
+        <li>La persona entra al sitio de Ferretería Kozlowski desde el celular o la computadora.</li>
+        <li>Busca por nombre o recorre las categorías hasta encontrar lo que necesita.</li>
+        <li>Ve precio, foto y si hay stock; agrega al carrito y revisa el total.</li>
+        <li>Deja el pedido con sus datos y recibe una confirmación en pantalla (y, si quieren, también por WhatsApp o mail).</li>
+        <li>En Ferretería Kozlowski ven el pedido en la pantalla del negocio, preparan la mercadería y coordinan pago y retiro o envío como lo acuerden con el cliente.</li>
+      </ol>
+      <p class="flujo-nota">Si al principio prefieren solo “pedido online y pago en el local”, se puede. Los cobros con tarjeta por la web se pueden sumar más adelante.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ IMPULSO COMERCIAL (VENTAS) ══════════ -->
+<section id="impulso-ventas" aria-labelledby="titulo-impulso">
+  <div class="container">
+    <p class="section-label">Más allá del catálogo</p>
+    <h2 id="titulo-impulso" class="section-title">Impulso comercial: qué sumamos para ayudar a vender más</h2>
+    <p class="section-sub">La tienda no es solo “subir fotos”: estas piezas están pensadas para <strong>más pedidos calificados</strong>, <strong>menos vueltas innecesarias</strong> y <strong>mejor ticket</strong> cuando tiene sentido para Ferretería Kozlowski. Lo que va en el desarrollo, lo que va en el mantenimiento y lo opcional quedan claros abajo.</p>
+
+    <div class="objetivo-caja">
+      <p><strong>Objetivo comercial de la propuesta:</strong> que Ferretería Kozlowski reciba más consultas y pedidos ordenados por internet, con menos tiempo perdido en mensajes sueltos y con datos para decidir ofertas y stock.</p>
+    </div>
+
+    <div class="metricas-caja">
+      <h3>Qué miramos cada mes (sin obsesionarnos con números vacíos)</h3>
+      <ul>
+        <li>Visitas a la tienda y de dónde vienen (búsqueda, redes, directo).</li>
+        <li>Pedidos completados y productos más vistos.</li>
+        <li>Consultas por WhatsApp desde la tienda (cuando dejemos botones medibles).</li>
+        <li>Evolución del ticket promedio y de las ofertas que pongan.</li>
+      </ul>
+      <p style="margin:12px 0 0;font-size:.88rem;color:#666">Con eso ajustamos textos, categorías, ofertas y publicaciones en redes en conjunto con ustedes.</p>
+    </div>
+
+    <div class="ventas-grid">
+      <article class="venta-card">
+        <span class="venta-tag venta-tag--base">Tienda + mantenimiento</span>
+        <h3>WhatsApp en todo el recorrido</h3>
+        <p>Botones para consultar por WhatsApp desde la ficha de producto, el carrito y después del pedido. En ferretería muchas ventas cierran con una pregunta (“¿tenés la medida X?”).</p>
+      </article>
+      <article class="venta-card">
+        <span class="venta-tag venta-tag--base">Tienda</span>
+        <h3>Retiro en el local y horarios claros</h3>
+        <p>Opción “Retiro en Ferretería Kozlowski” con dirección, mapa y horario de atención. Reduce dudas y sube conversión frente a un pedido sin contexto.</p>
+      </article>
+      <article class="venta-card">
+        <span class="venta-tag venta-tag--base">Tienda</span>
+        <h3>Envíos o zonas explícitas</h3>
+        <p>Reglas visibles: zonas atendidas, costo o monto mínimo si aplica. La duda “¿llegan?” suele frenar la compra.</p>
+      </article>
+      <article class="venta-card">
+        <span class="venta-tag venta-tag--mes">Mantenimiento</span>
+        <h3>Ofertas, listas y banners</h3>
+        <p>Actualización periódica de precios y promos (ferretería cambia listas seguido) y espacios en la home para destacar ofertas. La frecuencia mínima la acordamos (por ejemplo semanal o quincenal para revisión).</p>
+      </article>
+      <article class="venta-card">
+        <span class="venta-tag venta-tag--base">Tienda</span>
+        <h3>Productos relacionados</h3>
+        <p>Sugerencias del tipo “quienes vieron esto también…” o complementos (tornillo + mecha + taraud) para subir el ticket sin ser agresivos.</p>
+      </article>
+      <article class="venta-card">
+        <span class="venta-tag venta-tag--base">Tienda</span>
+        <h3>Stock que se entienda al toque</h3>
+        <p>Indicación clara: hay stock, poco stock o consultar. Menos pedidos fallidos y más confianza.</p>
+      </article>
+      <article class="venta-card">
+        <span class="venta-tag venta-tag--opt">Opcional</span>
+        <h3>Clientes mayoristas u obra</h3>
+        <p>Si aplica al negocio: lista o condiciones distintas para obradores o electricistas (flujo a definir). No es obligatorio el día uno.</p>
+      </article>
+      <article class="venta-card">
+        <span class="venta-tag venta-tag--opt">Opcional</span>
+        <h3>Cobro online (Mercado Pago u otro)</h3>
+        <p>Cuando el negocio esté listo, se puede integrar pago con tarjeta o billetera en la web. Se puede arrancar solo con transferencia o efectivo en el local.</p>
+      </article>
+      <article class="venta-card">
+        <span class="venta-tag venta-tag--mes">Mantenimiento</span>
+        <h3>Perfil de Google Business alineado</h3>
+        <p>Mismo nombre, horarios, fotos y enlace a la tienda. Refuerza búsquedas del tipo “ferretería cerca” y suma tráfico sin pauta.</p>
+      </article>
+      <article class="venta-card">
+        <span class="venta-tag venta-tag--mes">Mantenimiento</span>
+        <h3>Medición con criterio</h3>
+        <p>Herramientas de estadísticas acordes al proyecto para ver qué funciona y qué hay que cambiar (sin marear al equipo con pantallas innecesarias).</p>
+      </article>
+      <article class="venta-card">
+        <span class="venta-tag venta-tag--base">Tienda</span>
+        <h3>Avisos de pedido (mail o WhatsApp)</h3>
+        <p>Confirmación al cliente: pedido recibido, listo para retiro, etc. Baja consultas repetidas y mejora la experiencia.</p>
+      </article>
+      <article class="venta-card">
+        <span class="venta-tag venta-tag--opt">Opcional</span>
+        <h3>Programa de fidelidad simple</h3>
+        <p>Puntos por compra o cupón en la segunda compra, fácil de explicar en el mostrador. Se puede sumar cuando la tienda ya esté rodando.</p>
+      </article>
+    </div>
+
+    <p class="precios-nota" style="margin-top:36px;margin-bottom:0"><strong>Cómo leer esta lista:</strong> lo marcado como <strong>tienda</strong> se desarrolla en la puesta en marcha (y se ajusta después). Lo marcado como <strong>mantenimiento</strong> se trabaja mes a mes dentro del abono. Lo <strong>opcional</strong> se cotiza o se agenda cuando Ferretería Kozlowski quiera avanzar en esa dirección.</p>
+  </div>
+</section>
+
+<!-- ══════════ PROCESO ══════════ -->
+<section id="proceso" aria-labelledby="titulo-proceso">
+  <div class="container">
+    <p class="section-label" style="color:var(--naranja-cl)">De cero a online</p>
+    <h2 id="titulo-proceso" class="section-title">¿Cómo funciona el proceso?</h2>
+    <p class="section-sub">Simple de entender, pero exige trabajo: desarrollar el sistema, cargar un catálogo de ferretería y enseñar al equipo desde cero en venta online lleva tiempo. Por eso la propuesta suma <strong>mantenimiento mensual</strong> después del lanzamiento: para <strong>no dejarlos solos</strong>, para <strong>asesorarlos</strong> y para seguir mejorando la presencia en <strong>Google</strong> y en <strong>redes</strong>.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num" aria-hidden="true">1</div>
+        <h3>Reunión y acuerdo</h3>
+        <p>Nos cuentan qué necesitan, vemos listas y prioridades. Sin compromiso en la primera charla.</p>
+      </div>
+      <div class="step">
+        <div class="step-num" aria-hidden="true">2</div>
+        <h3>Desarrollo del sistema</h3>
+        <p>Construimos la tienda con la identidad de Ferretería Kozlowski y la lógica para muchos productos y categorías.</p>
+      </div>
+      <div class="step">
+        <div class="step-num" aria-hidden="true">3</div>
+        <h3>Carga inicial del catálogo</h3>
+        <p>Subimos un primer bloque amplio de productos (como mínimo en torno a un centenar; la ferretería puede seguir creciendo después).</p>
+      </div>
+      <div class="step">
+        <div class="step-num" aria-hidden="true">4</div>
+        <h3>Capacitación y salida a producción</h3>
+        <p>La tienda queda en línea. Explicamos paso a paso el uso de la pantalla del negocio, sin apuro, porque para ustedes es nuevo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ NECESIDAD ══════════ -->
+<section id="necesidad" aria-labelledby="titulo-necesidad">
+  <div class="container">
+    <p class="section-label">Del lado de Ferretería Kozlowski</p>
+    <h2 id="titulo-necesidad" class="section-title">Qué necesitamos y cómo los acompañamos</h2>
+    <p class="section-sub">No hace falta saber nada de venta online: <strong>eso es lo normal</strong> en este proyecto. Lo que sí hace falta es disponibilidad para reunirse, revisar precios y autorizar cambios. Nosotros llevamos la parte técnica y la carga; ustedes llevan el criterio del negocio.</p>
+
+    <ul class="need-list">
+      <li>
+        <div class="num">1</div>
+        <div>
+          <strong>Nombre, logo y datos del local</strong><br>
+          <span style="color:#666;font-size:.88rem">Lo que ya usan en redes o en el cartel. Con eso armamos la cara visible de la tienda.</span>
+        </div>
+      </li>
+      <li>
+        <div class="num">2</div>
+        <div>
+          <strong>Listas de productos y precios</strong><br>
+          <span style="color:#666;font-size:.88rem">En papel, planilla o WhatsApp. Para una ferretería son muchas líneas: vamos por etapas, empezando por un bloque amplio (no menos de un centenar de productos en la salida inicial).</span>
+        </div>
+      </li>
+      <li>
+        <div class="num">3</div>
+        <div>
+          <strong>Fotos (lo que puedan)</strong><br>
+          <span style="color:#666;font-size:.88rem">Con celular sirve. Donde no haya foto, usamos imágenes de referencia hasta reemplazar.</span>
+        </div>
+      </li>
+      <li>
+        <div class="num">4</div>
+        <div>
+          <strong>Tiempo para aprender con calma</strong><br>
+          <span style="color:#666;font-size:.88rem">Varias charlas prácticas para el equipo: cómo ver un pedido, cómo pedir un cambio de precio, qué hacer si algo no se entiende. Después, el mantenimiento mensual es el canal fijo de acompañamiento y asesoramiento, más el trabajo en Google y redes.</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════ ALCANCE ══════════ -->
+<section id="alcance" aria-labelledby="titulo-alcance">
+  <div class="container">
+    <p class="section-label">Para que no queden dudas</p>
+    <h2 id="titulo-alcance" class="section-title">Qué entra en esta propuesta y qué queda fuera</h2>
+    <p class="section-sub">Así todos saben qué compran. La propuesta se basa en <strong>desarrollo + mantenimiento mensual</strong>. Abajo: qué va incluido, qué es <strong>opcional</strong> (se cotiza aparte o en una segunda etapa) y qué no entra.</p>
+
+    <div class="alcance-grid">
+      <div class="alcance-bloque si">
+        <h3>Sí incluye (núcleo del acuerdo)</h3>
+        <ul>
+          <li>Desarrollo del sistema de tienda en internet: catálogo amplio, carrito y pedidos.</li>
+          <li>La pantalla para que Ferretería Kozlowski vea pedidos y gestione el catálogo.</li>
+          <li>Carga inicial de un catálogo acorde a ferretería (bloque grande de productos desde el día uno).</li>
+          <li>Capacitación al equipo sin experiencia en venta online.</li>
+          <li>Primer año de nombre de página .com.ar y espacio en internet para que el sitio esté publicado; copias de seguridad de la información.</li>
+          <li>Enlaces claros a Instagram y WhatsApp; en la tienda, recorrido pensado para consultas y pedidos (ver sección <a href="#impulso-ventas">Impulso comercial</a>).</li>
+          <li><strong>Mantenimiento mensual</strong> contratado junto con el desarrollo: acompañamiento, asesoramiento, <strong>posicionamiento en Google</strong> (orgánico), <strong>redes</strong>, <strong>perfil de Google Business</strong> alineado, revisión de métricas y ofertas según lo acordado.</li>
+        </ul>
+      </div>
+      <div class="alcance-bloque opt">
+        <h3>Opcional (se acuerda aparte)</h3>
+        <ul>
+          <li><strong>Cobro online</strong> (Mercado Pago u otro medio) cuando quieran activarlo.</li>
+          <li><strong>Flujo mayorista</strong> o listas especiales para obradores, si el negocio lo necesita.</li>
+          <li><strong>Programa de fidelidad</strong> o promos más complejas una vez que la tienda esté estable.</li>
+          <li><strong>Campañas de publicidad paga</strong> (anuncios en Google, Meta, etc.) con presupuesto de dinero: se cotiza y gestiona aparte.</li>
+          <li><strong>Fotografía profesional</strong> de depósito o catálogo completo.</li>
+        </ul>
+      </div>
+      <div class="alcance-bloque no">
+        <h3>No incluye</h3>
+        <ul>
+          <li>La logística de envío en sí (camioneta, reparto): la tienda registra el pedido; el despacho lo define Ferretería Kozlowski.</li>
+          <li>Atención telefónica 24 h: el sitio puede recibir pedidos; el local sigue sus horarios.</li>
+          <li>Resultados garantizados en Google: se trabaja bien, sin prometer el primer puesto.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ INVERSIÓN ══════════ -->
+<section id="inversion" aria-labelledby="titulo-inversion">
+  <div class="container">
+    <p class="section-label">Inversión</p>
+    <h2 id="titulo-inversion" class="section-title">Desarrollo del sistema y mantenimiento mensual</h2>
+    <p class="section-sub">Para Ferretería Kozlowski no alcanza una “página chica”: hace falta un sistema que soporte <strong>muchos productos</strong> y un equipo que <strong>no conoce la venta online</strong>. Eso implica muchas horas de desarrollo, carga, pruebas y <strong>acompañamiento real</strong> —no entregar y retirarse—, más el trabajo continuo para que la tienda sea encontrable en <strong>Google</strong> y para ordenar la comunicación en <strong>redes</strong>. Por eso la propuesta tiene <strong>dos partes</strong>: un pago por el desarrollo e implementación, y un <strong>abono mensual obligatorio</strong> mientras dure el acuerdo.</p>
+
+    <p class="precios-nota"><strong>Por qué no es barato ni debería serlo:</strong> armar categorías, subir un catálogo inicial amplio, enseñar desde cero, <strong>no dejarlos solos</strong> después del lanzamiento, asesorar, actualizar listas y dedicar tiempo cada mes al <strong>SEO</strong> (visibilidad en búsquedas) y a la <strong>estrategia en redes</strong> lleva muchas horas. Los valores reflejan ese trabajo.</p>
+
+    <div class="planes">
+      <div class="plan destacado">
+        <div class="badge-pop">Parte 1 — Pago único</div>
+        <h3>Desarrollo e implementación</h3>
+        <p class="plan-precio">$ 1.980.000 <small>pesos argentinos</small></p>
+        <p class="plan-pago">Incluye el armado del sistema de tienda, la puesta en línea y la primera etapa del catálogo a escala ferretería.</p>
+        <ul>
+          <li>Diseño y programación de la tienda a medida para Ferretería Kozlowski</li>
+          <li>Catálogo preparado para cientos de productos; carga inicial acordada (como mínimo alrededor de 100 artículos en la salida)</li>
+          <li>Carrito, pedidos y pantalla de gestión para el negocio</li>
+          <li>Registro de clientes y seguimiento de pedidos</li>
+          <li>Primer año de nombre .com.ar y espacio en internet para publicar el sitio</li>
+          <li>Capacitación al equipo en varias instancias (no es una sola charla de media hora)</li>
+          <li>Enlaces a redes y WhatsApp desde la tienda, con recorrido pensado para consultas y cierre de venta (botones en fichas y pedido)</li>
+          <li>Formas de entrega visibles: <strong>retiro en el local</strong> con datos y horarios; <strong>envíos o zonas</strong> según lo que definan</li>
+          <li>Espacio para <strong>ofertas y destacados</strong> en la página de inicio; estructura para <strong>productos relacionados</strong> y <strong>stock</strong> entendible (hay / poco / consultar)</li>
+          <li>Base para <strong>avisos al cliente</strong> por mail o WhatsApp según el estado del pedido (recibido, listo para retiro, etc.)</li>
+          <li>Configuración inicial para que Google pueda leer bien la tienda; el refuerzo continuo, el perfil de Google Business y las métricas van en el mantenimiento mensual</li>
+        </ul>
+        <a href="#cta-final" class="cta-plan">Coordinar reunión</a>
+      </div>
+
+      <div class="plan servicio-mensual">
+        <span class="badge-oblig">Parte 2 — Contratación mensual</span>
+        <h3>Mantenimiento, acompañamiento y visibilidad</h3>
+        <p class="plan-precio">$ 118.000 <small>por mes</small></p>
+        <p class="plan-pago">Se acuerda junto con el desarrollo y se factura desde que la tienda está en producción. <strong>No los dejamos solos:</strong> incluye soporte, asesoramiento y el trabajo mensual para la tienda y su presencia online.</p>
+        <ul>
+          <li><strong>Acompañamiento y asesoramiento:</strong> canal fijo para dudas de venta online, cambios de precios y uso de la tienda; no es “entregamos y desaparecemos”</li>
+          <li>Actualización de productos y precios con criterio acordado (una ferretería mueve listas seguido)</li>
+          <li><strong>Posicionamiento en Google (SEO):</strong> trabajo mensual sobre títulos, textos y estructura para que la web se entienda mejor en las búsquedas (sin prometer el primer puesto; eso depende de la competencia y del tiempo)</li>
+          <li><strong>Redes sociales:</strong> orientación y trabajo acordado para alinear Instagram (u otras redes) con la tienda, publicaciones y mensajes coherentes con Ferretería Kozlowski</li>
+          <li><strong>Google Business Profile:</strong> datos coherentes con la tienda (horarios, link, fotos) para reforzar búsquedas locales</li>
+          <li><strong>Ofertas y listas:</strong> revisión periódica de precios, promos y banners en la home con frecuencia mínima acordada (ferretería mueve listas seguido)</li>
+          <li><strong>Métricas:</strong> revisión mensual de visitas, pedidos y productos más vistos para ajustar lo que haga falta</li>
+          <li>Respuesta prioritaria a consultas del equipo</li>
+          <li>Copias de seguridad de la información de la tienda</li>
+          <li>Renovación del espacio en internet y del nombre de dominio cuando corresponda (según lo incluido en el contrato)</li>
+          <li>Ajustes chicos de textos o secciones cuando hagan falta</li>
+          <li>Resumen mensual de pedidos y movimiento por la tienda</li>
+        </ul>
+        <a href="#cta-final" class="cta-plan">Consultar condiciones</a>
+      </div>
+    </div>
+
+    <p class="precios-nota" style="margin-top:28px;margin-bottom:0">Montos en pesos argentinos, valores de referencia a abril de 2026. Se confirman por escrito al firmar. Si la situación económica cambia fuerte antes del cierre, los revisamos en la reunión. El mantenimiento mensual puede actualizarse una vez al año con aviso previo, de común acuerdo.</p>
+  </div>
+</section>
+
+<!-- ══════════ POR QUÉ ══════════ -->
+<section id="porque" aria-labelledby="titulo-porque">
+  <div class="container">
+    <p class="section-label">Nuestras ventajas</p>
+    <h2 id="titulo-porque" class="section-title">¿Por qué elegirnos?</h2>
+
+    <div class="razones">
+      <div class="razon">
+        <div class="icon" aria-hidden="true">⚡</div>
+        <h3>Entrega rápida</h3>
+        <p>La base de la tienda ya está hecha y probada; no arrancamos de una hoja en blanco cada vez.</p>
+      </div>
+      <div class="razon">
+        <div class="icon" aria-hidden="true">🏠</div>
+        <h3>Local, en español</h3>
+        <p>Somos de Misiones. Sin intermediarios, sin demoras por zona horaria.</p>
+      </div>
+      <div class="razon">
+        <div class="icon" aria-hidden="true">🎯</div>
+        <h3>Demo y transparencia</h3>
+        <p>Podés ver la tienda funcionando en vivo antes de comprometerte. Y queda claro que el servicio sigue después del lanzamiento.</p>
+      </div>
+      <div class="razon">
+        <div class="icon" aria-hidden="true">🔧</div>
+        <h3>Hecho para ferreterías</h3>
+        <p>Pensado para catálogos grandes y para quienes no vienen del mundo digital: desarrollo serio más acompañamiento mensual.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FAQ ══════════ -->
+<section id="faq" aria-labelledby="titulo-faq">
+  <div class="container">
+    <p class="section-label">Dudas frecuentes</p>
+    <h2 id="titulo-faq" class="section-title">Preguntas que suelen hacer</h2>
+    <p class="section-sub">Respuestas directas. Si falta algo, lo vemos en la reunión o por WhatsApp.</p>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>¿Hace falta saber mucho de computación?</summary>
+        <div class="faq-body">No. La pantalla del negocio está pensada para el día a día: cargar productos, ver pedidos y cambiar precios. Damos capacitación y, encima, el mantenimiento mensual es el lugar donde pueden pedir ayuda y asesoramiento sin quedar solos.</div>
+      </details>
+      <details class="faq-item">
+        <summary>¿El trabajo en Google y redes les garantiza el primer resultado?</summary>
+        <div class="faq-body">Nadie honesto puede prometer el primer puesto en Google: depende de la competencia, la zona y el tiempo. Sí incluimos trabajo mensual de posicionamiento orgánico (textos, estructura y buenas prácticas) y apoyo en redes para que Ferretería Kozlowski gane visibilidad de forma sostenible. La publicidad paga es otra cosa y se cotiza aparte si la quieren.</div>
+      </details>
+      <details class="faq-item">
+        <summary>¿Hay que cobrar con tarjeta por internet sí o sí?</summary>
+        <div class="faq-body">No. Se puede empezar con pedido por la web y el mismo tipo de cobro que usan hoy (efectivo en el local, transferencia, etc.). Cobrar con tarjeta desde la página se puede sumar más adelante si lo desean.</div>
+      </details>
+      <details class="faq-item">
+        <summary>¿Los datos de los clientes son de Ferretería Kozlowski?</summary>
+        <div class="faq-body">Sí. La tienda es de Ferretería Kozlowski: listas de clientes, pedidos e historial quedan del lado del negocio, sin depender de una página grande que se quede con el contacto.</div>
+      </details>
+      <details class="faq-item">
+        <summary>¿Se puede contratar solo el desarrollo, sin el pago mensual?</summary>
+        <div class="faq-body">No está previsto en esta propuesta. Una ferretería con muchos productos y un equipo que recién entra en la venta online necesita seguimiento: listas que cambian, dudas del día a día, ajustes y además el trabajo de visibilidad en Google y en redes. El mantenimiento mensual cubre eso para no dejarlos solos.</div>
+      </details>
+      <details class="faq-item">
+        <summary>¿Y si después hay que sumar muchos productos nuevos?</summary>
+        <div class="faq-body">El sistema está hecho para crecer. Pueden sumar desde la pantalla del negocio o pedirnos que carguemos nosotros dentro de lo acordado en el mantenimiento mensual.</div>
+      </details>
+      <details class="faq-item">
+        <summary>¿Todo lo de “impulso comercial” queda activo el primer día?</summary>
+        <div class="faq-body">Se prioriza lo que más impacto tiene según el acuerdo: normalmente tienda usable, WhatsApp, retiro y datos claros primero; ofertas, métricas finas y Google Business se van completando en las primeras semanas con el mantenimiento. Lo opcional (pago online, mayorista, fidelidad) se agenda cuando Ferretería Kozlowski quiera.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CTA FINAL ══════════ -->
+<section id="cta-final" aria-labelledby="titulo-cta">
+  <div class="container">
+    <h2 id="titulo-cta">¿Listos para desarrollar la tienda de Ferretería Kozlowski?</h2>
+    <p>Escribinos y coordinamos una charla o demo, sin compromiso. Ahí vemos el catálogo, el <a href="#impulso-ventas" style="color:inherit;text-decoration:underline">impulso comercial</a>, el acompañamiento y el mantenimiento mensual (SEO, redes y Google Business).</p>
+
+    <a href="https://wa.me/5493764447531?text=Hola!%20Vi%20la%20propuesta%20de%20tienda%20virtual%20para%20Ferreter%C3%ADa%20Kozlowski%20y%20quiero%20saber%20m%C3%A1s." class="btn-cta" target="_blank" rel="noopener noreferrer">
+      📲 Escribir por WhatsApp
+    </a>
+    <a href="#solucion" class="btn-cta outline">
+      Ver funcionalidades
+    </a>
+
+    <div class="contacto-info">
+      <p>
+        📍 Cuba 994, Jardín América, Misiones &nbsp;|&nbsp;
+        📞 376-444-7531 &nbsp;|&nbsp;
+        <a href="https://www.instagram.com/ferreteriakozlowskimnes/" target="_blank" rel="noopener noreferrer">@ferreteriakozlowskimnes</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<button type="button" class="to-top" id="to-top" aria-label="Volver arriba">↑</button>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer>
+  <p>Propuesta preparada especialmente para Ferretería Kozlowski · Jardín América, Misiones · 2026</p>
+</footer>
+
+<script>
+(function () {
+  var btn = document.getElementById('to-top');
+  if (!btn) return;
+  function toggle() {
+    btn.classList.toggle('visible', window.scrollY > 400);
+  }
+  window.addEventListener('scroll', toggle, { passive: true });
+  toggle();
+  btn.addEventListener('click', function () {
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  });
+})();
+</script>
+
+</body>
+</html>
