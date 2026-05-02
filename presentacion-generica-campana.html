@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema Digital de Campaña Electoral</title>
+  <meta name="author" content="Enzo Gabriel Mantay">
+  <meta name="copyright" content="© 2026 Enzo Gabriel Mantay. Todos los derechos reservados.">
+  <link rel="author" href="mailto:enzomantay@gmail.com">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --azul:      #1e3070;
+      --azul-med:  #2a4094;
+      --azul-claro:#3d5ab8;
+      --rojo:      #d42b2b;
+      --gris:      #f4f6f9;
+      --texto:     #1e2a3a;
+      --suave:     #6b7c93;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      color: var(--texto);
+      background: white;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ── LOGO ── */
+    .logo-wrap {
+      background: white;
+      border-radius: 10px;
+      padding: 6px 10px;
+      display: inline-block;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .logo-wrap img {
+      width: 340px;
+      max-width: 80vw;
+      display: block;
+    }
+    .logo-wrap-sm {
+      background: white;
+      border-radius: 8px;
+      padding: 5px 8px;
+      display: inline-block;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .logo-wrap-sm img {
+      width: 220px;
+      max-width: 60vw;
+      display: block;
+    }
+
+    /* ── PORTADA ── */
+    .portada {
+      background: linear-gradient(150deg, #0f1f4e 0%, #1e3070 55%, #2a4094 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .portada::before {
+      content: '';
+      position: absolute;
+      width: 650px; height: 650px;
+      border-radius: 50%;
+      border: 90px solid rgba(255,255,255,0.03);
+      top: -120px; right: -120px;
+    }
+    .portada::after {
+      content: '';
+      position: absolute;
+      width: 420px; height: 420px;
+      border-radius: 50%;
+      border: 70px solid rgba(212,43,43,0.08);
+      bottom: -90px; left: -90px;
+    }
+    .portada .franja-roja {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--rojo), #ff6b6b, var(--rojo));
+    }
+    .portada .etiqueta {
+      background: rgba(212,43,43,0.2);
+      border: 1px solid rgba(212,43,43,0.4);
+      color: rgba(255,255,255,0.9);
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      position: relative;
+      z-index: 1;
+    }
+    .portada h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+      max-width: 620px;
+      color: rgba(255,255,255,0.95);
+    }
+    .portada .subtitulo {
+      font-size: 1rem;
+      opacity: 0.8;
+      max-width: 520px;
+      margin-bottom: 48px;
+      position: relative;
+      z-index: 1;
+    }
+    .portada .stats {
+      display: flex;
+      gap: 40px;
+      position: relative;
+      z-index: 1;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .portada .stat .num  { font-size: 2.2rem; font-weight: 800; color: var(--rojo); line-height: 1; }
+    .portada .stat .num.b { color: #7ec8ff; }
+    .portada .stat .desc { font-size: 0.78rem; opacity: 0.7; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .portada .ciudad {
+      position: absolute;
+      bottom: 18px;
+      font-size: 0.78rem;
+      opacity: 0.5;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      z-index: 1;
+    }
+
+    /* ── SECCIONES ── */
+    section { padding: 70px 40px; max-width: 900px; margin: 0 auto; }
+    .seccion-titulo { display: flex; align-items: center; gap: 14px; margin-bottom: 40px; }
+    .seccion-titulo .num {
+      background: var(--azul);
+      color: white;
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1rem; flex-shrink: 0;
+    }
+    .seccion-titulo h2 { font-size: 1.7rem; font-weight: 700; color: var(--azul); }
+    .seccion-titulo p  { font-size: 0.88rem; color: var(--suave); margin-top: 2px; }
+
+    /* ── DIVISORES ── */
+    .divisor       { height: 5px; background: linear-gradient(90deg, var(--azul), var(--rojo), var(--azul-claro)); border: none; }
+    .divisor-suave { height: 1px; background: #e8ecf0; border: none; max-width: 900px; margin: 0 auto; }
+
+    /* ── REELECCIÓN ── */
+    .reeleccion-box {
+      background: linear-gradient(135deg, #f0f3ff, #e8ecff);
+      border: 1.5px solid #c5cff5;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 0;
+    }
+    .reeleccion-box h3 { color: var(--azul); font-size: 1rem; margin-bottom: 16px; display:flex; align-items:center; gap:8px; }
+    .reeleccion-items { display: flex; flex-direction: column; gap: 12px; }
+    .reeleccion-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: white;
+      border-radius: 10px;
+      padding: 14px 16px;
+      border: 1px solid #dde3f5;
+    }
+    .reeleccion-item .ri-icono { font-size: 1.4rem; flex-shrink: 0; }
+    .reeleccion-item h4 { font-size: 0.88rem; font-weight: 700; color: var(--azul); margin-bottom: 3px; }
+    .reeleccion-item p  { font-size: 0.82rem; color: #555; line-height: 1.6; }
+
+    /* ── MÓDULOS ── */
+    .modulos { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .modulo {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .modulo::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--azul), var(--rojo));
+      border-radius: 14px 14px 0 0;
+    }
+    .modulo .modulo-icono { font-size: 2rem; margin-bottom: 10px; }
+    .modulo h3 { font-size: 1rem; font-weight: 700; color: var(--azul); margin-bottom: 8px; }
+    .modulo p  { font-size: 0.85rem; color: #555; line-height: 1.6; }
+    .badge-dev {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: #eef2ff;
+      color: var(--azul);
+    }
+
+    /* ── WHATSAPP ── */
+    .wa-section {
+      background: linear-gradient(135deg, #f0fff4, #e8f8ef);
+      border-radius: 18px;
+      padding: 48px 40px;
+      margin: 0 auto;
+      max-width: 900px;
+      border: 1.5px solid #b7e4c7;
+    }
+    .wa-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+    .wa-header .wa-icono {
+      background: #25d366; color: white;
+      width: 56px; height: 56px;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; flex-shrink: 0;
+    }
+    .wa-header h2 { font-size: 1.6rem; font-weight: 700; color: #1a5c36; }
+    .wa-header p  { font-size: 0.88rem; color: #4a7c59; margin-top: 2px; }
+    .usos-wa { display: flex; flex-direction: column; gap: 16px; }
+    .uso-wa {
+      background: white; border-radius: 12px;
+      padding: 18px 20px;
+      display: flex; gap: 16px; align-items: flex-start;
+      border: 1px solid #d4edda;
+    }
+    .uso-wa .uso-num {
+      background: #25d366; color: white;
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.82rem; flex-shrink: 0; margin-top: 2px;
+    }
+    .uso-wa h4 { font-size: 0.92rem; font-weight: 700; color: #1a5c36; margin-bottom: 4px; }
+    .uso-wa p  { font-size: 0.83rem; color: #555; line-height: 1.6; }
+    .uso-wa .ejemplo {
+      margin-top: 8px;
+      background: #f0fff4;
+      border-left: 3px solid #25d366;
+      padding: 8px 12px;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.8rem; color: #2d6a4f; font-style: italic;
+    }
+
+    /* ── TABLA ── */
+    .tabla-estado {
+      width: 100%; border-collapse: collapse;
+      border-radius: 12px; overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+    .tabla-estado th {
+      background: var(--azul); color: white;
+      padding: 14px 20px; text-align: left;
+      font-size: 0.82rem; font-weight: 600; letter-spacing: 0.5px;
+    }
+    .tabla-estado td { padding: 14px 20px; font-size: 0.88rem; border-bottom: 1px solid #f0f4f8; }
+    .tabla-estado tr:last-child td { border-bottom: none; }
+    .tabla-estado tr:nth-child(even) td { background: #f7f9fc; }
+    .estado-si { color: #27ae60; font-weight: 700; }
+    .estado-no { color: var(--azul); font-weight: 700; }
+
+    /* ── LEGAL ── */
+    .legal-box {
+      background: #fff8e1; border: 1.5px solid #ffe082;
+      border-radius: 14px; padding: 28px 32px;
+    }
+    .legal-box h3 { color: #b8860b; font-size: 1rem; margin-bottom: 12px; }
+    .legal-box ul { padding-left: 20px; }
+    .legal-box ul li { font-size: 0.88rem; color: #555; margin-bottom: 8px; line-height: 1.6; }
+
+    /* ── CIERRE ── */
+    .cierre {
+      background: linear-gradient(150deg, #0f1f4e, #1e3070);
+      color: white;
+      padding: 80px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cierre::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--rojo), #ff6b6b, var(--rojo));
+    }
+    .cierre .logo-cierre { margin-bottom: 28px; display: flex; justify-content: center; }
+    .cierre h2 { font-size: 1.9rem; font-weight: 800; margin-bottom: 14px; line-height: 1.3; }
+    .cierre h2 span { color: var(--rojo); }
+    .cierre p  { font-size: 1rem; opacity: 0.82; max-width: 540px; margin: 0 auto 32px; }
+    .cierre .slogan-final {
+      display: inline-block;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 14px 36px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-style: italic;
+      color: rgba(255,255,255,0.9);
+      letter-spacing: 0.5px;
+    }
+
+    @media print {
+      .portada { min-height: auto; padding: 40px; page-break-after: always; }
+      section { padding: 40px 30px; }
+      .wa-section { margin: 0 30px; }
+    }
+
+    /* ── TABLET ── */
+    @media (max-width: 768px) {
+      .portada h1         { font-size: 1.4rem; }
+      .portada .subtitulo { font-size: 0.9rem; }
+      .portada .stats     { gap: 16px; }
+      .portada .stat .num { font-size: 1.8rem; }
+      section             { padding: 50px 24px; }
+      .seccion-titulo h2  { font-size: 1.4rem; }
+      .modulos            { grid-template-columns: 1fr 1fr; }
+      .wa-section         { padding: 32px 24px; margin: 0 24px; }
+    }
+
+    /* ── MÓVIL ── */
+    @media (max-width: 480px) {
+      .portada            { padding: 48px 20px; }
+      .portada h1         { font-size: 1.3rem; }
+      .portada .subtitulo { font-size: 0.85rem; margin-bottom: 32px; }
+      .portada .stats     { gap: 12px; }
+      .portada .stat      { min-width: 70px; }
+      .portada .stat .num { font-size: 1.5rem; }
+      .portada .stat .desc{ font-size: 0.65rem; }
+
+      section             { padding: 40px 16px; }
+      .seccion-titulo     { gap: 10px; }
+      .seccion-titulo h2  { font-size: 1.2rem; }
+      .seccion-titulo .num{ width: 34px; height: 34px; font-size: 0.85rem; }
+
+      /* Módulos a 1 columna */
+      .modulos            { grid-template-columns: 1fr !important; }
+
+      /* WhatsApp */
+      .wa-section         { padding: 24px 16px; margin: 0 16px; }
+      .wa-header          { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .wa-header h2       { font-size: 1.2rem; }
+      .uso-wa             { flex-direction: column; gap: 8px; }
+      .uso-wa .uso-num    { width: 24px; height: 24px; font-size: 0.75rem; }
+
+      /* Tabla comparativa scroll horizontal */
+      .tabla-wrap         { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .tabla-estado th,
+      .tabla-estado td    { padding: 10px 12px; font-size: 0.78rem; white-space: nowrap; }
+
+      /* Cronograma */
+      .cronograma-item    { flex-direction: column; }
+
+      /* Legal */
+      .legal-box          { padding: 20px 18px; }
+
+      /* Cierre */
+      .cierre             { padding: 50px 20px; }
+      .cierre h2          { font-size: 1.4rem; }
+      .cierre p           { font-size: 0.88rem; }
+      .slogan-final       { font-size: 0.88rem; padding: 12px 20px; }
+
+      /* Secciones con flex row → column en móvil */
+      .flex-mobile-col    { flex-direction: column !important; }
+
+      /* Bloque urgencia y caso de uso */
+      div[style*="display:flex"][style*="align-items:center"] { flex-direction: column; }
+
+      /* Inversión */
+      div[style*="grid-template-columns:repeat(auto-fit"] { grid-template-columns: 1fr !important; }
+
+      /* CTA contacto */
+      div[style*="max-width:360px"] { max-width: 100% !important; }
+
+      /* Portada gancho */
+      div[style*="max-width:680px"] { padding: 14px 18px !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ PORTADA ══════════════════════════════════════════════════════════════ -->
+<div class="portada">
+  <div class="etiqueta">Propuesta tecnológica · Campaña electoral</div>
+
+  <div style="margin-bottom:20px; background:rgba(212,43,43,0.15); border:1px solid rgba(212,43,43,0.4); border-radius:12px; padding:16px 28px; max-width:680px;">
+    <p style="font-size:1.25rem; font-weight:800; color:white; line-height:1.4; margin-bottom:6px;">¿Querés ganar las próximas elecciones?</p>
+    <p style="font-size:0.95rem; color:rgba(255,255,255,0.85); line-height:1.6;">Entonces tenés que aplicar esta tecnología.</p>
+  </div>
+  <h1 style="font-size:clamp(2rem,5vw,3.2rem);">Sistema Digital Integral<br/>para la Campaña Electoral</h1>
+  <p class="subtitulo">
+    Te presentamos una plataforma completa para organizar, comunicar y conectar con los vecinos de tu ciudad durante la campaña.
+  </p>
+  <div class="stats">
+    <div class="stat"><div class="num">8</div><div class="desc">Módulos</div></div>
+    <div class="stat"><div class="num">1</div><div class="desc">Plataforma</div></div>
+    <div class="stat"><div class="num b">∞</div><div class="desc">Contactos</div></div>
+    <div class="stat"><div class="num">90%</div><div class="desc">Apertura WhatsApp</div></div>
+    <div class="stat"><div class="num">11</div><div class="desc">Semanas de desarrollo</div></div>
+    <div class="stat"><div class="num">100%</div><div class="desc">Datos propios</div></div>
+  </div>
+  <div class="franja-roja"></div>
+</div>
+
+<hr class="divisor" />
+
+<!-- ══ INTRODUCCIÓN ══════════════════════════════════════════════════════════ -->
+<section>
+  <div class="seccion-titulo">
+    <div><h2>¿De qué se trata?</h2></div>
+  </div>
+
+  <!-- Gancho inicial -->
+  <div style="background:linear-gradient(135deg,#0f1f4e,#1e3070); border-radius:16px; padding:28px 32px; color:white; margin-bottom:28px;">
+    <p style="font-size:1.15rem; font-weight:700; line-height:1.6; margin-bottom:12px;">Las campañas electorales modernas no se ganan solo con carteles y actos. Se ganan con organización, con datos y con comunicación directa.</p>
+    <p style="font-size:0.92rem; color:rgba(255,255,255,0.8); line-height:1.8;">Mientras tu competencia sigue manejando su campaña con grupos de WhatsApp desorganizados y planillas de Excel, vos vas a tener una plataforma profesional que te da información en tiempo real, comunicación masiva con un clic y tu equipo coordinado desde un solo lugar. <strong style="color:white;">Esa diferencia, en el tramo final de una campaña, puede ser decisiva.</strong></p>
+  </div>
+
+  <p style="font-size:1.05rem; color:#333; max-width:780px; line-height:1.8; margin-bottom:28px;">
+    Es una plataforma digital <strong>100% propia de tu campaña</strong>, accesible desde cualquier computadora o celular, que centraliza la comunicación, la organización del equipo y el seguimiento del electorado en un solo lugar. No depende de los algoritmos de las redes sociales ni de plataformas de terceros — <strong>los datos son tuyos, el control es tuyo.</strong>
+  </p>
+
+  <!-- Por qué es indispensable -->
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:28px;">
+    <div style="background:#f0f3ff; border-radius:12px; padding:20px; border-top:3px solid var(--azul);">
+      <div style="font-size:1.6rem; margin-bottom:8px;">🎯</div>
+      <div style="font-weight:700; color:var(--azul); font-size:0.92rem; margin-bottom:6px;">Comunicación directa y sin filtros</div>
+      <div style="font-size:0.82rem; color:#555; line-height:1.6;">Llegás a cada vecino por WhatsApp, sin depender de Facebook, Instagram ni ningún algoritmo que decide quién ve tu mensaje y quién no.</div>
+    </div>
+    <div style="background:#fff0f0; border-radius:12px; padding:20px; border-top:3px solid var(--rojo);">
+      <div style="font-size:1.6rem; margin-bottom:8px;">📊</div>
+      <div style="font-weight:700; color:var(--rojo); font-size:0.92rem; margin-bottom:6px;">Conocés a tu electorado de verdad</div>
+      <div style="font-size:0.82rem; color:#555; line-height:1.6;">Encuestas automáticas y registro de vecinos te dan información real sobre qué le preocupa a la gente, barrio por barrio, sin pagar consultoras.</div>
+    </div>
+    <div style="background:#f0f3ff; border-radius:12px; padding:20px; border-top:3px solid var(--azul-claro);">
+      <div style="font-size:1.6rem; margin-bottom:8px;">⚡</div>
+      <div style="font-weight:700; color:var(--azul-claro); font-size:0.92rem; margin-bottom:6px;">Tu equipo trabaja coordinado</div>
+      <div style="font-size:0.82rem; color:#555; line-height:1.6;">Voluntarios, referentes barriales y el equipo central trabajan desde la misma plataforma, con accesos diferenciados y tareas claras.</div>
+    </div>
+    <div style="background:#fff8f0; border-radius:12px; padding:20px; border-top:3px solid #e87722;">
+      <div style="font-size:1.6rem; margin-bottom:8px;">🗺️</div>
+      <div style="font-weight:700; color:#e87722; font-size:0.92rem; margin-bottom:6px;">Movilización el día de la elección</div>
+      <div style="font-size:0.82rem; color:#555; line-height:1.6;">Una base de contactos bien construida permite recordarle a cada votante que tiene que ir a votar, coordinar fiscales y actuar rápido ante cualquier imprevisto.</div>
+    </div>
+  </div>
+
+  <!-- Frase cierre -->
+  <div style="border-left:4px solid var(--rojo); padding:14px 20px; background:#fff5f5; border-radius:0 10px 10px 0;">
+    <p style="font-size:0.95rem; color:#333; line-height:1.7;"><strong>En resumen:</strong> este sistema reemplaza el caos de los grupos de WhatsApp, las planillas de Excel y los cuadernos de papel por una herramienta profesional, centralizada y diseñada específicamente para ganar elecciones.</p>
+  </div>
+</section>
+
+<hr class="divisor-suave" />
+
+<!-- ══ ¿POR QUÉ AHORA? ════════════════════════════════════════════════════ -->
+<section>
+  <div class="seccion-titulo">
+    <div class="num" style="background:var(--rojo);">!</div>
+    <div>
+      <h2>¿Por qué empezar ahora?</h2>
+      <p>El tiempo es el recurso más valioso en una campaña.</p>
+    </div>
+  </div>
+  <div style="display:flex; gap:20px; flex-wrap:wrap;">
+    <div style="flex:1; min-width:220px; background:linear-gradient(135deg,#fff0f0,#ffe8e8); border-radius:14px; padding:24px; border-left:4px solid var(--rojo);">
+      <div style="font-size:1.8rem; margin-bottom:10px;">📋</div>
+      <h3 style="color:var(--rojo); font-size:0.95rem; margin-bottom:8px;">La base de contactos necesita tiempo</h3>
+      <p style="font-size:0.84rem; color:#555; line-height:1.7;">Cuanto antes se empiece a registrar vecinos y voluntarios, más grande y sólida será la base el día de la elección. Una base construida en semanas es mucho más poderosa que una armada en días.</p>
+    </div>
+    <div style="flex:1; min-width:220px; background:linear-gradient(135deg,#f0f3ff,#e8ecff); border-radius:14px; padding:24px; border-left:4px solid var(--azul);">
+      <div style="font-size:1.8rem; margin-bottom:10px;">🔄</div>
+      <h3 style="color:var(--azul); font-size:0.95rem; margin-bottom:8px;">Los datos mejoran con el uso</h3>
+      <p style="font-size:0.84rem; color:#555; line-height:1.7;">Las encuestas y respuestas de los vecinos van afinando el mensaje del candidato. Empezar temprano permite ajustar la propuesta con datos reales antes del tramo final.</p>
+    </div>
+    <div style="flex:1; min-width:220px; background:linear-gradient(135deg,#fff0f0,#ffe8e8); border-radius:14px; padding:24px; border-left:4px solid var(--rojo);">
+      <div style="font-size:1.8rem; margin-bottom:10px;">🏁</div>
+      <h3 style="color:var(--rojo); font-size:0.95rem; margin-bottom:8px;">El día de la elección no se improvisa</h3>
+      <p style="font-size:0.84rem; color:#555; line-height:1.7;">El recordatorio del día de la votación, la coordinación de fiscales y la movilización de votantes requieren una estructura digital ya probada y funcionando.</p>
+    </div>
+  </div>
+
+  <!-- Bloque de urgencia -->
+  <div style="margin-top:32px; background:linear-gradient(135deg, #0f1f4e, #1e3070); border-radius:16px; padding:32px 36px; color:white; display:flex; align-items:center; gap:28px; flex-wrap:wrap;">
+    <div style="font-size:3rem; flex-shrink:0;">⏳</div>
+    <div style="flex:1; min-width:220px;">
+      <div style="font-size:1.15rem; font-weight:800; margin-bottom:10px; line-height:1.3;">Cada semana que pasa sin el sistema es una semana de datos perdidos, contactos no registrados y oportunidades que no vuelven.</div>
+      <div style="font-size:0.88rem; color:rgba(255,255,255,0.75); line-height:1.7;">En política, el tiempo no es neutral: trabaja a favor de quien se organiza antes. Los candidatos que arrancan temprano construyen ventajas que los que arrancan tarde no pueden recuperar. <strong style="color:white;">El mejor momento para empezar fue ayer. El segundo mejor momento es hoy.</strong></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divisor-suave" />
+
+<!-- ══ MÓDULOS ═══════════════════════════════════════════════════════════════ -->
+<section>
+  <div class="seccion-titulo">
+    <div class="num">1</div>
+    <div>
+      <h2>Los 8 módulos del sistema</h2>
+      <p>Cada módulo funciona de forma independiente y también en conjunto.</p>
+    </div>
+  </div>
+  <div class="modulos">
+    <div class="modulo">
+      <div class="modulo-icono">🌐</div>
+      <h3>Sitio web de campaña</h3>
+      <p>Página en internet con la presentación del candidato, sus logros de gestión y propuestas, galería de fotos y un formulario donde los vecinos pueden sumarse y dejar su número de WhatsApp.</p>
+      <span class="badge-dev">Por desarrollar</span>
+    </div>
+    <div class="modulo">
+      <div class="modulo-icono">🗺️</div>
+      <h3>Mapa interactivo de obras</h3>
+      <p>Mapa de la ciudad con marcadores de obras realizadas y propuestas. Al hacer clic: descripción, fotos, estado y fecha. Se incrusta en cualquier página con un solo código.</p>
+      <span class="badge-dev">Por desarrollar</span>
+    </div>
+    <div class="modulo">
+      <div class="modulo-icono">👥</div>
+      <h3>Base de datos de contactos</h3>
+      <p>Registro completo de vecinos, voluntarios y referentes barriales con nombre, teléfono, barrio y grupo. Importable desde Excel, filtrable por zona para envíos segmentados.</p>
+      <span class="badge-dev">Por desarrollar</span>
+    </div>
+    <div class="modulo">
+      <div class="modulo-icono">💬</div>
+      <h3>Mensajes masivos por WhatsApp</h3>
+      <p>Envío de mensajes personalizados y segmentados por barrio o grupo. Propuestas, convocatorias, encuestas y recordatorios directamente al celular de cada vecino.</p>
+      <span class="badge-dev">Por desarrollar</span>
+    </div>
+    <div class="modulo">
+      <div class="modulo-icono">📊</div>
+      <h3>Panel de control del equipo</h3>
+      <p>Pantalla central con métricas en tiempo real: contactos por barrio, mensajes enviados, resultados de encuestas y actividad del equipo. Accesible desde cualquier dispositivo.</p>
+      <span class="badge-dev">Por desarrollar</span>
+    </div>
+    <div class="modulo">
+      <div class="modulo-icono">📲</div>
+      <h3>QR para volantes y carteles</h3>
+      <p>Código QR personalizado que lleva al vecino directo al formulario de registro o a la landing page del candidato. Convierte cada volante, cartel o afiche en una puerta de entrada digital a la campaña.</p>
+      <span class="badge-dev">Por desarrollar</span>
+    </div>
+    <div class="modulo">
+      <div class="modulo-icono">🗳️</div>
+      <h3>Gestión de fiscales</h3>
+      <p>Módulo específico para el día de la elección: lista completa de fiscales asignados por mesa y escuela, confirmación de presencia en tiempo real, reporte de incidentes y canal de comunicación directa con el equipo central. Todo desde el celular, sin grupos de WhatsApp desordenados.</p>
+      <span class="badge-dev">Por desarrollar</span>
+    </div>
+    <div class="modulo" style="grid-column: 1 / -1;">
+      <div class="modulo-icono">🏛️</div>
+      <h3>Central de cómputos propia</h3>
+      <p>El módulo más poderoso para el día de la elección. Cada fiscal carga los resultados de su mesa desde el celular en tiempo real. El sistema genera automáticamente métricas completas: porcentaje de votos por mesa, por escuela, por barrio y totales acumulados. El equipo central ve los resultados a medida que llegan, sin esperar el escrutinio oficial, con gráficos en tiempo real y comparativas por zona. Una central de cómputos propia, profesional y exclusiva del candidato.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+        <span style="background:#f0f3ff; color:var(--azul); border-radius:20px; padding:4px 12px; font-size:0.75rem; font-weight:600;">📊 Resultados en tiempo real</span>
+        <span style="background:#fff0f0; color:var(--rojo); border-radius:20px; padding:4px 12px; font-size:0.75rem; font-weight:600;">🗺️ Métricas por zona y barrio</span>
+        <span style="background:#f0fff4; color:#27ae60; border-radius:20px; padding:4px 12px; font-size:0.75rem; font-weight:600;">📱 Carga desde el celular</span>
+        <span style="background:#fff8f0; color:#e87722; border-radius:20px; padding:4px 12px; font-size:0.75rem; font-weight:600;">📈 Gráficos comparativos</span>
+      </div>
+      <span class="badge-dev" style="margin-top:12px;">Por desarrollar</span>
+    </div>
+  </div>
+</section>
+
+<hr class="divisor" />
+
+<!-- ══ WHATSAPP ═══════════════════════════════════════════════════════════════ -->
+<div style="padding: 60px 40px; max-width:980px; margin:0 auto;">
+  <div class="wa-section">
+    <div class="wa-header">
+      <div class="wa-icono">📱</div>
+      <div>
+        <h2>WhatsApp: la herramienta más poderosa</h2>
+        <p>El canal con mayor tasa de apertura. Los mensajes llegan y se leen.</p>
+      </div>
+    </div>
+    <div class="usos-wa">
+      <div class="uso-wa">
+        <div class="uso-num">1</div>
+        <div>
+          <h4>Propuestas personalizadas por barrio</h4>
+          <p>Cada vecino recibe la propuesta que le importa según dónde vive. Un mensaje sobre pavimentación llega a los que viven en calles de tierra; uno sobre salud, a los barrios que lo necesitan.</p>
+          <div class="ejemplo">"Hola María, sabemos que en tu barrio las calles son un problema. Por eso la primera obra de la próxima gestión será..."</div>
+        </div>
+      </div>
+      <div class="uso-wa">
+        <div class="uso-num">2</div>
+        <div>
+          <h4>Convocatoria a eventos y actos</h4>
+          <p>Invitaciones personalizadas a reuniones vecinales, caravanas y actos, filtradas por zona para que cada vecino reciba solo lo que es relevante para él.</p>
+          <div class="ejemplo">"Hola Juan, este sábado a las 18hs hay un acto en tu barrio. ¡Te esperamos en la plaza central!"</div>
+        </div>
+      </div>
+      <div class="uso-wa">
+        <div class="uso-num">3</div>
+        <div>
+          <h4>Encuestas rápidas a los vecinos</h4>
+          <p>El sistema envía una pregunta simple y registra las respuestas automáticamente. Los resultados alimentan el discurso del candidato con datos reales.</p>
+          <div class="ejemplo">"¿Cuál es el problema más urgente de tu barrio? 1-Calles / 2-Agua / 3-Seguridad / 4-Empleo"</div>
+        </div>
+      </div>
+      <div class="uso-wa">
+        <div class="uso-num">4</div>
+        <div>
+          <h4>Coordinación interna del equipo</h4>
+          <p>Mensajes automáticos a voluntarios con instrucciones, horarios y zonas de trabajo. Orden y eficiencia sin grupos de WhatsApp desordenados.</p>
+          <div class="ejemplo">"Equipo zona sur: mañana 9hs en San Martín y Roca para el timbreo. Llevar gorras y volantes."</div>
+        </div>
+      </div>
+      <div class="uso-wa">
+        <div class="uso-num">5</div>
+        <div>
+          <h4>Difusión de material multimedia</h4>
+          <p>Videos cortos del candidato, audios con propuestas, fotos de obras realizadas. WhatsApp tiene una tasa de apertura del 90%, contra el 20% del correo electrónico.</p>
+          <div class="ejemplo">Video de 60 segundos mostrando las obras realizadas en la gestión actual, enviado a toda la base.</div>
+        </div>
+      </div>
+      <div class="uso-wa">
+        <div class="uso-num">6</div>
+        <div>
+          <h4>Recordatorio el día de la elección</h4>
+          <p>El uso más efectivo comprobado en campañas de todo el mundo. Un mensaje el día de la votación puede ser decisivo para movilizar al electorado.</p>
+          <div class="ejemplo">"Hola Carlos, hoy es el día. Votá nuestra lista en tu escuela de siempre. Horario: 8 a 18hs. ¡Gracias!"</div>
+        </div>
+      </div>
+      <div class="uso-wa">
+        <div class="uso-num">7</div>
+        <div>
+          <h4>Agradecimiento y cierre de campaña</h4>
+          <p>Terminada la elección, un mensaje personal de agradecimiento que construye vínculo con los vecinos y sienta las bases para la próxima gestión.</p>
+          <div class="ejemplo">"Gracias por acompañarnos. Juntos seguiremos construyendo la ciudad que merecemos."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ COMPARATIVA ════════════════════════════════════════════════════════ -->
+<section>
+  <div class="seccion-titulo">
+    <div class="num">vs</div>
+    <div>
+      <h2>Este sistema vs. las redes sociales</h2>
+      <p>¿Por qué no alcanza con Facebook e Instagram?</p>
+    </div>
+  </div>
+  <div class="tabla-wrap">
+    <table class="tabla-estado">
+      <thead>
+        <tr>
+          <th>Característica</th>
+          <th style="background:#3d5ab8;">📱 Redes sociales</th>
+          <th style="background:#27ae60;">🏛️ Este sistema</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>¿Quién ve el mensaje?</strong></td>
+          <td style="color:#c0392b;">Solo a quien el algoritmo decide mostrarle</td>
+          <td style="color:#27ae60; font-weight:600;">Llega a todos los contactos seleccionados</td>
+        </tr>
+        <tr>
+          <td><strong>Costo para llegar a más gente</strong></td>
+          <td style="color:#c0392b;">Requiere pagar publicidad constantemente</td>
+          <td style="color:#27ae60; font-weight:600;">Sin costo adicional por contacto</td>
+        </tr>
+        <tr>
+          <td><strong>¿Los datos son propios?</strong></td>
+          <td style="color:#c0392b;">No. Le pertenecen a Meta o TikTok</td>
+          <td style="color:#27ae60; font-weight:600;">Sí. Son del equipo de campaña</td>
+        </tr>
+        <tr>
+          <td><strong>Segmentación por barrio</strong></td>
+          <td style="color:#c0392b;">Limitada y poco precisa</td>
+          <td style="color:#27ae60; font-weight:600;">Exacta, por barrio o grupo</td>
+        </tr>
+        <tr>
+          <td><strong>Tasa de apertura del mensaje</strong></td>
+          <td style="color:#c0392b;">5% a 20% en promedio</td>
+          <td style="color:#27ae60; font-weight:600;">Hasta 90% en WhatsApp</td>
+        </tr>
+        <tr>
+          <td><strong>Encuestas a vecinos</strong></td>
+          <td style="color:#c0392b;">No permite registrar respuestas fácilmente</td>
+          <td style="color:#27ae60; font-weight:600;">Automático, con resultados en tiempo real</td>
+        </tr>
+        <tr>
+          <td><strong>Riesgo de suspensión de cuenta</strong></td>
+          <td style="color:#c0392b;">Alto, por contenido político</td>
+          <td style="color:#27ae60; font-weight:600;">Ninguno. Es una plataforma propia</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="divisor-suave" />
+
+<!-- ══ CASO DE USO ════════════════════════════════════════════════════════ -->
+<section>
+  <div class="seccion-titulo">
+    <div class="num">📖</div>
+    <div>
+      <h2>Un día real de campaña con el sistema</h2>
+      <p>Así se vive la diferencia en la práctica.</p>
+    </div>
+  </div>
+  <div style="background:linear-gradient(135deg,#f8f9ff,#f0f3ff); border-radius:16px; padding:32px; border:1px solid #dde3ff;">
+    <p style="font-size:0.95rem; font-weight:700; color:var(--azul); margin-bottom:20px;">📅 Es jueves, faltan 4 días para la elección.</p>
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div style="display:flex; gap:16px; align-items:flex-start;">
+        <div style="background:var(--azul); color:white; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; flex-shrink:0;">8</div>
+        <div style="font-size:0.88rem; color:#444; line-height:1.7;"><strong>8:00 hs —</strong> El coordinador abre el panel desde su celular. Ve que hay 3 fiscales que todavía no confirmaron su mesa. Les manda un mensaje directo desde el sistema con un clic.</div>
+      </div>
+      <div style="display:flex; gap:16px; align-items:flex-start;">
+        <div style="background:var(--rojo); color:white; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; flex-shrink:0;">10</div>
+        <div style="font-size:0.88rem; color:#444; line-height:1.7;"><strong>10:00 hs —</strong> Se envía un mensaje masivo segmentado a los 800 vecinos del barrio norte recordándoles el acto de cierre de campaña del viernes. El mensaje llega con el nombre de cada uno. Tasa de apertura: 87%.</div>
+      </div>
+      <div style="display:flex; gap:16px; align-items:flex-start;">
+        <div style="background:var(--azul); color:white; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; flex-shrink:0;">14</div>
+        <div style="font-size:0.88rem; color:#444; line-height:1.7;"><strong>14:00 hs —</strong> El candidato revisa el dashboard: las encuestas muestran que en el barrio sur la seguridad es el tema más mencionado. Ajusta su discurso del acto de cierre en base a datos reales.</div>
+      </div>
+      <div style="display:flex; gap:16px; align-items:flex-start;">
+        <div style="background:var(--rojo); color:white; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; flex-shrink:0;">18</div>
+        <div style="font-size:0.88rem; color:#444; line-height:1.7;"><strong>18:00 hs —</strong> Un voluntario registra 40 vecinos nuevos desde el timbreo del día usando el formulario del celular. Quedan automáticamente en la base, segmentados por barrio.</div>
+      </div>
+      <div style="display:flex; gap:16px; align-items:flex-start;">
+        <div style="background:#27ae60; color:white; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; flex-shrink:0;">7</div>
+        <div style="font-size:0.88rem; color:#444; line-height:1.7;"><strong>Domingo 7:00 hs — Día de la elección.</strong> A las 7 de la mañana, con un solo clic, se envía a toda la base: <em>"Hoy es el día. Gracias por acompañarnos. Acordate de votar entre las 8 y las 18hs."</em> Cada fiscal recibe en su celular la lista de su mesa y el contacto de emergencia del coordinador.</div>
+      </div>
+      <div style="display:flex; gap:16px; align-items:flex-start;">
+        <div style="background:#27ae60; color:white; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; flex-shrink:0;">18</div>
+        <div style="font-size:0.88rem; color:#444; line-height:1.7;"><strong>Domingo 18:30 hs — Cierre de urnas.</strong> Los fiscales empiezan a cargar los resultados de cada mesa desde sus celulares. En el cuartel general, el candidato y su equipo ven en tiempo real los porcentajes que llegan, barrio por barrio, escuela por escuela — antes que cualquier medio de comunicación. Su propia central de cómputos, en la palma de la mano.</div>
+      </div>
+    </div>
+    <div style="margin-top:24px; padding:16px 20px; background:white; border-radius:10px; border-left:4px solid var(--rojo);">
+      <p style="font-size:0.9rem; color:#333; line-height:1.7;"><strong>Todo esto desde un solo sistema, sin caos, sin grupos de WhatsApp desordenados, sin planillas de Excel.</strong> El equipo coordinado, el candidato con información real, y cada vecino con el mensaje correcto en el momento correcto.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divisor-suave" />
+
+<!-- ══ MOCKUP VISUAL ══════════════════════════════════════════════════════ -->
+<section>
+  <div class="seccion-titulo">
+    <div class="num">👁</div>
+    <div>
+      <h2>¿Cómo se vería el sistema?</h2>
+      <p>Vista previa de los módulos principales.</p>
+    </div>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:24px;">
+    <div style="border:1.5px solid #e2e8f0; border-radius:14px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.07);">
+      <div style="background:var(--azul); color:white; padding:10px 18px; font-size:0.82rem; font-weight:600; display:flex; justify-content:space-between; align-items:center;">
+        <span>🗺️ Mapa de obras y propuestas – Tu ciudad</span>
+        <span style="opacity:0.6; font-size:0.72rem;">Vista pública</span>
+      </div>
+      <div style="display:flex; height:220px;">
+        <div style="width:200px; background:#f7f9fc; border-right:1px solid #eee; padding:12px; flex-shrink:0;">
+          <div style="font-size:0.7rem; font-weight:700; color:#888; text-transform:uppercase; margin-bottom:10px;">Obras</div>
+          <div style="background:white; border-radius:8px; padding:10px; margin-bottom:8px; border:1px solid #eee;">
+            <div style="width:50px; height:8px; background:#2e86de; border-radius:4px; margin-bottom:6px;"></div>
+            <div style="width:80px; height:7px; background:#eee; border-radius:4px; margin-bottom:4px;"></div>
+            <div style="width:60px; height:7px; background:#eee; border-radius:4px;"></div>
+          </div>
+          <div style="background:white; border-radius:8px; padding:10px; margin-bottom:8px; border:1px solid #eee;">
+            <div style="width:50px; height:8px; background:#e67e22; border-radius:4px; margin-bottom:6px;"></div>
+            <div style="width:90px; height:7px; background:#eee; border-radius:4px; margin-bottom:4px;"></div>
+            <div style="width:65px; height:7px; background:#eee; border-radius:4px;"></div>
+          </div>
+          <div style="background:white; border-radius:8px; padding:10px; border:1px solid #eee;">
+            <div style="width:50px; height:8px; background:#27ae60; border-radius:4px; margin-bottom:6px;"></div>
+            <div style="width:75px; height:7px; background:#eee; border-radius:4px; margin-bottom:4px;"></div>
+            <div style="width:55px; height:7px; background:#eee; border-radius:4px;"></div>
+          </div>
+        </div>
+        <div style="flex:1; background:linear-gradient(135deg,#e8f0e8,#d4e8d4); position:relative; overflow:hidden;">
+          <div style="position:absolute; top:50%; left:0; right:0; height:2px; background:rgba(255,255,255,0.5);"></div>
+          <div style="position:absolute; top:0; bottom:0; left:40%; width:2px; background:rgba(255,255,255,0.5);"></div>
+          <div style="position:absolute; top:0; bottom:0; left:70%; width:2px; background:rgba(255,255,255,0.4);"></div>
+          <div style="position:absolute; top:30%; left:0; right:0; height:2px; background:rgba(255,255,255,0.3);"></div>
+          <div style="position:absolute; top:70%; left:0; right:0; height:2px; background:rgba(255,255,255,0.3);"></div>
+          <div style="position:absolute; top:25%; left:35%; width:16px; height:16px; background:#2e86de; border-radius:50% 50% 50% 0; transform:rotate(-45deg); border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>
+          <div style="position:absolute; top:45%; left:60%; width:16px; height:16px; background:#e67e22; border-radius:50% 50% 50% 0; transform:rotate(-45deg); border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>
+          <div style="position:absolute; top:65%; left:25%; width:16px; height:16px; background:#27ae60; border-radius:50% 50% 50% 0; transform:rotate(-45deg); border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>
+          <div style="position:absolute; top:30%; left:75%; width:16px; height:16px; background:#2e86de; border-radius:50% 50% 50% 0; transform:rotate(-45deg); border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>
+          <div style="position:absolute; bottom:10px; right:10px; background:white; border-radius:6px; padding:6px 10px; font-size:0.65rem; line-height:1.8; box-shadow:0 1px 4px rgba(0,0,0,0.15);">
+            <div style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:#2e86de;display:inline-block;"></span> Planificada</div>
+            <div style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:#e67e22;display:inline-block;"></span> En ejecución</div>
+            <div style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:#27ae60;display:inline-block;"></span> Finalizada</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+      <div style="border:1.5px solid #e2e8f0; border-radius:14px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.07);">
+        <div style="background:var(--azul); color:white; padding:10px 18px; font-size:0.82rem; font-weight:600;">👥 Base de contactos</div>
+        <div style="padding:14px;">
+          <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <div style="background:#f0f3ff; border-radius:20px; padding:4px 12px; font-size:0.72rem; color:var(--azul); font-weight:600;">Todos (342)</div>
+            <div style="background:#eee; border-radius:20px; padding:4px 12px; font-size:0.72rem; color:#888;">Voluntarios (48)</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:center; gap:10px; padding:8px; background:#f7f9fc; border-radius:8px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:#dde3ff;display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--azul);font-weight:700;">MA</div>
+              <div style="flex:1;"><div style="height:7px;background:#ccc;border-radius:4px;width:100px;margin-bottom:4px;"></div><div style="height:6px;background:#e8e8e8;border-radius:4px;width:70px;"></div></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; padding:8px; background:#f7f9fc; border-radius:8px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:#ffdde0;display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--rojo);font-weight:700;">JR</div>
+              <div style="flex:1;"><div style="height:7px;background:#ccc;border-radius:4px;width:85px;margin-bottom:4px;"></div><div style="height:6px;background:#e8e8e8;border-radius:4px;width:55px;"></div></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; padding:8px; background:#f7f9fc; border-radius:8px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:#ddfbe8;display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:#27ae60;font-weight:700;">SL</div>
+              <div style="flex:1;"><div style="height:7px;background:#ccc;border-radius:4px;width:110px;margin-bottom:4px;"></div><div style="height:6px;background:#e8e8e8;border-radius:4px;width:65px;"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="border:1.5px solid #e2e8f0; border-radius:14px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.07);">
+        <div style="background:#25d366; color:white; padding:10px 18px; font-size:0.82rem; font-weight:600;">💬 Envío de mensaje</div>
+        <div style="padding:14px;">
+          <div style="font-size:0.72rem; color:#888; margin-bottom:4px; font-weight:600;">DESTINATARIOS</div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;">
+            <div style="background:#e8f0ff; border-radius:20px; padding:3px 10px; font-size:0.7rem; color:var(--azul);">Barrio Norte (89)</div>
+            <div style="background:#e8f0ff; border-radius:20px; padding:3px 10px; font-size:0.7rem; color:var(--azul);">Barrio Sur (64)</div>
+          </div>
+          <div style="font-size:0.72rem; color:#888; margin-bottom:4px; font-weight:600;">MENSAJE</div>
+          <div style="background:#f0fff4; border:1px solid #b7e4c7; border-radius:8px; padding:10px; font-size:0.78rem; color:#2d6a4f; line-height:1.6; margin-bottom:12px;">
+            "Hola {nombre}, como vecino de tu barrio queremos contarte nuestra propuesta..."
+          </div>
+          <div style="background:#25d366; color:white; border-radius:8px; padding:8px; text-align:center; font-size:0.8rem; font-weight:700;">Enviar a 153 contactos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divisor-suave" />
+
+<!-- ══ LEGAL ═══════════════════════════════════════════════════════════════ -->
+<section>
+  <div class="seccion-titulo">
+    <div class="num" style="background:var(--rojo);">⚖</div>
+    <div>
+      <h2>Uso responsable y legal</h2>
+      <p>El sistema está diseñado para cumplir con la normativa vigente.</p>
+    </div>
+  </div>
+  <div class="legal-box">
+    <h3>⚠️ Puntos clave para el uso correcto</h3>
+    <ul>
+      <li><strong>Consentimiento:</strong> solo se envían mensajes a personas que dieron su número voluntariamente, ya sea a través del formulario web, en eventos o con un voluntario.</li>
+      <li><strong>Opción de baja:</strong> cada mensaje incluye la opción de darse de baja con un simple "STOP". El sistema lo registra automáticamente.</li>
+      <li><strong>Número dedicado:</strong> se recomienda usar un número de WhatsApp exclusivo de la campaña, no el personal del candidato.</li>
+      <li><strong>Datos propios:</strong> toda la información se guarda en los servidores del equipo. No se comparte con plataformas externas.</li>
+      <li><strong>Sin spam:</strong> el sistema limita la frecuencia de envíos para no saturar a los contactos y mantener la credibilidad de la campaña.</li>
+    </ul>
+  </div>
+</section>
+
+<hr class="divisor-suave" />
+
+<!-- ══ CRONOGRAMA ═════════════════════════════════════════════════════════ -->
+<section>
+  <div class="seccion-titulo">
+    <div class="num">📅</div>
+    <div>
+      <h2>Cronograma de desarrollo</h2>
+      <p>Orden y tiempos estimados para tener el sistema completo operativo.</p>
+    </div>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:0;">
+
+    <div style="display:flex; gap:0; align-items:stretch;">
+      <div style="display:flex; flex-direction:column; align-items:center; margin-right:20px; flex-shrink:0;">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--rojo);color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;">1</div>
+        <div style="width:2px;flex:1;background:#e2e8f0;margin:4px 0;"></div>
+      </div>
+      <div style="background:#fff0f0;border-radius:12px;padding:18px 20px;margin-bottom:12px;flex:1;border:1px solid #ffd0d0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <h3 style="color:var(--rojo);font-size:0.95rem;">🌐 Sitio web de campaña</h3>
+          <span style="background:var(--rojo);color:white;padding:2px 10px;border-radius:10px;font-size:0.72rem;font-weight:700;">Semana 1–3</span>
+        </div>
+        <p style="font-size:0.83rem;color:#555;">La base digital de toda la campaña. Página con propuestas, galería y formulario de registro para vecinos. Es el primer paso porque todo lo demás se apoya en ella.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:0; align-items:stretch;">
+      <div style="display:flex; flex-direction:column; align-items:center; margin-right:20px; flex-shrink:0;">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--azul);color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;">2</div>
+        <div style="width:2px;flex:1;background:#e2e8f0;margin:4px 0;"></div>
+      </div>
+      <div style="background:#f0f3ff;border-radius:12px;padding:18px 20px;margin-bottom:12px;flex:1;border:1px solid #d0d8ff;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <h3 style="color:var(--azul);font-size:0.95rem;">📲 QR para volantes y carteles</h3>
+          <span style="background:var(--azul);color:white;padding:2px 10px;border-radius:10px;font-size:0.72rem;font-weight:700;">Semana 3</span>
+        </div>
+        <p style="font-size:0.83rem;color:#555;">Una vez que el sitio está activo, se genera el código QR personalizado. Se integra en todos los materiales físicos de campaña para convertir volantes y carteles en contactos digitales.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:0; align-items:stretch;">
+      <div style="display:flex; flex-direction:column; align-items:center; margin-right:20px; flex-shrink:0;">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--rojo);color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;">3</div>
+        <div style="width:2px;flex:1;background:#e2e8f0;margin:4px 0;"></div>
+      </div>
+      <div style="background:#fff0f0;border-radius:12px;padding:18px 20px;margin-bottom:12px;flex:1;border:1px solid #ffd0d0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <h3 style="color:var(--rojo);font-size:0.95rem;">🗺️ Mapa de obras y propuestas</h3>
+          <span style="background:var(--rojo);color:white;padding:2px 10px;border-radius:10px;font-size:0.72rem;font-weight:700;">Semana 3–5</span>
+        </div>
+        <p style="font-size:0.83rem;color:#555;">Mapa interactivo con obras y propuestas por zona. Se incrusta en el sitio web y se puede compartir en redes sociales.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:0; align-items:stretch;">
+      <div style="display:flex; flex-direction:column; align-items:center; margin-right:20px; flex-shrink:0;">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--azul);color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;">4</div>
+        <div style="width:2px;flex:1;background:#e2e8f0;margin:4px 0;"></div>
+      </div>
+      <div style="background:#f0f3ff;border-radius:12px;padding:18px 20px;margin-bottom:12px;flex:1;border:1px solid #d0d8ff;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <h3 style="color:var(--azul);font-size:0.95rem;">👥 Base de contactos</h3>
+          <span style="background:var(--azul);color:white;padding:2px 10px;border-radius:10px;font-size:0.72rem;font-weight:700;">Semana 4–6</span>
+        </div>
+        <p style="font-size:0.83rem;color:#555;">Sistema de gestión de vecinos, voluntarios y referentes barriales. Con importación desde Excel y filtros por zona. Cuanto antes esté activo, más grande será la base al llegar al tramo final.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:0; align-items:stretch;">
+      <div style="display:flex; flex-direction:column; align-items:center; margin-right:20px; flex-shrink:0;">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--rojo);color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;">5</div>
+        <div style="width:2px;flex:1;background:#e2e8f0;margin:4px 0;"></div>
+      </div>
+      <div style="background:#fff0f0;border-radius:12px;padding:18px 20px;margin-bottom:12px;flex:1;border:1px solid #ffd0d0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <h3 style="color:var(--rojo);font-size:0.95rem;">💬 Mensajes masivos por WhatsApp</h3>
+          <span style="background:var(--rojo);color:white;padding:2px 10px;border-radius:10px;font-size:0.72rem;font-weight:700;">Semana 6–8</span>
+        </div>
+        <p style="font-size:0.83rem;color:#555;">Motor de envíos segmentados con encuestas automáticas, integrado con la base de contactos. Se activa una vez que hay suficiente base construida para aprovechar su potencial.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:0; align-items:stretch;">
+      <div style="display:flex; flex-direction:column; align-items:center; margin-right:20px; flex-shrink:0;">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--azul);color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;">6</div>
+        <div style="width:2px;flex:1;background:#e2e8f0;margin:4px 0;"></div>
+      </div>
+      <div style="background:#f0f3ff;border-radius:12px;padding:18px 20px;margin-bottom:12px;flex:1;border:1px solid #d0d8ff;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <h3 style="color:var(--azul);font-size:0.95rem;">📊 Panel de control</h3>
+          <span style="background:var(--azul);color:white;padding:2px 10px;border-radius:10px;font-size:0.72rem;font-weight:700;">Semana 7–9</span>
+        </div>
+        <p style="font-size:0.83rem;color:#555;">Dashboard unificado con métricas en tiempo real de todos los módulos: contactos por barrio, mensajes enviados, respuestas a encuestas y actividad del equipo.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:0; align-items:stretch;">
+      <div style="display:flex; flex-direction:column; align-items:center; margin-right:20px; flex-shrink:0;">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--rojo);color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;">7</div>
+        <div style="width:2px;flex:1;background:#e2e8f0;margin:4px 0;"></div>
+      </div>
+      <div style="background:#fff0f0;border-radius:12px;padding:18px 20px;margin-bottom:12px;flex:1;border:1px solid #ffd0d0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <h3 style="color:var(--rojo);font-size:0.95rem;">🗳️ Gestión de fiscales</h3>
+          <span style="background:var(--rojo);color:white;padding:2px 10px;border-radius:10px;font-size:0.72rem;font-weight:700;">Semana 9–10</span>
+        </div>
+        <p style="font-size:0.83rem;color:#555;">Módulo para el día de la elección: asignación de fiscales por mesa, confirmación de presencia, reporte de incidentes y comunicación directa con el equipo central desde el celular.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:0; align-items:stretch;">
+      <div style="display:flex; flex-direction:column; align-items:center; margin-right:20px; flex-shrink:0;">
+        <div style="width:40px;height:40px;border-radius:50%;background:#27ae60;color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;">8</div>
+      </div>
+      <div style="background:#f0fff4;border-radius:12px;padding:18px 20px;flex:1;border:1px solid #b7e4c7;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <h3 style="color:#27ae60;font-size:0.95rem;">🏛️ Central de cómputos propia</h3>
+          <span style="background:#27ae60;color:white;padding:2px 10px;border-radius:10px;font-size:0.72rem;font-weight:700;">Semana 10–11</span>
+        </div>
+        <p style="font-size:0.83rem;color:#555;">El módulo final y más diferenciador. Cada fiscal carga los resultados de su mesa en tiempo real. El equipo central ve los porcentajes por barrio y escuela antes que cualquier medio, con gráficos automáticos y comparativas por zona.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ INVERSIÓN ══════════════════════════════════════════════════════════ -->
+<section>
+  <div class="seccion-titulo">
+    <div class="num" style="background:var(--azul);">$</div>
+    <div>
+      <h2>¿Cuánto representa esta inversión?</h2>
+      <p>Una campaña organizada cuesta menos de lo que parece.</p>
+    </div>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-bottom:28px;">
+    <div style="border-radius:16px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.08); border:1px solid #e2e8f0;">
+      <div style="background:var(--azul); color:white; padding:20px 24px;">
+        <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; opacity:0.8; margin-bottom:6px;">Desarrollo del sistema</div>
+        <div style="font-size:2rem; font-weight:800;">USD 800<span style="font-size:1rem; font-weight:400;"> – 3.500</span></div>
+        <div style="font-size:0.78rem; opacity:0.75; margin-top:4px;">Pago único · Según escala del municipio</div>
+      </div>
+      <div style="padding:20px 24px; background:white;">
+        <ul style="list-style:none; font-size:0.84rem; color:#444; line-height:2;">
+          <li>✅ Los 8 módulos del sistema</li>
+          <li>✅ Diseño personalizado con tu imagen</li>
+          <li>✅ Capacitación del equipo incluida</li>
+          <li>✅ Entrega en 8 semanas</li>
+        </ul>
+      </div>
+    </div>
+    <div style="border-radius:16px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.08); border:1px solid #e2e8f0;">
+      <div style="background:var(--rojo); color:white; padding:20px 24px;">
+        <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; opacity:0.8; margin-bottom:6px;">Soporte mensual</div>
+        <div style="font-size:2rem; font-weight:800;">USD 150<span style="font-size:1rem; font-weight:400;"> – 400/mes</span></div>
+        <div style="font-size:0.78rem; opacity:0.75; margin-top:4px;">Según nivel de servicio elegido</div>
+      </div>
+      <div style="padding:20px 24px; background:white;">
+        <ul style="list-style:none; font-size:0.84rem; color:#444; line-height:2;">
+          <li>✅ Mantenimiento técnico 24/7</li>
+          <li>✅ Carga de contactos y envíos</li>
+          <li>✅ Reportes semanales con métricas</li>
+          <li>✅ Soporte al equipo en tiempo real</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- Costo WhatsApp API -->
+  <div style="background:#f0fff4; border-radius:12px; padding:20px 24px; border-left:4px solid #27ae60; margin-bottom:16px;">
+    <p style="font-size:0.88rem; font-weight:700; color:#27ae60; margin-bottom:8px;">📱 Costo operativo de envíos masivos por WhatsApp</p>
+    <p style="font-size:0.84rem; color:#444; line-height:1.7; margin-bottom:10px;">El módulo de mensajería masiva utiliza la API oficial de WhatsApp (Meta), que cobra por conversación. Este costo se traslada al cliente o se incluye en el plan de soporte:</p>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <div style="background:white; border-radius:8px; padding:12px 16px; flex:1; min-width:160px; border:1px solid #d4edda;">
+        <div style="font-size:0.75rem; color:#888; margin-bottom:4px;">Base pequeña · hasta 2.000 contactos</div>
+        <div style="font-weight:700; color:#27ae60; font-size:1rem;">USD 30–50/mes</div>
+      </div>
+      <div style="background:white; border-radius:8px; padding:12px 16px; flex:1; min-width:160px; border:1px solid #d4edda;">
+        <div style="font-size:0.75rem; color:#888; margin-bottom:4px;">Base mediana · hasta 5.000 contactos</div>
+        <div style="font-weight:700; color:#27ae60; font-size:1rem;">USD 80–150/mes</div>
+      </div>
+      <div style="background:white; border-radius:8px; padding:12px 16px; flex:1; min-width:160px; border:1px solid #d4edda;">
+        <div style="font-size:0.75rem; color:#888; margin-bottom:4px;">Costo por conversación (API Meta)</div>
+        <div style="font-weight:700; color:#27ae60; font-size:1rem;">≈ USD 0,05</div>
+      </div>
+    </div>
+  </div>
+  <div style="background:#f0f3ff; border-radius:12px; padding:18px 24px; border-left:4px solid var(--azul);">
+    <p style="font-size:0.9rem; color:#333; line-height:1.7;">💡 <strong>Para dimensionar:</strong> una sola tanda de publicidad en radio o un camión con pantalla LED tiene un costo similar o mayor — y no genera base de datos, ni permite medir resultados, ni queda para la próxima campaña.</p>
+  </div>
+</section>
+
+<hr class="divisor-suave" />
+
+<!-- ══ CONTACTO / CTA ══════════════════════════════════════════════════════ -->
+<section style="text-align:center;">
+  <div style="background:linear-gradient(135deg,#0f1f4e,#1e3070); border-radius:20px; padding:48px 40px; color:white; max-width:700px; margin:0 auto;">
+    <div style="font-size:2.5rem; margin-bottom:16px;">🚀</div>
+    <h2 style="font-size:1.6rem; font-weight:800; margin-bottom:12px; line-height:1.3;">¿Querés implementar este sistema en tu campaña?</h2>
+    <p style="font-size:0.95rem; color:rgba(255,255,255,0.8); line-height:1.7; margin-bottom:28px;">Cada semana que pasa es una semana menos para construir tu base de contactos. Escribinos hoy y coordinamos una reunión sin compromiso para analizar tu caso.</p>
+    <div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
+      <a href="https://wa.me/543743483429" target="_blank" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:10px; padding:12px 28px; font-size:0.95rem; color:white; width:100%; max-width:360px; text-decoration:none; display:block; text-align:center;">
+        📱 <strong>WhatsApp:</strong> 3743 483429
+      </a>
+      <div style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:10px; padding:12px 28px; font-size:0.95rem; color:white; width:100%; max-width:360px;">
+        ✉️ <strong>Email:</strong> enzomantay@gmail.com
+      </div>
+    </div>
+    <p style="margin-top:20px; font-size:0.78rem; color:rgba(255,255,255,0.5);">Respondemos en menos de 24 horas.</p>
+  </div>
+</section>
+
+<hr class="divisor-suave" />
+
+<!-- ══ CIERRE ═════════════════════════════════════════════════════════════ -->
+<div class="cierre">
+  <h2>Una campaña <span>más organizada,<br/>más conectada</span> con la gente.</h2>
+  <p>Este sistema le da al equipo las herramientas para llegar a cada vecino con el mensaje correcto, en el momento correcto y desde un lugar de cercanía real.</p>
+  <div class="slogan-final">Tu competencia no tiene esto. Vos podés tenerlo.</div>
+</div>
+
+<!-- ══ FOOTER ══════════════════════════════════════════════════════════════ -->
+<div style="background:#0f1f4e; color:rgba(255,255,255,0.5); text-align:center; padding:20px 40px; font-size:0.78rem; border-top:1px solid rgba(255,255,255,0.08);">
+  © 2026 &nbsp;·&nbsp; Desarrollado por <strong style="color:rgba(255,255,255,0.8);">Enzo Gabriel Mantay</strong>
+  &nbsp;·&nbsp; enzomantay@gmail.com
+  &nbsp;·&nbsp; Cel: 3743 483429
+  &nbsp;·&nbsp; <span style="color:rgba(255,255,255,0.35);">Todos los derechos reservados. Reproducción no autorizada prohibida.</span>
+</div>
+
+<script>
+// © 2026 Enzo Gabriel Mantay — Todos los derechos reservados
+// Este documento es confidencial y su reproducción no autorizada está prohibida.
+(function(){
+  // Bloquear clic derecho
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  // Bloquear teclas de desarrollador y ver código fuente
+  document.addEventListener('keydown', function(e){
+    if (
+      e.key === 'F12' ||
+      (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'K')) ||
+      (e.ctrlKey && (e.key === 'U' || e.key === 'S'))
+    ) {
+      e.preventDefault();
+      return false;
+    }
+  });
+  // Bloquear selección de texto
+  document.addEventListener('selectstart', function(e){ e.preventDefault(); });
+  // Bloquear arrastrar imágenes/elementos
+  document.addEventListener('dragstart', function(e){ e.preventDefault(); });
+})();
+</script>
+</body>
+</html>
