@@ -35,10 +35,10 @@ export function FormSimularEnvio({ barrios }: { barrios: string[] }) {
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-panel">
-      <h3 className="font-bold text-campana-azul">Simular envío masivo</h3>
+      <h3 className="font-bold text-campana-azul">Simulación (sin Meta)</h3>
       <p className="mt-2 text-sm text-slate-600">
-        Registra un lote y un estado por contacto, como haría el panel con WhatsApp. Todavía{" "}
-        <strong>no</strong> se envía nada a Meta: es para probar flujo y auditoría.
+        Registra un lote en la base <strong>sin</strong> llamar a la API. Útil para capacitación o demos sin
+        costo.
       </p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <label className="block text-sm">

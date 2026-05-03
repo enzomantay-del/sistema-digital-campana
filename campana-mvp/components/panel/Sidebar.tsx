@@ -16,7 +16,7 @@ export function Sidebar() {
           Plataforma de campaña
         </h1>
         <p className="mt-2 text-xs text-slate-500">
-          Datos + panel. WhatsApp Cloud API en siguiente iteración.
+          Datos + panel + envío por plantilla (Meta). Configuración en el menú inferior.
         </p>
       </div>
       <nav className="flex flex-1 flex-col gap-1 p-3">

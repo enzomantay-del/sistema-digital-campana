@@ -30,7 +30,7 @@ model Envio {
   nombre        String
   /// Si null, el envío apunta a todos los contactos; si string, filtra por barrio
   filtroBarrio  String?
-  estado        String   @default("BORRADOR") // BORRADOR | LISTO | SIMULADO
+  estado        String   @default("BORRADOR") // BORRADOR | SIMULADO | ENVIANDO | PARCIAL | COMPLETADO | ERROR
   creadoEn      DateTime @default(now())
   descripcion   String?  @default("")
 
@@ -44,11 +44,12 @@ model MessageLog {
   contactoId String
   contacto   Contacto @relation(fields: [contactoId], references: [id], onDelete: Cascade)
 
-  estado         String  @default("PENDIENTE") // PENDIENTE | SIMULADO_OK | ERROR
+  estado         String  @default("PENDIENTE") // PENDIENTE | SIMULADO_OK | ENVIADO | ENTREGADO | LEIDO | ERROR
   detalle        String? @default("")
-  waMessageId    String? // reservado para Fase 2 (Cloud API)
+  waMessageId    String?
   actualizadoEn  DateTime @updatedAt
 
   @@index([envioId])
   @@index([contactoId])
+  @@index([waMessageId])
 }

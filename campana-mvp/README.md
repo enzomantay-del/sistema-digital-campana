@@ -45,8 +45,9 @@ Abrí [http://localhost:3000](http://localhost:3000) → redirige al panel.
 
 ## Fases
 
-- **Fase 1 (actual):** modelo de datos, UI panel, simulación de envíos.
-- **Fase 2:** WhatsApp Cloud API, webhooks en `/api/webhooks/whatsapp`, plantillas Meta.
+- **Fase 1:** modelo de datos, UI panel, simulación de envíos.
+- **Fase 2 (actual):** envío de **plantillas** vía Graph API (`/api/envios/whatsapp`), recepción de estados en
+  `/api/webhooks/whatsapp` (actualiza `MessageLog`). Ver variables en `.env.example` y la pantalla **Configuración**.
 
 ## Producción
 

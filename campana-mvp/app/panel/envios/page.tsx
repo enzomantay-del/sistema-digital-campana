@@ -1,5 +1,19 @@
+import {
+  getDefaultTemplateLanguage,
+  getDefaultTemplateName,
+  isWhatsAppConfigured,
+} from "@/lib/whatsapp-config";
 import { prisma } from "@/lib/prisma";
+import { FormEnvioWhatsApp } from "./FormEnvioWhatsApp";
 import { FormSimularEnvio } from "./FormSimular";
+
+function badgeEnvio(estado: string) {
+  const base = "rounded-full px-2.5 py-0.5 text-xs font-medium";
+  if (estado === "ERROR" || estado === "error") return `${base} bg-red-50 text-red-800`;
+  if (estado === "COMPLETADO" || estado === "SIMULADO") return `${base} bg-emerald-50 text-emerald-800`;
+  if (estado === "PARCIAL" || estado === "ENVIANDO") return `${base} bg-amber-50 text-amber-900`;
+  return `${base} bg-slate-100 text-slate-800`;
+}
 
 export default async function EnviosPage() {
   const barrios = await prisma.contacto.findMany({
@@ -18,10 +32,17 @@ export default async function EnviosPage() {
       <div>
         <h2 className="text-2xl font-bold text-campana-azul">Envíos</h2>
         <p className="mt-1 text-sm text-slate-600">
-          Cada fila es un lote. En esta fase los mensajes son <strong>simulados</strong> para validar el modelo de datos
-          y el panel antes de conectar la API de WhatsApp.
+          <strong>Fase 2:</strong> envío real con plantilla aprobada (Meta). <strong>Fase 1:</strong> simulación local
+          sin costo.
         </p>
       </div>
+
+      <FormEnvioWhatsApp
+        barrios={barrios.map((b) => b.barrio)}
+        whatsappListo={isWhatsAppConfigured()}
+        plantillaDefault={getDefaultTemplateName()}
+        idiomaDefault={getDefaultTemplateLanguage()}
+      />
 
       <FormSimularEnvio barrios={barrios.map((b) => b.barrio)} />
 
@@ -53,9 +74,7 @@ export default async function EnviosPage() {
                     <td className="px-4 py-3 font-medium text-slate-800">{e.nombre}</td>
                     <td className="px-4 py-3 text-slate-600">{e.filtroBarrio ?? "— Todos —"}</td>
                     <td className="px-4 py-3">
-                      <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
-                        {e.estado}
-                      </span>
+                      <span className={badgeEnvio(e.estado)}>{e.estado}</span>
                     </td>
                     <td className="px-4 py-3 tabular-nums">{e._count.mensajes}</td>
                     <td className="px-4 py-3 text-xs text-slate-500">
