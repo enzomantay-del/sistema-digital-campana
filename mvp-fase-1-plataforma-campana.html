@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MVP Fase 1 — Plataforma de campaña (guía viva)</title>
+  <meta name="description" content="Definición del primer producto demostrable: datos, WhatsApp y panel. Plantilla reutilizable por candidato.">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --azul: #1e3070;
+      --azul-med: #2a4094;
+      --azul-claro: #3d5ab8;
+      --rojo: #d42b2b;
+      --ok: #1e8f4a;
+      --warn: #c97a00;
+      --texto: #1e2a3a;
+      --suave: #5c6b82;
+      --fondo: #f4f6fb;
+      --card: #ffffff;
+      --borde: #e2e8f4;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      color: var(--texto);
+      background: var(--fondo);
+      font-size: 16px;
+      line-height: 1.65;
+    }
+
+    .hero {
+      background: linear-gradient(145deg, #0f1f4e 0%, #1e3070 45%, #2a4094 100%);
+      color: #fff;
+      padding: 48px 24px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      border: 72px solid rgba(255,255,255,0.04);
+      top: -140px;
+      right: -100px;
+      pointer-events: none;
+    }
+    .hero-inner { max-width: 920px; margin: 0 auto; position: relative; z-index: 1; }
+
+    .badge {
+      display: inline-block;
+      background: rgba(212,43,43,0.22);
+      border: 1px solid rgba(255,255,255,0.35);
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.75rem, 4.5vw, 2.35rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 14px;
+      max-width: 720px;
+    }
+
+    .hero .lead {
+      font-size: 1.05rem;
+      opacity: 0.92;
+      max-width: 680px;
+      margin-bottom: 28px;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      max-width: 720px;
+    }
+
+    .hero-stat {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .hero-stat .n { font-size: 1.65rem; font-weight: 800; color: #ffb4b4; line-height: 1.1; }
+    .hero-stat .d { font-size: 0.8rem; opacity: 0.85; margin-top: 6px; }
+
+    .wrap { max-width: 920px; margin: 0 auto; padding: 40px 24px 64px; }
+
+    h2 {
+      font-size: 1.35rem;
+      color: var(--azul);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    h2 .ico { font-size: 1.35rem; line-height: 1; }
+
+    .sub { color: var(--suave); font-size: 0.95rem; margin-bottom: 22px; max-width: 720px; }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-bottom: 36px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 22px 20px;
+      border: 1px solid var(--borde);
+      box-shadow: 0 8px 28px rgba(30,48,112,0.06);
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      color: var(--azul);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .card h3 span:first-child { font-size: 1.45rem; line-height: 1.2; flex-shrink: 0; }
+
+    .card p, .card li { font-size: 0.92rem; color: #3d4a5f; }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+    .pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: var(--azul-med);
+    }
+
+    .timeline {
+      margin: 28px 0 36px;
+      padding-left: 0;
+      list-style: none;
+      border-left: 3px solid var(--azul-claro);
+      margin-left: 14px;
+    }
+
+    .timeline li {
+      position: relative;
+      padding: 0 0 22px 26px;
+      margin-left: 0;
+    }
+
+    .timeline li::before {
+      content: attr(data-step);
+      position: absolute;
+      left: -14px;
+      top: 0;
+      transform: translateX(-50%);
+      width: 28px;
+      height: 28px;
+      background: var(--rojo);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(212,43,43,0.35);
+    }
+
+    .timeline strong { color: var(--azul); display: block; margin-bottom: 4px; font-size: 0.95rem; }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 36px;
+    }
+
+    @media (max-width: 720px) {
+      .split { grid-template-columns: 1fr; }
+    }
+
+    .in-box { border-top: 4px solid var(--ok); }
+    .out-box { border-top: 4px solid #94a3b8; }
+
+    .in-box h3, .out-box h3 {
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .check-list li {
+      list-style: none;
+      padding-left: 28px;
+      position: relative;
+      margin-bottom: 10px;
+      font-size: 0.92rem;
+    }
+
+    .check-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--ok);
+      font-weight: 800;
+    }
+
+    .out-list li {
+      list-style: none;
+      padding-left: 28px;
+      position: relative;
+      margin-bottom: 10px;
+      font-size: 0.92rem;
+      color: #5c6578;
+    }
+
+    .out-list li::before {
+      content: '○';
+      position: absolute;
+      left: 0;
+      color: #94a3b8;
+      font-weight: 700;
+    }
+
+    .stories {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+
+    .story {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 16px;
+      align-items: start;
+      background: var(--card);
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      padding: 18px 18px;
+      box-shadow: 0 4px 18px rgba(30,48,112,0.05);
+    }
+
+    .story .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #e8ecff, #f0f4ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .story .role {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--suave);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .story .want {
+      font-weight: 700;
+      color: var(--azul);
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    .example {
+      background: linear-gradient(135deg, #fff8f0 0%, #fff 50%);
+      border: 1px solid #ffe0cc;
+      border-radius: 14px;
+      padding: 22px 22px;
+      margin-bottom: 36px;
+    }
+
+    .example h3 {
+      color: var(--warn);
+      font-size: 1rem;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .example-step {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 14px;
+      font-size: 0.92rem;
+    }
+
+    .example-step:last-child { margin-bottom: 0; }
+
+    .t { flex-shrink: 0; width: 52px; font-weight: 800; color: var(--azul); font-size: 0.85rem; }
+
+    .risks {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .risk {
+      display: flex;
+      gap: 14px;
+      background: #fff;
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      padding: 14px 16px;
+      align-items: flex-start;
+    }
+
+    .risk .r-ico { font-size: 1.35rem; flex-shrink: 0; }
+
+    .cta {
+      background: linear-gradient(135deg, var(--azul) 0%, var(--azul-med) 100%);
+      color: #fff;
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(30,48,112,0.2);
+    }
+
+    .cta p { opacity: 0.92; font-size: 0.95rem; margin-bottom: 8px; max-width: 560px; margin-left: auto; margin-right: auto; }
+
+    .cta strong { display: block; font-size: 1.1rem; margin-bottom: 8px; }
+
+    footer {
+      text-align: center;
+      padding: 28px 20px;
+      font-size: 0.8rem;
+      color: var(--suave);
+    }
+
+    .muted { color: var(--suave); font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <span class="badge">Desarrollo · Punto 1 del roadmap</span>
+      <h1>MVP Fase 1: lo primero que tiene que existir</h1>
+      <p class="lead">
+        Un producto mínimo que ya se puede <strong>mostrar en vivo</strong>: importar o cargar contactos por barrio,
+        enviar mensajes segmentados por WhatsApp (oficial) y ver en un panel qué pasó con cada envío.
+        Todo lo demás (QR fino, fiscales full, cómputo avanzado) entra después, sin frenar el arranque.
+      </p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="n">3</div>
+          <div class="d">pilares técnicos entrelazados</div>
+        </div>
+        <div class="hero-stat">
+          <div class="n">2–4</div>
+          <div class="d">semanas de foco típicas</div>
+        </div>
+        <div class="hero-stat">
+          <div class="n">1</div>
+          <div class="d">demo que vende sola</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <h2><span class="ico">🎯</span> Objetivo del MVP (una sola frase)</h2>
+    <p class="sub">
+      Que el equipo de campaña pueda decir: <em>“Ya tenemos nuestra base ordenada, ya mandamos por WhatsApp a quien queremos,
+      y vemos el resultado en pantalla.”</em> Eso es el núcleo comercial y técnico.
+    </p>
+
+    <div class="grid-3">
+      <div class="card">
+        <h3><span>🗂️</span><span>Datos por territorio</span></h3>
+        <p>Contactos con barrio/zona, etiquetas y teléfono normalizado. Importación desde planilla y alta manual.</p>
+        <div class="pill-row">
+          <span class="pill">CSV / Excel</span>
+          <span class="pill">Segmentación</span>
+          <span class="pill">Roles</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span>💬</span><span>WhatsApp oficial</span></h3>
+        <p>Envíos masivos o segmentados usando API de Meta (Cloud API). Plantillas aprobadas y registro de estado.</p>
+        <div class="pill-row">
+          <span class="pill">Entregado / leído</span>
+          <span class="pill">Errores visibles</span>
+          <span class="pill">Costo variable</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span>📊</span><span>Panel operativo</span></h3>
+        <p>Tablero simple: cuántos contactos por barrio, últimos envíos, filtros y alertas. Sin BI de lujo todavía.</p>
+        <div class="pill-row">
+          <span class="pill">Tiempo real</span>
+          <span class="pill">Por barrio</span>
+          <span class="pill">Exportar</span>
+        </div>
+      </div>
+    </div>
+
+    <h2><span class="ico">🗓️</span> Camino sugerido (ejemplo 2–4 semanas)</h2>
+    <p class="sub">No es una promesa de calendario: es un orden de batalla para que cualquier equipo lo adapte a su ritmo.</p>
+
+    <ol class="timeline">
+      <li data-step="1">
+        <strong>Semana 1 — Cimiento</strong>
+        Modelo de datos (contacto, barrio, usuario, envío), login y permisos básicos. Importador de planilla con vista previa.
+      </li>
+      <li data-step="2">
+        <strong>Semana 2 — Canal</strong>
+        Integración WhatsApp Cloud API: primera plantilla en sandbox/producción, envío a lista filtrada, log de respuestas del proveedor.
+      </li>
+      <li data-step="3">
+        <strong>Semana 3 — Visibilidad</strong>
+        Panel: lista de envíos, estados agregados, drill-down por barrio. Alertas si fallan números o límites de cuenta.
+      </li>
+      <li data-step="4">
+        <strong>Semana 4 — Cierre de MVP</strong>
+        Pulido UX, capacitación corta documentada, checklist “día de demo”. Opcional: primer sondeo simple (pregunta + opciones) enlazado al mismo canal.
+      </li>
+    </ol>
+
+    <h2><span class="ico">✅</span> Alcance del MVP vs. lo que viene después</h2>
+    <p class="sub">Ser claros acá evita frustración del candidato y retrabajo del equipo técnico.</p>
+
+    <div class="split">
+      <div class="card in-box">
+        <h3><span>✅</span> Dentro del MVP (Fase 1)</h3>
+        <ul class="check-list">
+          <li>Base de datos propia con barrios y filtros.</li>
+          <li>Envío WhatsApp segmentado + registro de estado.</li>
+          <li>Panel con métricas mínimas y exportación.</li>
+          <li>Usuarios con roles (ej. admin / coordinador).</li>
+          <li>Documentación para importar contactos y mandar campaña.</li>
+        </ul>
+      </div>
+      <div class="card out-box">
+        <h3><span>⏭️</span> Fuera por ahora (siguientes fases)</h3>
+        <ul class="out-list">
+          <li>Central de cómputos completa y mapas electorales finos.</li>
+          <li>Gestión avanzada de fiscales por mesa (puede ser Fase 2).</li>
+          <li>Landing pública con marca full y A/B testing.</li>
+          <li>Integraciones con redes distintas de WhatsApp.</li>
+          <li>BI predictivo o scoring masivo (salvo un prototipo muy acotado).</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2><span class="ico">👥</span> Historias de usuario (plantilla para cualquier campaña)</h2>
+    <p class="sub">Copiá y reemplazá el nombre del distrito. Sirven para validar que el MVP responde a roles reales.</p>
+
+    <div class="stories">
+      <div class="story">
+        <div class="avatar">🧑‍💼</div>
+        <div>
+          <div class="role">Jefe de campaña</div>
+          <div class="want">Quiero importar 4.000 contactos con barrio y ver duplicados antes de guardar.</div>
+          <p class="muted">Así no ensuciamos la base el primer día y podemos segmentar sin Excel paralelo.</p>
+        </div>
+      </div>
+      <div class="story">
+        <div class="avatar">📣</div>
+        <div>
+          <div class="role">Coordinador territorial</div>
+          <div class="want">Quiero mandar un mensaje solo a “Zona Sur” y saber cuántos llegaron.</div>
+          <p class="muted">Para ajustar convocatorias y seguimiento sin spamear al resto de la ciudad.</p>
+        </div>
+      </div>
+      <div class="story">
+        <div class="avatar">🎯</div>
+        <div>
+          <div class="role">Candidato / vocero</div>
+          <div class="want">Quiero ver en una pantalla si el mensaje del cierre se entregó bien.</div>
+          <p class="muted">Tranquilidad mediática: datos propios, no captura de pantalla de un grupo.</p>
+        </div>
+      </div>
+      <div class="story">
+        <div class="avatar">💻</div>
+        <div>
+          <div class="role">Equipo técnico</div>
+          <div class="want">Quiero logs de API y reintentos claros cuando Meta rechaza un número.</div>
+          <p class="muted">Reduce soporte nocturno y permite explicar costos/límites con evidencia.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2><span class="ico">☀️</span> Ejemplo de “día feliz” (relato corto)</h2>
+    <p class="sub">Útil para onboarding y para la demo al político: todos entienden una historia.</p>
+
+    <div class="example">
+      <h3><span>📍</span> Miércoles, campaña en marcha</h3>
+      <div class="example-step">
+        <span class="t">10:00</span>
+        <div><strong>Importación:</strong> suben una planilla con columnas Nombre, Teléfono, Barrio. El sistema marca 37 duplicados y los fusiona.</div>
+      </div>
+      <div class="example-step">
+        <span class="t">11:30</span>
+        <div><strong>Segmento:</strong> eligen “Barrio Centro” (812 personas). Redactan variaciones del mismo mensaje si hace falta.</div>
+      </div>
+      <div class="example-step">
+        <span class="t">15:00</span>
+        <div><strong>Envío:</strong> disparan campaña con plantilla aprobada. El panel muestra entregados, lecturas y fallos por número inválido.</div>
+      </div>
+      <div class="example-step">
+        <span class="t">18:00</span>
+        <div><strong>Cierre:</strong> exportan CSV de respuestas de estado para la reunión de equipo. Mañana repiten en otro barrio.</div>
+      </div>
+    </div>
+
+    <h2><span class="ico">🎓</span> Definición de “terminado” (checklist)</h2>
+    <p class="sub">Si cumple todo esto, el MVP está listo para mostrar a un candidato serio.</p>
+
+    <div class="card" style="margin-bottom: 36px;">
+      <ul class="check-list">
+        <li>Un usuario nuevo puede cargar datos, enviar y ver resultados sin ayuda telefónica (guiado por tutoriales en pantalla).</li>
+        <li>Los envíos quedan auditados: quién mandó, cuándo, a qué segmento.</li>
+        <li>Hay manejo explícito de errores de WhatsApp (con mensajes claros, no códigos crudos).</li>
+        <li>Existe un “modo demo” con datos ficticios para no exponer teléfonos reales en reuniones.</li>
+      </ul>
+    </div>
+
+    <h2><span class="ico">⚠️</span> Riesgos típicos y cómo cubrirlos desde el MVP</h2>
+    <div class="risks">
+      <div class="risk">
+        <span class="r-ico">📉</span>
+        <div>
+          <strong>Límites y costos de Meta</strong>
+          <p class="muted">Acordar rangos de mensajes/mes y mostrar estimación antes de enviar. Documentar recarga de saldo o facturación.</p>
+        </div>
+      </div>
+      <div class="risk">
+        <span class="r-ico">🔐</span>
+        <div>
+          <strong>Datos sensibles</strong>
+          <p class="muted">Contraseñas fuertes, roles, backups básicos y política de quién exporta la base.</p>
+        </div>
+      </div>
+      <div class="risk">
+        <span class="r-ico">⏱️</span>
+        <div>
+          <strong>Plantillas lentas de aprobar</strong>
+          <p class="muted">Preparar textos base genéricos temprano; tener plan B (mensaje más corto o dos variantes).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta">
+      <strong>Próximo paso después del MVP 1</strong>
+      <p>
+        Enganchar <strong>sondeos</strong> simples al mismo flujo, luego <strong>fiscales</strong> y <strong>cómputo</strong> cuando la base y el canal ya estén maduros.
+        Así cada fase suma sobre cimiento real, no sobre humo.
+      </p>
+    </div>
+
+  </main>
+
+  <footer>
+    Plantilla viva · Adaptá textos al distrito y al candidato · © 2026
+  </footer>
+
+</body>
+</html>
