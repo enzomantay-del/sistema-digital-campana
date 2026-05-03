@@ -9,9 +9,21 @@ Aplicación **Next.js** con **Prisma** y **SQLite** en desarrollo: base de conta
 
 ## Arranque local
 
+**No hay un solo archivo “para abrir” como un HTML:** esto es una aplicación que corre con Node.js. Tenés dos opciones:
+
+### Opción A — Windows (doble clic)
+
+1. Entrá a la carpeta `campana-mvp`.
+2. **Doble clic** en **`iniciar-panel.bat`**.  
+   La primera vez va a instalar dependencias y puede tardar varios minutos.
+3. Se abre el navegador en `http://localhost:3000`. Si no pasa solo, abrilo vos a esa dirección.
+4. **Una sola vez**, si la base está vacía y querés datos de prueba, con el servidor **cerrado** abrí `cmd` en esta carpeta y ejecutá: `npm run db:seed`
+
+### Opción B — Terminal (manual)
+
 ```bash
 cd campana-mvp
-cp .env.example .env
+copy .env.example .env
 npm install
 npx prisma migrate dev
 npm run db:seed
@@ -19,6 +31,8 @@ npm run dev
 ```
 
 Abrí [http://localhost:3000](http://localhost:3000) → redirige al panel.
+
+**Requisito:** tener [Node.js](https://nodejs.org) instalado (versión LTS recomendada).
 
 ## Scripts
 
