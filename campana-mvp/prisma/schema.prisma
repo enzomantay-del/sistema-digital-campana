@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Contacto en base territorial (Fase 1: núcleo de todo el sistema)
+model Contacto {
+  id         String   @id @default(cuid())
+  nombre     String
+  telefono   String
+  /// Valor crudo o E.164; en Fase 1 aceptamos normalización básica en import
+  barrio     String
+  notas      String?  @default("")
+  creadoEn   DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  mensajes MessageLog[]
+
+  @@index([barrio])
+  @@index([telefono])
+}
+
+/// Lote de envío (campaña interna) — aún sin integración WA en Fase 1 = simulación + registro
+model Envio {
+  id            String   @id @default(cuid())
+  nombre        String
+  /// Si null, el envío apunta a todos los contactos; si string, filtra por barrio
+  filtroBarrio  String?
+  estado        String   @default("BORRADOR") // BORRADOR | LISTO | SIMULADO
+  creadoEn      DateTime @default(now())
+  descripcion   String?  @default("")
+
+  mensajes MessageLog[]
+}
+
+model MessageLog {
+  id         String   @id @default(cuid())
+  envioId    String
+  envio      Envio    @relation(fields: [envioId], references: [id], onDelete: Cascade)
+  contactoId String
+  contacto   Contacto @relation(fields: [contactoId], references: [id], onDelete: Cascade)
+
+  estado         String  @default("PENDIENTE") // PENDIENTE | SIMULADO_OK | ERROR
+  detalle        String? @default("")
+  waMessageId    String? // reservado para Fase 2 (Cloud API)
+  actualizadoEn  DateTime @updatedAt
+
+  @@index([envioId])
+  @@index([contactoId])
+}
