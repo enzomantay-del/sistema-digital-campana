@@ -12,7 +12,7 @@ export default async function PanelInicioPage() {
   });
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    <div className="mx-auto w-full max-w-7xl space-y-8">
       <header className="rounded-2xl bg-gradient-to-br from-campana-azul via-campana-azul-med to-campana-azul-claro p-8 text-white shadow-panel">
         <p className="text-sm font-medium text-white/80">Panel operativo</p>
         <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">

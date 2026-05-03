@@ -7,7 +7,7 @@ export default async function ContactosPage() {
   const rows = await prisma.contacto.findMany({ orderBy: { creadoEn: "desc" } });
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    <div className="mx-auto w-full max-w-7xl space-y-8">
       <div>
         <h2 className="text-2xl font-bold text-campana-azul">Contactos territoriales</h2>
         <p className="mt-1 text-sm text-slate-600">

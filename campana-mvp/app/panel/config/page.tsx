@@ -1,6 +1,6 @@
 export default function ConfigPage() {
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto w-full max-w-4xl space-y-6">
       <h2 className="text-2xl font-bold text-campana-azul">Configuración</h2>
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-950">
         <p className="font-semibold">WhatsApp Cloud API (Meta) — próxima fase</p>

@@ -14,7 +14,7 @@ export default async function EnviosPage() {
   });
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    <div className="mx-auto w-full max-w-7xl space-y-8">
       <div>
         <h2 className="text-2xl font-bold text-campana-azul">Envíos</h2>
         <p className="mt-1 text-sm text-slate-600">

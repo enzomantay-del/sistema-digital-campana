@@ -9,7 +9,7 @@ const items = [
 
 export function Sidebar() {
   return (
-    <aside className="flex w-full flex-col border-r border-slate-200/80 bg-white shadow-panel lg:fixed lg:inset-y-0 lg:w-64">
+    <aside className="flex w-full flex-col border-b border-slate-200/80 bg-white shadow-panel lg:h-screen lg:min-h-screen lg:sticky lg:top-0 lg:border-b-0 lg:border-r lg:w-64 lg:shrink-0">
       <div className="border-b border-slate-100 px-5 py-6">
         <p className="text-xs font-semibold uppercase tracking-wider text-campana-rojo">MVP · Fase 1</p>
         <h1 className="mt-1 text-lg font-bold leading-tight text-campana-azul">
@@ -39,7 +39,7 @@ export function Sidebar() {
         ))}
       </nav>
       <div className="border-t border-slate-100 p-4 text-[11px] leading-snug text-slate-400">
-        Plantilla reutilizable: adaptá nombre del distrito y marca quando corresponda.
+        Plantilla reutilizable: adaptá nombre del distrito y marca cuando corresponda.
       </div>
     </aside>
   );
