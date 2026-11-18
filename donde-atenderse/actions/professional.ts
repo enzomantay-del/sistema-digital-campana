@@ -61,13 +61,18 @@ export async function guardarProfesional(borrador: BorradorProfesional): Promise
   }
 
   const actuales = await prisma.attendance.findMany({ where: { professionalId: professional.id } });
+  const editores = new Set(user.places.map((item) => item.placeId));
   const conservados = new Set<string>();
   const rows: { key: string; id: string; placeId: string }[] = [];
   const ahora = new Date();
 
   for (const horario of borrador.horarios) {
-    let placeId = horario.placeId;
-    if (!placeId && horario.ownsPlace) {
+    const existente = horario.id
+      ? actuales.find((item) => item.id === horario.id && item.professionalId === professional.id)
+      : undefined;
+    let placeId = existente?.placeId;
+
+    if (!placeId && !horario.placeId && horario.ownsPlace) {
       if (horario.placeName.trim().length < 2) continue;
       if (!LOCALIDADES.includes(horario.locality as (typeof LOCALIDADES)[number])) {
         return { ok: false, error: "El consultorio necesita una localidad del corredor." };
@@ -77,50 +82,54 @@ export async function guardarProfesional(borrador: BorradorProfesional): Promise
           name: horario.placeName.trim(),
           kind: "consultorio",
           locality: horario.locality,
-          address: horario.address.trim(),
+          address: horario.address.trim().slice(0, 200),
           published: true,
         },
       });
       await prisma.placeEditor.create({ data: { userId: user.id, placeId: place.id } });
+      editores.add(place.id);
       placeId = place.id;
+    } else if (!placeId && horario.placeId && editores.has(horario.placeId)) {
+      placeId = horario.placeId;
     }
-    if (!placeId) continue;
 
-    const editor = await prisma.placeEditor.findUnique({
-      where: { userId_placeId: { userId: user.id, placeId } },
-    });
-    if (editor && horario.ownsPlace) {
+    if (!placeId) continue;
+    const esEditor = editores.has(placeId);
+    const mismaFicha = !existente || !horario.placeId || horario.placeId === existente.placeId;
+
+    if (esEditor && horario.ownsPlace && mismaFicha) {
       await prisma.place.update({
         where: { id: placeId },
         data: {
           name: horario.placeName.trim() || undefined,
-          locality: horario.locality,
-          address: horario.address.trim(),
+          locality: LOCALIDADES.includes(horario.locality as (typeof LOCALIDADES)[number])
+            ? horario.locality
+            : undefined,
+          address: horario.address.trim().slice(0, 200),
         },
       });
     }
 
     const dataProfesional = {
       professionalDays: horario.days.join(","),
-      professionalTime: horario.time.trim(),
+      professionalTime: horario.time.trim().slice(0, 80),
       professionalShift: horario.shift,
       professionalUpdatedAt: ahora,
-      ...(editor
+      ...(esEditor
         ? {
             placeDays: horario.days.join(","),
-            placeTime: horario.time.trim(),
+            placeTime: horario.time.trim().slice(0, 80),
             placeShift: horario.shift,
             placeUpdatedAt: ahora,
           }
         : {}),
     };
 
-    const existente = horario.id ? actuales.find((item) => item.id === horario.id) : undefined;
-    if (existente && existente.professionalId === professional.id) {
+    if (existente) {
       await prisma.attendance.update({ where: { id: existente.id }, data: dataProfesional });
       conservados.add(existente.id);
       rows.push({ key: horario.key, id: existente.id, placeId });
-    } else {
+    } else if (esEditor) {
       const creado = await prisma.attendance.create({
         data: { professionalId: professional.id, placeId, ...dataProfesional },
       });

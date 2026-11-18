@@ -22,7 +22,7 @@ export default async function PaginaEditorProfesional() {
   });
   const [lugares, obras] = await Promise.all([
     prisma.place.findMany({
-      where: { kind: { not: "farmacia" } },
+      where: { editors: { some: { userId: usuario.id } }, kind: { not: "farmacia" } },
       select: { id: true, name: true, locality: true },
       orderBy: { name: "asc" },
     }),

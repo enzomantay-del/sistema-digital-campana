@@ -35,7 +35,7 @@ export function FormularioCuenta() {
       </fieldset>
       {tipo === "profesional" ? (
         <label className="grid gap-1">
-          Matrícula, si ya está cargada
+          Matrícula
           <input name="license" className="campo" />
         </label>
       ) : (

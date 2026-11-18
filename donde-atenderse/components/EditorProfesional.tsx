@@ -214,6 +214,11 @@ export function EditorProfesional({
           <h2 className="text-2xl font-semibold">Dónde atendés</h2>
           {borrador.horarios.map((horario) => (
             <div key={horario.key} className="grid gap-3 border-t border-line pt-4">
+              {horario.placeId && !horario.ownsPlace ? (
+                <p>
+                  {horario.placeName} · {horario.locality}
+                </p>
+              ) : (
               <label className="grid gap-1">
                 Lugar
                 <select
@@ -225,11 +230,12 @@ export function EditorProfesional({
                       return;
                     }
                     const lugar = lugares.find((item) => item.id === event.target.value);
+                    if (!lugar) return;
                     cambiarHorario(horario.key, {
-                      placeId: event.target.value,
-                      ownsPlace: false,
-                      placeName: lugar?.name || "",
-                      locality: lugar?.locality || horario.locality,
+                      placeId: lugar.id,
+                      ownsPlace: true,
+                      placeName: lugar.name,
+                      locality: lugar.locality,
                     });
                   }}
                 >
@@ -242,6 +248,7 @@ export function EditorProfesional({
                   ))}
                 </select>
               </label>
+              )}
               {horario.ownsPlace && !horario.placeId ? (
                 <>
                   <label className="grid gap-1">

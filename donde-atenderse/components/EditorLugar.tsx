@@ -16,12 +16,10 @@ export function EditorLugar({
   placeId,
   inicial,
   obras,
-  profesionales,
 }: {
   placeId: string;
   inicial: BorradorLugar;
   obras: string[];
-  profesionales: { id: string; fullName: string; specialty: string; area: string; license: string }[];
 }) {
   const [borrador, setBorrador] = useState(inicial);
   const [estado, setEstado] = useState("Se guarda solo.");
@@ -248,38 +246,12 @@ export function EditorLugar({
             <h2 className="text-2xl font-semibold">Quién atiende</h2>
             {borrador.horarios.map((horario) => (
               <div key={horario.key} className="grid gap-3 border-t border-line pt-4">
-                <label className="grid gap-1">
-                  Profesional
-                  <select
-                    className="campo"
-                    value={horario.professionalId || "__nuevo"}
-                    onChange={(event) => {
-                      if (event.target.value === "__nuevo") {
-                        cambiarHorario(horario.key, { professionalId: undefined, professionalName: "" });
-                        return;
-                      }
-                      const persona = profesionales.find((item) => item.id === event.target.value);
-                      cambiarHorario(horario.key, {
-                        professionalId: event.target.value,
-                        professionalName: persona?.fullName || "",
-                        specialty: persona?.specialty || "",
-                        area: persona?.area || "cuerpo",
-                        license: persona?.license || "",
-                      });
-                    }}
-                  >
-                    <option value="__nuevo">Cargar una persona nueva</option>
-                    {profesionales.map((persona) => (
-                      <option key={persona.id} value={persona.id}>
-                        {persona.fullName} · {persona.specialty}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                {horario.professionalId ? <p className="font-semibold">{horario.professionalName}</p> : null}
                 {!horario.professionalId ? (
                   <>
                     <input className="campo" placeholder="Nombre" value={horario.professionalName} onChange={(event) => cambiarHorario(horario.key, { professionalName: event.target.value })} />
                     <input className="campo" placeholder="Especialidad" value={horario.specialty} onChange={(event) => cambiarHorario(horario.key, { specialty: event.target.value })} />
+                    <input className="campo" placeholder="Matrícula" value={horario.license} onChange={(event) => cambiarHorario(horario.key, { license: event.target.value })} />
                     <select className="campo" value={horario.area} onChange={(event) => cambiarHorario(horario.key, { area: event.target.value })}>
                       {AREAS.map((area) => (
                         <option key={area.id} value={area.id}>

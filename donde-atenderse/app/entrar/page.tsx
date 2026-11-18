@@ -17,9 +17,6 @@ export default async function Entrar() {
           Crear una cuenta
         </Link>
       </p>
-      <p className="max-w-xl text-base text-muted">
-        Para probar: ana@ejemplo.com o recepcion@ejemplo.com, contraseña ejemplo123.
-      </p>
     </div>
   );
 }

@@ -16,9 +16,6 @@ npm run dev
 
 Abrí http://localhost:3000
 
-Cuentas de ejemplo, contraseña `ejemplo123`:
+Para crear una cuenta, definí `AUTH_SECRET` en el entorno con una frase larga. No la subas al repositorio.
 
-- `ana@ejemplo.com` edita la ficha de la Dra. Ana López
-- `recepcion@ejemplo.com` edita el Hospital de Jardín América
-
-Los profesionales y lugares que aparecen al entrar son datos de ejemplo.
+Los profesionales y lugares que aparecen al entrar son datos de ejemplo. No tienen usuario ni contraseña.

@@ -120,41 +120,37 @@ export async function guardarLugar(placeId: string, borrador: BorradorLugar): Pr
   const ahora = new Date();
 
   for (const horario of borrador.horarios) {
-    if (!horario.professionalId && horario.professionalName.trim().length < 2) continue;
-    let professionalId = horario.professionalId;
-    if (!professionalId) {
-      if (!AREAS.some((area) => area.id === horario.area)) {
-        return { ok: false, error: "Elegí el área de la persona que agregaste." };
-      }
-      const creado = await prisma.professional.create({
-        data: {
-          fullName: horario.professionalName.trim(),
-          specialty: horario.specialty.trim(),
-          area: horario.area || "cuerpo",
-          license: horario.license.trim(),
-          published: true,
-        },
-      });
-      professionalId = creado.id;
-    }
     const dataLugar = {
       placeDays: horario.days.join(","),
-      placeTime: horario.time.trim(),
+      placeTime: horario.time.trim().slice(0, 80),
       placeShift: horario.shift,
       placeUpdatedAt: ahora,
     };
-    const existente = horario.id ? actuales.find((item) => item.id === horario.id) : undefined;
-    if (existente && existente.placeId === placeId) {
+    const existente = horario.id ? actuales.find((item) => item.id === horario.id && item.placeId === placeId) : undefined;
+    if (existente) {
       await prisma.attendance.update({ where: { id: existente.id }, data: dataLugar });
       conservados.add(existente.id);
-      horarios.push({ key: horario.key, id: existente.id, professionalId });
-    } else {
-      const creado = await prisma.attendance.create({
-        data: { placeId, professionalId, ...dataLugar },
-      });
-      conservados.add(creado.id);
-      horarios.push({ key: horario.key, id: creado.id, professionalId });
+      horarios.push({ key: horario.key, id: existente.id, professionalId: existente.professionalId });
+      continue;
     }
+    if (horario.professionalName.trim().length < 2) continue;
+    if (!AREAS.some((area) => area.id === horario.area)) {
+      return { ok: false, error: "Elegí el área de la persona que agregaste." };
+    }
+    const persona = await prisma.professional.create({
+      data: {
+        fullName: horario.professionalName.trim().slice(0, 120),
+        specialty: horario.specialty.trim().slice(0, 120),
+        area: horario.area || "cuerpo",
+        license: horario.license.trim().slice(0, 40),
+        published: true,
+      },
+    });
+    const creado = await prisma.attendance.create({
+      data: { placeId, professionalId: persona.id, ...dataLugar },
+    });
+    conservados.add(creado.id);
+    horarios.push({ key: horario.key, id: creado.id, professionalId: persona.id });
   }
 
   for (const item of actuales) {

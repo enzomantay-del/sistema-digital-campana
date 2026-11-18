@@ -9,7 +9,7 @@ export default async function CrearCuenta() {
     <div className="grid gap-6">
       <h1 className="text-4xl font-semibold tracking-tight">Crear cuenta</h1>
       <p className="max-w-xl text-muted">
-        Si tu matrícula ya está cargada, la ficha se vincula a tu cuenta. No se crea otra igual.
+        Creás tu propia ficha. No se une a una ficha que ya está publicada.
       </p>
       <FormularioCuenta />
       <p>

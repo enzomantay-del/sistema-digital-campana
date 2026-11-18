@@ -22,20 +22,13 @@ export default async function PaginaEditorLugar({ params }: { params: Promise<{ 
     },
   });
   if (!lugar) notFound();
-  const [obras, profesionales] = await Promise.all([
-    catalogoObras(),
-    prisma.professional.findMany({
-      select: { id: true, fullName: true, specialty: true, area: true, license: true },
-      orderBy: { fullName: "asc" },
-    }),
-  ]);
+  const obras = await catalogoObras();
   const turno = lugar.duties[0];
 
   return (
     <EditorLugar
       placeId={lugar.id}
       obras={obras}
-      profesionales={profesionales}
       inicial={{
         name: lugar.name,
         kind: lugar.kind,

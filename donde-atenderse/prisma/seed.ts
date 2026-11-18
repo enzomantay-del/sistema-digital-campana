@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -17,14 +16,6 @@ async function main() {
     console.log("La base ya tiene datos. No se vuelve a cargar el ejemplo.");
     return;
   }
-
-  const passwordHash = await bcrypt.hash("ejemplo123", 10);
-  const anaUser = await prisma.user.create({
-    data: { name: "Ana López", email: "ana@ejemplo.com", passwordHash },
-  });
-  const recepcionUser = await prisma.user.create({
-    data: { name: "Recepción del hospital", email: "recepcion@ejemplo.com", passwordHash },
-  });
 
   const obras = Object.fromEntries(
     await Promise.all(
@@ -192,9 +183,6 @@ async function main() {
     });
   }
 
-  await prisma.placeEditor.create({ data: { userId: recepcionUser.id, placeId: hospital.id } });
-  await prisma.placeEditor.create({ data: { userId: anaUser.id, placeId: consultorioAna.id } });
-
   async function obrasDe(placeId: string, nombres: string[]) {
     await prisma.placeObra.createMany({
       data: nombres.map((nombre) => ({ placeId, obraId: obras[nombre] })),
@@ -230,7 +218,6 @@ async function main() {
 
   const ana = await prisma.professional.create({
     data: {
-      userId: anaUser.id,
       fullName: "Dra. Ana López",
       license: "EJ-1001",
       area: "cuerpo",
@@ -472,7 +459,7 @@ async function main() {
     ],
   });
 
-  console.log("Ejemplo cargado. Cuentas: ana@ejemplo.com y recepcion@ejemplo.com / ejemplo123");
+  console.log("Ejemplo cargado. Las fichas no tienen usuario.");
 }
 
 main()
