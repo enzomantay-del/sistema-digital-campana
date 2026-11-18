@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: #f3f0e8;
+  color: #1b2421;
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+
+::selection {
+  background: #d5ebe6;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo {
+  @apply w-full rounded-lg border border-line bg-card px-3 py-3 text-ink outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent;
+}
+
+.boton {
+  @apply inline-flex items-center justify-center rounded-lg bg-accent px-4 py-3 font-semibold text-white hover:bg-accent-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent;
+}
+
+.boton-suave {
+  @apply inline-flex items-center justify-center rounded-lg border border-line bg-card px-4 py-3 font-semibold text-ink hover:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent;
+}
