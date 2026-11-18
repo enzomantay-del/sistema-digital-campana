@@ -23,11 +23,13 @@ export async function buscar(filtros: {
   localidad?: string;
   area?: string;
   obra?: string;
+  estudios?: string;
 }) {
   const q = filtros.q?.trim() ?? "";
   const localidad = filtros.localidad?.trim() ?? "";
   const area = filtros.area?.trim() ?? "";
   const obra = filtros.obra?.trim() ?? "";
+  const estudios = filtros.estudios === "1";
 
   const [professionals, places] = await Promise.all([
     prisma.professional.findMany({
@@ -66,10 +68,11 @@ export async function buscar(filtros: {
       const estudio = area === "cuerpo" && (lugar.kind === "imagenes" || lugar.kind === "laboratorio" || lugar.kind === "hospital" || lugar.kind === "sanatorio");
       if (!coincide && !estudio) return false;
     }
+    if (estudios && lugar.kind !== "imagenes" && lugar.kind !== "laboratorio" && lugar.studies.length === 0) return false;
     return true;
   });
 
-  return { personas, centros, q, localidad, area, obra };
+  return { personas: estudios && !q ? [] : personas, centros, q, localidad, area, obra, estudios };
 }
 
 export async function farmaciasDeTurno(ahora = new Date()) {

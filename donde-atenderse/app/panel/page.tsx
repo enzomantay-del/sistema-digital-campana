@@ -10,7 +10,7 @@ export default async function Panel() {
   return (
     <div className="grid max-w-2xl gap-8">
       <header className="grid gap-2">
-        <h1 className="text-4xl font-semibold tracking-tight">Hola, {usuario.name}</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Hola, {usuario.name}</h1>
         <p className="text-muted">La ficha es gratis. Lo que cargues es lo que ve el paciente.</p>
       </header>
       <div className="flex flex-wrap gap-3">
@@ -36,7 +36,7 @@ export default async function Panel() {
         </section>
       ) : null}
       <form action={salir}>
-        <button className="text-accent font-semibold" type="submit">
+        <button className="font-semibold text-link" type="submit">
           Salir
         </button>
       </form>

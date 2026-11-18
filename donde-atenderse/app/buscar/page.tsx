@@ -8,10 +8,10 @@ import { armarVistaProfesional } from "@/lib/view";
 export default async function PaginaBuscar({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; localidad?: string; area?: string; obra?: string }>;
+  searchParams: Promise<{ q?: string; localidad?: string; area?: string; obra?: string; estudios?: string }>;
 }) {
   const filtros = await searchParams;
-  const [{ personas, centros, q, localidad, area, obra }, obras] = await Promise.all([
+  const [{ personas, centros, q, localidad, area, obra, estudios }, obras] = await Promise.all([
     buscar(filtros),
     catalogoObras(),
   ]);
@@ -19,21 +19,28 @@ export default async function PaginaBuscar({
 
   return (
     <div className="grid gap-8">
-      <h1 className="text-4xl font-semibold tracking-tight">Buscar</h1>
-      <Buscador q={q} localidad={localidad} area={area} obra={obra} obras={obras} mostrarFiltros />
+      <header className="grid max-w-3xl gap-2">
+        <h1 className="text-4xl font-bold tracking-tight">{estudios ? "Estudios" : "Profesionales"}</h1>
+        <p className="text-muted">
+          {estudios
+            ? "Centros de imágenes, laboratorios y lugares que cargaron un estudio."
+            : "Buscá por el nombre, la especialidad o el lugar."}
+        </p>
+      </header>
+      <Buscador q={q} localidad={localidad} area={area} obra={obra} obras={obras} estudios={estudios} mostrarFiltros />
       <p className="text-muted">
         {personas.length} {personas.length === 1 ? "profesional" : "profesionales"} y {centros.length}{" "}
         {centros.length === 1 ? "lugar" : "lugares"}
       </p>
       {buscaFarmacia ? (
-        <Link href="/farmacia" className="font-semibold text-accent">
+        <Link href="/farmacia" className="font-semibold text-link">
           La farmacia de turno está en su propia página.
         </Link>
       ) : null}
       {personas.length === 0 && centros.length === 0 ? (
         <p>No hay fichas con esos datos. Probá con otra palabra o con otra localidad.</p>
       ) : null}
-      <section className="grid">
+      <section className={`grid gap-3 ${estudios ? "order-2" : ""}`}>
         {personas.map((persona) => {
           const vista = armarVistaProfesional({
             fullName: persona.fullName,
@@ -49,8 +56,8 @@ export default async function PaginaBuscar({
             filas: persona.attendances.map(filaHorario),
           });
           return (
-            <Link key={persona.id} href={`/profesional/${persona.id}`} className="border-t border-line py-5 hover:text-accent">
-              <h2 className="text-2xl font-semibold text-ink">{vista.nombre}</h2>
+            <Link key={persona.id} href={`/profesional/${persona.id}`} className="tarjeta block transition hover:border-link">
+              <h2 className="text-2xl font-bold tracking-tight text-ink">{vista.nombre}</h2>
               <p className="text-muted">
                 {vista.especialidad} · {vista.area}
                 {persona.example ? " · Dato de ejemplo" : ""}
@@ -69,10 +76,10 @@ export default async function PaginaBuscar({
           );
         })}
       </section>
-      <section className="grid">
+      <section className={`grid gap-3 ${estudios ? "order-1" : ""}`}>
         {centros.map((lugar) => (
-          <Link key={lugar.id} href={`/lugar/${lugar.id}`} className="border-t border-line py-5">
-            <h2 className="text-2xl font-semibold">{lugar.name}</h2>
+          <Link key={lugar.id} href={`/lugar/${lugar.id}`} className="tarjeta block transition hover:border-link">
+            <h2 className="text-2xl font-bold tracking-tight">{lugar.name}</h2>
             <p className="text-muted">
               {etiquetaLugar(lugar.kind)} · {lugar.locality}
               {lugar.example ? " · Dato de ejemplo" : ""}

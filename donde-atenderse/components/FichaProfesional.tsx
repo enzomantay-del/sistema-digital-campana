@@ -13,12 +13,12 @@ export function FichaProfesional({
   enlazar?: boolean;
 }) {
   return (
-    <article className="grid gap-8">
+    <article className="tarjeta grid gap-8">
       <header className="grid gap-2">
-        <p className="text-base text-muted">
+        <p className="text-sm font-semibold uppercase tracking-[0.08em] text-accent">
           {vista.especialidad} · {vista.area}
         </p>
-        <h1 className="text-4xl font-semibold tracking-tight">{vista.nombre}</h1>
+        <h1 className="text-4xl font-bold tracking-tight">{vista.nombre}</h1>
         {vista.matricula ? <p>Matrícula {vista.matricula}</p> : null}
         {ejemplo ? <p className="text-base text-warn">Dato de ejemplo.</p> : null}
       </header>
@@ -36,7 +36,7 @@ export function FichaProfesional({
               {bloque.lineas.map((linea) => (
                 <div key={linea.id} className="border-t border-line pt-4">
                   {enlazar ? (
-                    <Link href={`/lugar/${linea.placeId}`} className="text-xl font-semibold text-accent">
+                    <Link href={`/lugar/${linea.placeId}`} className="text-xl font-semibold text-link">
                       {linea.rotulo}
                     </Link>
                   ) : (

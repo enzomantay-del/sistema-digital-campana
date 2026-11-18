@@ -41,7 +41,7 @@ export const DIAS = [
 export const OBRAS_INICIALES = ["IPS", "Particular", "OSDE", "Swiss Medical", "Galeno"] as const;
 
 export const MENSAJE_WHATSAPP =
-  "Hola, te escribo desde Dónde atenderse. Quería consultar por atención.";
+  "Hola, te escribo desde Cercalud. Quería consultar por atención.";
 
 export type AreaId = (typeof AREAS)[number]["id"];
 export type TipoLugarId = (typeof TIPOS_LUGAR)[number]["id"];

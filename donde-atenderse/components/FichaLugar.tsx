@@ -13,12 +13,12 @@ export function FichaLugar({
   enlazar?: boolean;
 }) {
   return (
-    <article className="grid gap-8">
+    <article className="tarjeta grid gap-8">
       <header className="grid gap-2">
-        <p className="text-base text-muted">
+        <p className="text-sm font-semibold uppercase tracking-[0.08em] text-accent">
           {etiquetaLugar(vista.kind)} · {vista.localidad}
         </p>
-        <h1 className="text-4xl font-semibold tracking-tight">{vista.nombre}</h1>
+        <h1 className="text-4xl font-bold tracking-tight">{vista.nombre}</h1>
         {vista.direccion ? <p>{vista.direccion}</p> : null}
         {vista.notaHospital ? <p className="text-base text-muted">{vista.notaHospital}</p> : null}
         {ejemplo ? <p className="text-base text-warn">Dato de ejemplo.</p> : null}
@@ -38,7 +38,7 @@ export function FichaLugar({
               {bloque.lineas.map((linea) => (
                 <div key={linea.id} className="border-t border-line pt-4">
                   {enlazar && linea.personaId ? (
-                    <Link href={`/profesional/${linea.personaId}`} className="text-xl font-semibold text-accent">
+                    <Link href={`/profesional/${linea.personaId}`} className="text-xl font-semibold text-link">
                       {linea.rotulo}
                     </Link>
                   ) : (

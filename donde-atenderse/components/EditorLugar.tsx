@@ -136,7 +136,7 @@ export function EditorLugar({
 
   return (
     <div className="grid items-start gap-10 lg:grid-cols-2">
-      <form className="grid gap-8" onSubmit={(event) => event.preventDefault()}>
+      <form className="tarjeta grid gap-8" onSubmit={(event) => event.preventDefault()}>
         <p className="text-base text-muted">{estado}</p>
         <section className="grid gap-4">
           <h2 className="text-2xl font-semibold">El lugar</h2>
@@ -178,22 +178,28 @@ export function EditorLugar({
             Horario del lugar
             <input className="campo" value={borrador.scheduleNote} onChange={(event) => cambiar({ scheduleNote: event.target.value })} />
           </label>
-          <fieldset className="grid gap-2">
-            <legend>Obra social</legend>
-            {catalogo.map((obra) => (
-              <label key={obra} className="flex gap-2">
-                <input
-                  type="checkbox"
-                  checked={borrador.obras.includes(obra)}
-                  onChange={(event) =>
-                    cambiar({
-                      obras: event.target.checked ? [...borrador.obras, obra] : borrador.obras.filter((item) => item !== obra),
-                    })
-                  }
-                />
-                {obra}
-              </label>
-            ))}
+          <fieldset className="grid gap-3">
+            <legend className="font-semibold">Obra social</legend>
+            <div className="flex flex-wrap gap-2">
+              {catalogo.map((obra) => {
+                const activa = borrador.obras.includes(obra);
+                return (
+                  <label key={obra} className={activa ? "pastilla pastilla-activa" : "pastilla"}>
+                    <input
+                      className="sr-only"
+                      type="checkbox"
+                      checked={activa}
+                      onChange={(event) =>
+                        cambiar({
+                          obras: event.target.checked ? [...borrador.obras, obra] : borrador.obras.filter((item) => item !== obra),
+                        })
+                      }
+                    />
+                    {obra}
+                  </label>
+                );
+              })}
+            </div>
             <input className="campo" placeholder="Otra" value={borrador.otraObra} onChange={(event) => cambiar({ otraObra: event.target.value })} />
           </fieldset>
         </section>
@@ -261,21 +267,25 @@ export function EditorLugar({
                     </select>
                   </>
                 ) : null}
-                <div className="flex flex-wrap gap-3">
-                  {DIAS.map((dia) => (
-                    <label key={dia.id} className="flex gap-2">
-                      <input
-                        type="checkbox"
-                        checked={horario.days.includes(dia.id)}
-                        onChange={(event) =>
-                          cambiarHorario(horario.key, {
-                            days: event.target.checked ? [...horario.days, dia.id] : horario.days.filter((item) => item !== dia.id),
-                          })
-                        }
-                      />
-                      {dia.label}
-                    </label>
-                  ))}
+                <div className="flex flex-wrap gap-2">
+                  {DIAS.map((dia) => {
+                    const activo = horario.days.includes(dia.id);
+                    return (
+                      <label key={dia.id} className={activo ? "pastilla pastilla-activa" : "pastilla"}>
+                        <input
+                          className="sr-only"
+                          type="checkbox"
+                          checked={activo}
+                          onChange={(event) =>
+                            cambiarHorario(horario.key, {
+                              days: event.target.checked ? [...horario.days, dia.id] : horario.days.filter((item) => item !== dia.id),
+                            })
+                          }
+                        />
+                        {dia.label}
+                      </label>
+                    );
+                  })}
                 </div>
                 <select className="campo" value={horario.shift} onChange={(event) => cambiarHorario(horario.key, { shift: event.target.value })}>
                   {TURNOS.map((turno) => (

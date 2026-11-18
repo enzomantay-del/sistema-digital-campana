@@ -1,10 +1,30 @@
-export function Pie() {
+import Link from "next/link";
+import { Marca } from "@/components/Marca";
+
+export function Pie({ ejemplo }: { ejemplo: boolean }) {
   return (
-    <footer className="mt-16 border-t border-line">
-      <p className="mx-auto max-w-page px-4 py-8 text-base text-muted">
-        Información cargada por cada profesional o por el lugar. No es un servicio de la
-        Municipalidad ni de la Provincia. No da turnos y no reemplaza una consulta.
-      </p>
+    <footer className="mt-20 border-t border-line bg-white">
+      <div className="mx-auto grid max-w-page gap-6 px-4 py-10">
+        <Marca />
+        <p className="max-w-3xl text-base leading-relaxed text-muted">
+          Cercalud es el directorio privado de información de salud de Jardín América y la zona.
+          No da ni gestiona turnos: te mostramos los datos y el turno lo pedís directo por WhatsApp.
+          No es un servicio de la Municipalidad ni de la Provincia, y no reemplaza una consulta.
+        </p>
+        {ejemplo ? (
+          <p className="max-w-3xl text-base text-ink">
+            Los datos que ves ahora son de ejemplo, para probar la web. No son profesionales ni
+            lugares reales de la zona.
+          </p>
+        ) : null}
+        <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-link">
+          <Link href="/">Inicio</Link>
+          <Link href="/buscar">Profesionales</Link>
+          <Link href="/buscar?estudios=1">Estudios</Link>
+          <Link href="/farmacia">Farmacia de turno</Link>
+          <Link href="/entrar">Soy profesional</Link>
+        </nav>
+      </div>
     </footer>
   );
 }

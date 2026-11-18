@@ -6,6 +6,7 @@ export function Buscador({
   area = "",
   obra = "",
   obras = [],
+  estudios = false,
   mostrarFiltros = false,
 }: {
   q?: string;
@@ -13,10 +14,12 @@ export function Buscador({
   area?: string;
   obra?: string;
   obras?: string[];
+  estudios?: boolean;
   mostrarFiltros?: boolean;
 }) {
   return (
-    <form action="/buscar" className="grid gap-3">
+    <form action="/buscar" className="grid gap-3 text-left">
+      {estudios ? <input type="hidden" name="estudios" value="1" /> : null}
       <div className="flex flex-col gap-3 sm:flex-row">
         <label className="sr-only" htmlFor="q">
           Buscar un profesional, una especialidad o un lugar
@@ -26,7 +29,7 @@ export function Buscador({
           name="q"
           defaultValue={q}
           placeholder="Nombre, especialidad o lugar"
-          className="campo"
+          className="campo-buscar"
         />
         <button className="boton shrink-0" type="submit">
           Buscar
