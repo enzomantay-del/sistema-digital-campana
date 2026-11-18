@@ -1,4 +1,6 @@
+import { OBRAS_MISIONES } from "./constants";
 import { incluye } from "./format";
+import { distanciaALocalidad } from "./geo";
 import { prisma } from "./prisma";
 
 const profesionalConRelaciones = {
@@ -15,7 +17,11 @@ const lugarConRelaciones = {
 
 export async function catalogoObras() {
   const obras = await prisma.obraSocial.findMany({ orderBy: { name: "asc" } });
-  return obras.map((obra) => obra.name);
+  return Array.from(new Set<string>([...OBRAS_MISIONES, ...obras.map((obra) => obra.name)])).sort((a, b) => {
+    if (a === "Particular") return -1;
+    if (b === "Particular") return 1;
+    return a.localeCompare(b, "es");
+  });
 }
 
 export async function buscar(filtros: {
@@ -24,12 +30,17 @@ export async function buscar(filtros: {
   area?: string;
   obra?: string;
   estudios?: string;
+  lat?: string;
+  lng?: string;
 }) {
   const q = filtros.q?.trim() ?? "";
   const localidad = filtros.localidad?.trim() ?? "";
   const area = filtros.area?.trim() ?? "";
   const obra = filtros.obra?.trim() ?? "";
   const estudios = filtros.estudios === "1";
+  const lat = Number(filtros.lat);
+  const lng = Number(filtros.lng);
+  const conUbicacion = Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
 
   const [professionals, places] = await Promise.all([
     prisma.professional.findMany({
@@ -72,7 +83,26 @@ export async function buscar(filtros: {
     return true;
   });
 
-  return { personas: estudios && !q ? [] : personas, centros, q, localidad, area, obra, estudios };
+  const personasVisibles = estudios && !q ? [] : personas;
+  const km = (localidadItem: string) => (conUbicacion ? distanciaALocalidad(localidadItem, lat, lng) : 0);
+  const porCercania = <T,>(items: T[], distanciaDe: (item: T) => number) => {
+    if (!conUbicacion || localidad) return items;
+    return [...items].sort((a, b) => distanciaDe(a) - distanciaDe(b));
+  };
+
+  return {
+    personas: porCercania(personasVisibles, (persona) => {
+      const distancias = persona.attendances.map((item) => km(item.place.locality));
+      return distancias.length > 0 ? Math.min(...distancias) : Number.POSITIVE_INFINITY;
+    }),
+    centros: porCercania(centros, (lugar) => km(lugar.locality)),
+    q,
+    localidad,
+    area,
+    obra,
+    estudios,
+    conUbicacion,
+  };
 }
 
 export async function farmaciasDeTurno(ahora = new Date()) {

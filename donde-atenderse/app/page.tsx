@@ -1,89 +1,71 @@
 import Link from "next/link";
 import { Buscador } from "@/components/Buscador";
-import { FichaProfesional } from "@/components/FichaProfesional";
 import { AREAS } from "@/lib/constants";
-import { filaHorario } from "@/lib/map";
-import { prisma } from "@/lib/prisma";
-import { armarVistaProfesional } from "@/lib/view";
+import { catalogoObras } from "@/lib/search";
 
-const PASOS = [
-  ["Buscás", "Por profesional, especialidad, lugar u obra social."],
-  ["Leés la ficha", "Horario, matrícula y la fecha en que se actualizó."],
-  ["Escribís", "El turno lo pedís directo. Esta web no lo reserva."],
+const BENEFICIOS = [
+  ["El corredor entero", "Si en tu pueblo no está esa atención, ves el pueblo de al lado."],
+  ["Con fecha", "Cada ficha dice quién la cargó y cuándo se actualizó."],
+  ["Tres áreas juntas", "Salud del cuerpo, salud mental y odontología, en la misma búsqueda."],
+  ["Sin turno desde acá", "Escribís directo al profesional o al lugar. Cercalud no reserva."],
+];
+
+const PREGUNTAS = [
+  ["¿Cercalud saca turnos?", "No. Muestra los datos para que le escribas al profesional o al lugar."],
+  ["¿Es de la municipalidad o de la provincia?", "No. Es un directorio privado. No reemplaza una consulta."],
+  ["¿Por qué pide mi ubicación?", "Para mostrar primero lo que tenés más cerca. Si no la activás, elegís el pueblo. No se guarda."],
+  ["¿Qué obras sociales figuran?", "Las que se usan en Misiones. Si una ficha no tiene la tuya, ese profesional todavía no la cargó."],
+  ["¿Los datos que veo son reales?", "Si aparece “Datos de ejemplo”, son para probar la web. No son profesionales ni lugares de la zona."],
+  ["¿Dónde miro la farmacia de turno?", "En su página, con la fecha que cargaron. Si esa fecha ya pasó, no es el turno de hoy."],
 ];
 
 export default async function Inicio() {
-  const personas = await prisma.professional.findMany({
-    where: { published: true, example: true },
-    include: { obras: { include: { obra: true } }, attendances: { include: { place: true } } },
-  });
-  const destacada = personas.sort((a, b) => b.attendances.length - a.attendances.length)[0];
-  const vista = destacada
-    ? armarVistaProfesional({
-        fullName: destacada.fullName,
-        specialty: destacada.specialty,
-        area: destacada.area,
-        license: destacada.license,
-        price: destacada.price,
-        priceUpdatedAt: destacada.priceUpdatedAt,
-        whatsapp: destacada.whatsapp,
-        phone: destacada.phone,
-        obras: destacada.obras.map((item) => item.obra.name),
-        updatedAt: destacada.updatedAt,
-        filas: destacada.attendances.map(filaHorario),
-      })
-    : null;
-
+  const obras = await catalogoObras();
   return (
-    <div className="grid gap-14">
-      <section className="mx-auto grid max-w-3xl gap-6 pt-4 text-center sm:pt-8">
-        <h1 className="text-4xl font-bold tracking-[-0.04em] text-balance sm:text-5xl">
-          Buscá quién atiende en tu zona
-        </h1>
-        <p className="text-lg text-muted">
-          Santo Pipó, Hipólito Yrigoyen, Jardín América, Ruiz de Montoya, Puerto Rico y
-          Capioví. Salud del cuerpo, salud mental y odontología.
-        </p>
-        <Buscador />
+    <div className="grid gap-16">
+      <section className="mx-auto grid max-w-3xl gap-6 pt-4 sm:pt-10">
+        <div className="grid gap-3 text-center">
+          <h1 className="text-4xl font-bold tracking-[-0.04em] text-balance sm:text-5xl">
+            Buscá quién atiende en tu zona
+          </h1>
+          <p className="text-lg text-muted">
+            Santo Pipó, Hipólito Yrigoyen, Jardín América, Ruiz de Montoya, Puerto Rico y Capioví.
+          </p>
+        </div>
+        <Buscador obras={obras} />
         <div className="flex flex-wrap justify-center gap-2">
           {AREAS.map((area) => (
             <Link key={area.id} href={`/buscar?area=${area.id}`} className="pastilla">
               {area.label}
             </Link>
           ))}
-          <Link href="/buscar?estudios=1" className="pastilla">
-            Estudios
-          </Link>
           <Link href="/farmacia" className="pastilla">
             Farmacia de turno
           </Link>
         </div>
       </section>
 
-      <section id="como-funciona" className="grid gap-4 scroll-mt-28 sm:grid-cols-3">
-        {PASOS.map(([titulo, texto], indice) => (
-          <article key={titulo} className="tarjeta grid gap-2">
-            <p className="text-sm font-bold uppercase tracking-[0.08em] text-menta">Paso {indice + 1}</p>
-            <h2 className="text-2xl font-bold tracking-tight">{titulo}</h2>
-            <p className="text-muted">{texto}</p>
-          </article>
-        ))}
+      <section id="como-funciona" className="grid scroll-mt-28 gap-5">
+        <h2 className="text-3xl font-bold tracking-tight">Por qué buscar en Cercalud</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {BENEFICIOS.map(([titulo, texto]) => (
+            <article key={titulo} className="grid gap-1 border-t border-line pt-4">
+              <h3 className="text-xl font-bold">{titulo}</h3>
+              <p className="text-muted">{texto}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
-      {vista && destacada ? (
-        <section className="grid gap-4">
-          <div className="max-w-2xl">
-            <h2 className="text-3xl font-bold tracking-tight">Así se lee un día</h2>
-            <p className="mt-2 text-muted">
-              Una misma persona puede atender a la mañana en el hospital, a la tarde en su
-              consultorio y a la noche de guardia.
-            </p>
-          </div>
-          <div className="max-w-2xl">
-            <FichaProfesional vista={vista} ejemplo={destacada.example} />
-          </div>
-        </section>
-      ) : null}
+      <section className="grid max-w-3xl gap-2">
+        <h2 className="text-3xl font-bold tracking-tight">Preguntas frecuentes</h2>
+        {PREGUNTAS.map(([pregunta, respuesta]) => (
+          <details key={pregunta} className="border-t border-line py-3">
+            <summary className="cursor-pointer text-lg font-semibold">{pregunta}</summary>
+            <p className="pt-2 text-muted">{respuesta}</p>
+          </details>
+        ))}
+      </section>
     </div>
   );
 }

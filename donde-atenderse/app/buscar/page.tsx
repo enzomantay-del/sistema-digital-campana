@@ -8,10 +8,10 @@ import { armarVistaProfesional } from "@/lib/view";
 export default async function PaginaBuscar({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; localidad?: string; area?: string; obra?: string; estudios?: string }>;
+  searchParams: Promise<{ q?: string; localidad?: string; area?: string; obra?: string; estudios?: string; lat?: string; lng?: string }>;
 }) {
   const filtros = await searchParams;
-  const [{ personas, centros, q, localidad, area, obra, estudios }, obras] = await Promise.all([
+  const [{ personas, centros, q, localidad, area, obra, estudios, conUbicacion }, obras] = await Promise.all([
     buscar(filtros),
     catalogoObras(),
   ]);
@@ -27,10 +27,11 @@ export default async function PaginaBuscar({
             : "Buscá por el nombre, la especialidad o el lugar."}
         </p>
       </header>
-      <Buscador q={q} localidad={localidad} area={area} obra={obra} obras={obras} estudios={estudios} mostrarFiltros />
+      <Buscador q={q} localidad={localidad} area={area} obra={obra} obras={obras} estudios={estudios} mostrarArea />
       <p className="text-muted">
         {personas.length} {personas.length === 1 ? "profesional" : "profesionales"} y {centros.length}{" "}
         {centros.length === 1 ? "lugar" : "lugares"}
+        {conUbicacion && !localidad ? " · Primero, lo que está más cerca de tu ubicación." : ""}
       </p>
       {buscaFarmacia ? (
         <Link href="/farmacia" className="font-semibold text-link">
