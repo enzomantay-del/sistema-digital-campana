@@ -63,7 +63,7 @@ export default async function Inicio() {
       <section id="como-funciona" className="grid gap-4 scroll-mt-28 sm:grid-cols-3">
         {PASOS.map(([titulo, texto], indice) => (
           <article key={titulo} className="tarjeta grid gap-2">
-            <p className="text-sm font-bold uppercase tracking-[0.08em] text-accent">Paso {indice + 1}</p>
+            <p className="text-sm font-bold uppercase tracking-[0.08em] text-menta">Paso {indice + 1}</p>
             <h2 className="text-2xl font-bold tracking-tight">{titulo}</h2>
             <p className="text-muted">{texto}</p>
           </article>

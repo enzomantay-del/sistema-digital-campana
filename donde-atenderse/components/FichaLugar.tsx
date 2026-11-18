@@ -15,7 +15,7 @@ export function FichaLugar({
   return (
     <article className="tarjeta grid gap-8">
       <header className="grid gap-2">
-        <p className="text-sm font-semibold uppercase tracking-[0.08em] text-accent">
+        <p className="text-sm font-semibold uppercase tracking-[0.08em] text-menta">
           {etiquetaLugar(vista.kind)} · {vista.localidad}
         </p>
         <h1 className="text-4xl font-bold tracking-tight">{vista.nombre}</h1>

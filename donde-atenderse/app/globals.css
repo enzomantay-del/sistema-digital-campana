@@ -7,14 +7,14 @@
 }
 
 body {
-  background: #f4f8fc;
-  color: #10243e;
+  background: #f4f9fc;
+  color: #12275c;
   font-size: 1.0625rem;
   line-height: 1.55;
 }
 
 ::selection {
-  background: #dbe7ff;
+  background: #d6eef8;
 }
 
 input,
@@ -38,12 +38,12 @@ button {
 
 .campo:focus,
 .campo-buscar:focus {
-  border-color: #1d4ed8;
-  box-shadow: 0 0 0 4px rgb(29 78 216 / 0.15);
+  border-color: #1478c0;
+  box-shadow: 0 0 0 4px rgb(20 120 192 / 0.16);
 }
 
 .campo-buscar {
-  @apply w-full rounded-full border-2 border-[#1d4ed8]/70 bg-white px-5 py-3.5 text-ink outline-none placeholder:text-muted;
+  @apply w-full rounded-full border-2 border-[#1478c0]/70 bg-white px-5 py-3.5 text-ink outline-none placeholder:text-muted;
 }
 
 .boton {
@@ -55,7 +55,7 @@ button {
 }
 
 .boton-suave:hover {
-  border-color: #1d4ed8;
+  border-color: #45c0a8;
 }
 
 .tarjeta {
@@ -66,12 +66,12 @@ button {
   @apply inline-flex cursor-pointer items-center rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-ink;
 }
 
-.pastilla:hover,
-.pastilla-activa {
-  border-color: #1d4ed8;
+.pastilla:hover {
+  border-color: #45c0a8;
 }
 
 .pastilla-activa {
-  background: #e8f0ff;
-  color: #1d4ed8;
+  border-color: #1786cc;
+  background: #e7f3fb;
+  color: #1478c0;
 }

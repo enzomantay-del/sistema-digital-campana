@@ -1,13 +1,18 @@
 import Link from "next/link";
 
-export function Marca() {
+export function Marca({ oficial = false }: { oficial?: boolean }) {
+  if (oficial) {
+    return (
+      <Link href="/" className="inline-flex w-fit">
+        <img src="/cercalud.png" alt="Cercalud" width={635} height={511} className="h-auto w-36" />
+      </Link>
+    );
+  }
+
   return (
-    <Link href="/" className="inline-flex items-center gap-2.5 text-ink">
-      <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true" className="shrink-0">
-        <circle cx="18" cy="18" r="18" fill="#14b5a8" />
-        <path d="M18 9.5v17M9.5 18h17" stroke="white" strokeWidth="3.4" strokeLinecap="round" />
-      </svg>
-      <span className="text-[1.45rem] font-bold leading-none tracking-[-0.045em]">cercalud</span>
+    <Link href="/" className="inline-flex items-center gap-2">
+      <img src="/marca-icono.png" alt="" width={366} height={373} className="size-9 shrink-0" />
+      <img src="/marca-nombre.png" alt="Cercalud" width={615} height={130} className="h-4 w-auto sm:h-5" />
     </Link>
   );
 }

@@ -5,7 +5,7 @@ export function Pie({ ejemplo }: { ejemplo: boolean }) {
   return (
     <footer className="mt-20 border-t border-line bg-white">
       <div className="mx-auto grid max-w-page gap-6 px-4 py-10">
-        <Marca />
+        <Marca oficial />
         <p className="max-w-3xl text-base leading-relaxed text-muted">
           Cercalud es el directorio privado de información de salud de Jardín América y la zona.
           No da ni gestiona turnos: te mostramos los datos y el turno lo pedís directo por WhatsApp.

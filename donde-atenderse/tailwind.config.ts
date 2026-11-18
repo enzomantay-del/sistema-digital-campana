@@ -5,18 +5,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        paper: "#f4f8fc",
+        paper: "#f4f9fc",
         card: "#ffffff",
-        ink: "#10243e",
-        muted: "#5c6d82",
-        line: "#d5e2f0",
-        accent: "#149a8e",
-        "accent-dark": "#0f7d74",
-        link: "#1d4ed8",
+        ink: "#12275c",
+        muted: "#5a6d86",
+        line: "#d4e3f0",
+        accent: "#1786cc",
+        "accent-dark": "#0c6aaa",
+        menta: "#45c0a8",
+        link: "#1478c0",
         warn: "#9a3412",
       },
       fontFamily: {
-        sans: ["var(--font-jakarta)", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ["var(--font-nunito)", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       maxWidth: {
         page: "76rem",

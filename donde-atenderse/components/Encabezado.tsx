@@ -28,7 +28,7 @@ export async function Encabezado({ ejemplo }: { ejemplo: boolean }) {
               className="inline-flex items-center gap-2 rounded-full border border-line bg-paper px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em]"
               title="Los datos que ves ahora son de ejemplo. No son profesionales ni lugares reales."
             >
-              <span className="size-2 rounded-full bg-link" />
+              <span className="size-2 rounded-full bg-menta" />
               Datos de ejemplo
             </span>
           ) : null}
