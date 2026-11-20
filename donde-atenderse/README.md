@@ -22,6 +22,14 @@ Si en el navegador ves **Internal Server Error** con `npm run dev`, cortá el se
 npm run dev:limpio
 ```
 
+No corras `npm run build` mientras `npm run dev` sigue abierto en la misma carpeta: mezcla archivos en `.next` y la web puede romperse hasta reiniciar con `dev:limpio`.
+
+Para probar con un servidor más estable (por ejemplo detrás de un túnel durante horas):
+
+```bash
+npm run preview
+```
+
 Para crear una cuenta, definí `AUTH_SECRET` en el entorno con una frase larga. No la subas al repositorio.
 
 Los profesionales y lugares que aparecen al entrar son datos de ejemplo. No tienen usuario ni contraseña.

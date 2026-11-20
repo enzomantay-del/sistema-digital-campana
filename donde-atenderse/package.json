@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:limpio": "rm -rf .next && next dev",
+    "preview": "prisma generate && next build && next start -p 3000",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
