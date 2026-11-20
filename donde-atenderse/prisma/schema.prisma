@@ -46,6 +46,7 @@ model Place {
   kind          String
   locality      String
   address       String         @default("")
+  logoUrl       String         @default("")
   whatsapp      String         @default("")
   phone         String         @default("")
   scheduleNote  String         @default("")

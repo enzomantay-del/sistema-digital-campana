@@ -105,6 +105,7 @@ export default async function PaginaEditorLugar({
           kind: lugar.kind,
           locality: lugar.locality,
           address: lugar.address,
+          logoUrl: lugar.logoUrl,
           whatsapp: lugar.whatsapp,
           phone: lugar.phone,
           schedule: horario.data,

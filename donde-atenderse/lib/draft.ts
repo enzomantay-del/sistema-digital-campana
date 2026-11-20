@@ -64,6 +64,7 @@ export type BorradorLugar = {
   kind: string;
   locality: string;
   address: string;
+  logoUrl: string;
   whatsapp: string;
   phone: string;
   schedule: HorarioLugarData;

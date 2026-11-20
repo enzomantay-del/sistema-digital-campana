@@ -31,6 +31,7 @@ export type VistaLugar = {
   kind: string;
   localidad: string;
   direccion: string;
+  logoUrl: string;
   whatsapp: string;
   telefono: string;
   horarioLugar: string;
@@ -132,6 +133,7 @@ export function armarVistaLugar(input: {
   kind: string;
   locality: string;
   address: string;
+  logoUrl?: string;
   whatsapp: string;
   phone: string;
   scheduleNote: string;
@@ -155,6 +157,7 @@ export function armarVistaLugar(input: {
     kind: input.kind,
     localidad: input.locality,
     direccion: input.address.trim(),
+    logoUrl: input.logoUrl?.trim() ?? "",
     whatsapp: input.whatsapp.trim(),
     telefono: input.phone.trim(),
     horarioLugar: textoHorarioLugarPublico(input.scheduleNote),

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { MENSAJE_WHATSAPP } from "@/lib/constants";
 import { enlaceMaps, enlaceTelefono, enlaceWhatsApp, etiquetaLugar } from "@/lib/format";
@@ -15,10 +16,26 @@ export function FichaLugar({
   return (
     <article className="tarjeta grid gap-8">
       <header className="grid gap-2">
-        <p className="text-sm font-semibold uppercase tracking-[0.08em] text-menta">
-          {etiquetaLugar(vista.kind)} · {vista.localidad}
-        </p>
-        <h1 className="text-4xl font-bold tracking-tight">{vista.nombre}</h1>
+        <div className="flex flex-wrap items-start gap-4">
+          {vista.logoUrl ? (
+            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
+              <Image
+                src={vista.logoUrl}
+                alt={`Logo de ${vista.nombre}`}
+                fill
+                className="object-contain p-1.5"
+                sizes="80px"
+                unoptimized
+              />
+            </div>
+          ) : null}
+          <div className="grid min-w-0 flex-1 gap-2">
+            <p className="text-sm font-semibold uppercase tracking-[0.08em] text-menta">
+              {etiquetaLugar(vista.kind)} · {vista.localidad}
+            </p>
+            <h1 className="text-4xl font-bold tracking-tight">{vista.nombre}</h1>
+          </div>
+        </div>
         {vista.direccion ? (
           ejemplo ? (
             <p>{vista.direccion}</p>

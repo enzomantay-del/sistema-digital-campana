@@ -1,5 +1,7 @@
 "use server";
 
+import { mkdir, readdir, unlink, writeFile } from "fs/promises";
+import path from "path";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { esAdmin, usuarioActual } from "@/lib/auth";
@@ -144,4 +146,72 @@ export async function guardarLugar(placeId: string, borrador: BorradorLugar): Pr
   }
 
   return { ok: true, horarios: [], studies };
+}
+
+const LOGO_MAX_BYTES = 2 * 1024 * 1024;
+const LOGO_TIPOS = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+
+function extensionLogo(tipo: string) {
+  if (tipo === "image/jpeg") return "jpg";
+  if (tipo === "image/png") return "png";
+  if (tipo === "image/webp") return "webp";
+  if (tipo === "image/gif") return "gif";
+  return null;
+}
+
+async function borrarArchivosLogo(placeId: string) {
+  const dir = path.join(process.cwd(), "public", "uploads", "logos");
+  try {
+    const archivos = await readdir(dir);
+    for (const nombre of archivos) {
+      if (nombre.startsWith(`${placeId}.`)) {
+        await unlink(path.join(dir, nombre));
+      }
+    }
+  } catch {
+    /* carpeta vacía */
+  }
+}
+
+export async function subirLogoLugar(
+  placeId: string,
+  formData: FormData,
+): Promise<{ ok: true; logoUrl: string } | { ok: false; error: string }> {
+  const user = await usuarioActual();
+  if (!user) return { ok: false, error: "Tenés que entrar de nuevo." };
+  if (!(await puedeEditarLugar(user, placeId))) {
+    return { ok: false, error: "Esta ficha no está en tu cuenta." };
+  }
+  const archivo = formData.get("logo");
+  if (!archivo || !(archivo instanceof File) || archivo.size === 0) {
+    return { ok: false, error: "Elegí una imagen." };
+  }
+  if (!LOGO_TIPOS.has(archivo.type)) {
+    return { ok: false, error: "Usá JPG, PNG, WebP o GIF." };
+  }
+  if (archivo.size > LOGO_MAX_BYTES) {
+    return { ok: false, error: "La imagen no puede pesar más de 2 MB." };
+  }
+  const extension = extensionLogo(archivo.type);
+  if (!extension) return { ok: false, error: "Formato de imagen no admitido." };
+
+  const dir = path.join(process.cwd(), "public", "uploads", "logos");
+  await mkdir(dir, { recursive: true });
+  await borrarArchivosLogo(placeId);
+  const nombre = `${placeId}.${extension}`;
+  await writeFile(path.join(dir, nombre), Buffer.from(await archivo.arrayBuffer()));
+  const logoUrl = `/uploads/logos/${nombre}?v=${Date.now()}`;
+  await prisma.place.update({ where: { id: placeId }, data: { logoUrl } });
+  return { ok: true, logoUrl };
+}
+
+export async function quitarLogoLugar(placeId: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  const user = await usuarioActual();
+  if (!user) return { ok: false, error: "Tenés que entrar de nuevo." };
+  if (!(await puedeEditarLugar(user, placeId))) {
+    return { ok: false, error: "Esta ficha no está en tu cuenta." };
+  }
+  await borrarArchivosLogo(placeId);
+  await prisma.place.update({ where: { id: placeId }, data: { logoUrl: "" } });
+  return { ok: true };
 }

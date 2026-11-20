@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { guardarLugar } from "@/actions/place";
 import { FichaLugar } from "@/components/FichaLugar";
 import { HorarioLugarEditor } from "@/components/HorarioLugarEditor";
+import { LogoLugarEditor } from "@/components/LogoLugarEditor";
 import { LOCALIDADES, OBRAS_INICIALES, TIPOS_LUGAR } from "@/lib/constants";
 import type { BorradorLugar, EstudioBorrador } from "@/lib/draft";
 import { MODOS_OBRAS_LUGAR, obrasModoDefault } from "@/lib/placeObras";
@@ -108,6 +109,7 @@ export function EditorLugar({
     kind: borrador.kind,
     locality: borrador.locality,
     address: borrador.address,
+    logoUrl: borrador.logoUrl,
     whatsapp: borrador.whatsapp,
     phone: borrador.phone,
     scheduleNote: notaHorarioParaGuardar(borrador.schedule, borrador.scheduleLegacy),
@@ -130,6 +132,13 @@ export function EditorLugar({
         <BarraGuardar />
         <section className="grid gap-4">
           <h2 className="text-2xl font-semibold">El lugar</h2>
+          <LogoLugarEditor
+            placeId={placeId}
+            logoUrl={borrador.logoUrl}
+            onChange={(logoUrl) => {
+              setBorrador((actual) => ({ ...actual, logoUrl }));
+            }}
+          />
           <label className="grid gap-1">
             Nombre
             <input className="campo" value={borrador.name} onChange={(event) => cambiar({ name: event.target.value })} />
