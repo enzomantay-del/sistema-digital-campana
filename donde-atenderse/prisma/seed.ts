@@ -1,7 +1,10 @@
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
+import { HORARIO_CONSULTORIO_TARDE, HORARIO_GUARDIA_SABADO, HORARIO_HOSPITAL_MANANA } from "./seedHorario";
 
 const prisma = new PrismaClient();
+
+const FOTO_EJEMPLO_ANA = "/ejemplos/dra-ana-lopez.svg";
 
 function dias(...ids: string[]) {
   return ids.join(",");
@@ -36,12 +39,47 @@ async function publicarEjemplos() {
   });
 }
 
+/** Ficha modelo con foto, horarios v2 y contacto — muestra el formato nuevo de Cercalud. */
+async function actualizarFichaEjemploAna() {
+  const ana = await prisma.professional.findFirst({
+    where: { example: true, fullName: "Dra. Ana López" },
+    include: { attendances: { include: { place: true } } },
+  });
+  if (!ana) return;
+
+  await prisma.professional.update({
+    where: { id: ana.id },
+    data: {
+      photoUrl: FOTO_EJEMPLO_ANA,
+      published: true,
+      reviewed: true,
+      example: true,
+    },
+  });
+
+  for (const att of ana.attendances) {
+    let nota = "";
+    if (att.place.name === "Hospital de Jardín América") nota = HORARIO_HOSPITAL_MANANA;
+    else if (att.place.name === "Consultorio López") nota = HORARIO_CONSULTORIO_TARDE;
+    else if (att.place.name === "Sanatorio del Paraná") nota = HORARIO_GUARDIA_SABADO;
+    else continue;
+
+    await prisma.attendance.update({
+      where: { id: att.id },
+      data: { professionalScheduleNote: nota },
+    });
+  }
+
+  console.log(`Ficha de ejemplo lista: Dra. Ana López (${ana.id})`);
+}
+
 async function main() {
   await asegurarAdmin();
 
   const yaHay = await prisma.professional.count();
   if (yaHay > 0) {
     await publicarEjemplos();
+    await actualizarFichaEjemploAna();
     console.log("La base ya tiene datos. No se vuelve a cargar el ejemplo.");
     return;
   }
@@ -251,6 +289,7 @@ async function main() {
       license: "EJ-1001",
       area: "cuerpo",
       specialty: "Clínica médica",
+      photoUrl: FOTO_EJEMPLO_ANA,
       whatsapp: "3743001001",
       phone: "3743 00-1001",
       price: "15000",
@@ -358,6 +397,7 @@ async function main() {
         professionalDays: dias("lun", "mar", "mie", "jue", "vie"),
         professionalTime: "8 a 12",
         professionalShift: "manana",
+        professionalScheduleNote: HORARIO_HOSPITAL_MANANA,
         placeDays: dias("lun", "mar", "mie", "jue", "vie"),
         placeTime: "8 a 12",
         placeShift: "manana",
@@ -369,6 +409,7 @@ async function main() {
         professionalDays: dias("lun", "mie", "vie"),
         professionalTime: "16 a 20",
         professionalShift: "tarde",
+        professionalScheduleNote: HORARIO_CONSULTORIO_TARDE,
         placeDays: dias("lun", "mie", "vie"),
         placeTime: "16 a 20",
         placeShift: "tarde",
@@ -378,8 +419,9 @@ async function main() {
         professionalId: ana.id,
         placeId: sanatorio.id,
         professionalDays: dias("sab"),
-        professionalTime: "20 a 8",
+        professionalTime: "24 h",
         professionalShift: "guardia",
+        professionalScheduleNote: HORARIO_GUARDIA_SABADO,
         placeDays: dias("sab"),
         placeTime: "20 a 8",
         placeShift: "guardia",
@@ -489,6 +531,7 @@ async function main() {
   });
 
   await publicarEjemplos();
+  await actualizarFichaEjemploAna();
   console.log("Ejemplo cargado. Las fichas no tienen usuario.");
 }
 
