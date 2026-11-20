@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { FichaLugar } from "@/components/FichaLugar";
+import { LayoutFichaPublica } from "@/components/LayoutFichaPublica";
 import { filaHorario } from "@/lib/map";
 import { equipoPublicadoEnLugar } from "@/lib/lugarEquipo";
 import { obrasModoEfectivo } from "@/lib/placeObras";
@@ -39,8 +40,8 @@ export default async function PaginaLugar({ params }: { params: Promise<{ id: st
       .map((item) => filaHorario({ ...item, professional: item.professional })),
   });
   return (
-    <div className="max-w-2xl">
+    <LayoutFichaPublica>
       <FichaLugar vista={vista} ejemplo={lugar.example} />
-    </div>
+    </LayoutFichaPublica>
   );
 }

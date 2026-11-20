@@ -300,7 +300,7 @@ export function EditorLugar({
             {borrador.dutyStart && borrador.dutyEnd ? `, del ${borrador.dutyStart} al ${borrador.dutyEnd}` : ""}.
           </p>
         ) : (
-          <FichaLugar vista={vista} enlazar={false} />
+          <FichaLugar vista={vista} enlazar={false} mostrarProfesionalesEnFicha />
         )}
       </aside>
     </div>

@@ -133,6 +133,41 @@ export function lineasHorarioLugar(note: string): string[] {
   return datos.franjas.map(textoFranja).filter(Boolean);
 }
 
+export type FranjaHorarioPublica = {
+  diasLabel: string;
+  cerrado: boolean;
+  guardia24: boolean;
+  turnos: { label: string; rango: string }[];
+};
+
+export function franjasHorarioLugarPublico(note: string): FranjaHorarioPublica[] {
+  const datos = parsearScheduleNote(note);
+  if (!datos) return [];
+  return datos.franjas
+    .map((franja) => {
+      const diasLabel = textoDias(ordenarDias(franja.dias));
+      if (!diasLabel) return null;
+      const turnos: FranjaHorarioPublica["turnos"] = [];
+      for (const turno of TURNOS_HORARIO_LUGAR) {
+        const datosTurno = franja[turno.id];
+        if (!datosTurno.activo) continue;
+        const rango = rangoTexto(datosTurno.desde, datosTurno.hasta);
+        turnos.push({ label: turno.label, rango });
+      }
+      return {
+        diasLabel,
+        cerrado: franja.cerrado,
+        guardia24: franja.guardia24,
+        turnos,
+      };
+    })
+    .filter((franja): franja is FranjaHorarioPublica => Boolean(franja));
+}
+
+export function lugarTieneGuardia24h(note: string) {
+  return franjasHorarioLugarPublico(note).some((franja) => franja.guardia24);
+}
+
 export function textoHorarioLugarPublico(note: string) {
   return lineasHorarioLugar(note).join(" ");
 }

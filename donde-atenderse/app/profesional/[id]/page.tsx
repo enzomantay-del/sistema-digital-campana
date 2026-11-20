@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { FichaProfesional } from "@/components/FichaProfesional";
+import { LayoutFichaPublica } from "@/components/LayoutFichaPublica";
 import { filaHorario } from "@/lib/map";
 import { prisma } from "@/lib/prisma";
 import { armarVistaProfesional } from "@/lib/view";
@@ -26,8 +27,8 @@ export default async function PaginaProfesional({ params }: { params: Promise<{ 
     filas: persona.attendances.map(filaHorario),
   });
   return (
-    <div className="max-w-2xl">
+    <LayoutFichaPublica>
       <FichaProfesional vista={vista} ejemplo={persona.example} />
-    </div>
+    </LayoutFichaPublica>
   );
 }

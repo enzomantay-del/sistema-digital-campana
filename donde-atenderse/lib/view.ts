@@ -35,6 +35,7 @@ export type VistaLugar = {
   logoUrl: string;
   whatsapp: string;
   telefono: string;
+  scheduleNote: string;
   horarioLugar: string;
   horarioLineas: string[];
   obras: string[];
@@ -167,6 +168,7 @@ export function armarVistaLugar(input: {
     logoUrl: input.logoUrl?.trim() ?? "",
     whatsapp: input.whatsapp.trim(),
     telefono: input.phone.trim(),
+    scheduleNote: input.scheduleNote,
     horarioLugar: textoHorarioLugarPublico(input.scheduleNote),
     horarioLineas: lineasHorarioLugar(input.scheduleNote),
     obras: obrasPresentacion.mostrarLista ? input.obras : [],
@@ -177,10 +179,7 @@ export function armarVistaLugar(input: {
     cantidadProfesionales: input.cantidadProfesionales,
     especialidades: input.especialidades,
     actualizacion: frase(input.updatedAt, input.name),
-    notaHospital:
-      input.kind === "hospital" || input.kind === "sanatorio"
-        ? "Los consultorios externos de este lugar están en esta ficha."
-        : "",
+    notaHospital: "",
     estudios: input.studies
       .filter((estudio) => estudio.name.trim())
       .map((estudio) => ({

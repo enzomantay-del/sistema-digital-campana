@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { FichaProfesional } from "@/components/FichaProfesional";
+import { LayoutFichaPublica } from "@/components/LayoutFichaPublica";
 import { PROFESIONAL_EJEMPLO_MODELO, profesionalEjemploModelo } from "@/lib/ejemplo";
 import { filaHorario } from "@/lib/map";
 import { armarVistaProfesional } from "@/lib/view";
@@ -44,15 +45,17 @@ export default async function PaginaProfesionalEjemplo() {
   });
 
   return (
-    <div className="max-w-2xl grid gap-4">
-      <p className="text-sm text-muted">
-        Enlace fijo para probar la web. La ficha real está en{" "}
-        <Link href={`/profesional/${persona.id}`} className="font-medium text-link">
-          /profesional/{persona.id}
-        </Link>
-        .
-      </p>
-      <FichaProfesional vista={vista} ejemplo={persona.example} />
-    </div>
+    <LayoutFichaPublica>
+      <div className="grid gap-4">
+        <p className="text-sm text-muted">
+          Enlace fijo para probar la web. La ficha real está en{" "}
+          <Link href={`/profesional/${persona.id}`} className="font-medium text-link">
+            /profesional/{persona.id}
+          </Link>
+          .
+        </p>
+        <FichaProfesional vista={vista} ejemplo={persona.example} />
+      </div>
+    </LayoutFichaPublica>
   );
 }

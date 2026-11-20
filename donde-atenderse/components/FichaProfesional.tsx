@@ -70,7 +70,7 @@ export function FichaProfesional({
                   ) : linea.detalle ? (
                     <p className="mt-1">{linea.detalle}</p>
                   ) : null}
-                  <p className="mt-2 text-base text-muted">{linea.actualizacion}</p>
+                  <p className="mt-2 text-xs text-muted">{linea.actualizacion}</p>
                   {linea.conflictoTexto ? <p className="mt-1 text-base text-warn">{linea.conflictoTexto}</p> : null}
                 </div>
               ))}
@@ -135,7 +135,7 @@ export function FichaProfesional({
         <p className="text-base text-muted">En una ficha real, estos botones abren el chat o el teléfono.</p>
       ) : null}
 
-      <p className="text-base text-muted">{vista.actualizacion}</p>
+      <p className="text-xs text-muted">{vista.actualizacion}</p>
     </article>
   );
 }

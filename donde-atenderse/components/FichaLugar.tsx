@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { HorarioLugarPublico } from "@/components/HorarioLugarPublico";
 import { MENSAJE_WHATSAPP } from "@/lib/constants";
 import { enlaceMaps, enlaceTelefono, enlaceWhatsApp, etiquetaLugar } from "@/lib/format";
 import type { VistaLugar } from "@/lib/view";
@@ -8,10 +9,13 @@ export function FichaLugar({
   vista,
   ejemplo = false,
   enlazar = true,
+  mostrarProfesionalesEnFicha = false,
 }: {
   vista: VistaLugar;
   ejemplo?: boolean;
   enlazar?: boolean;
+  /** En el panel se puede previsualizar el listado; en la ficha pública va solo el resumen. */
+  mostrarProfesionalesEnFicha?: boolean;
 }) {
   return (
     <article className="tarjeta grid gap-8">
@@ -50,29 +54,38 @@ export function FichaLugar({
             </a>
           )
         ) : null}
-        {vista.notaHospital ? <p className="text-base text-muted">{vista.notaHospital}</p> : null}
         {ejemplo ? <p className="text-base text-warn">Dato de ejemplo.</p> : null}
       </header>
 
-      {vista.horarioLineas.length > 0 ? (
-        <div className="grid gap-1">
-          {vista.horarioLineas.map((linea) => (
-            <p key={linea}>{linea}</p>
-          ))}
-        </div>
-      ) : vista.horarioLugar ? (
-        <p>{vista.horarioLugar}</p>
+      <HorarioLugarPublico
+        scheduleNote={vista.scheduleNote}
+        lineasFallback={vista.horarioLineas}
+        textoFallback={vista.horarioLugar}
+      />
+
+      {vista.cantidadProfesionales > 0 ? (
+        <section className="grid gap-4">
+          <h2 className="text-2xl font-semibold">Quién atiende</h2>
+          <p className="text-muted">Consultá el listado completo de profesionales y especialidades en este lugar.</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href={`/lugar/${vista.placeId}/profesionales`} className="boton-suave">
+              Ver profesionales ({vista.cantidadProfesionales})
+            </Link>
+            {vista.especialidades.length > 0 ? (
+              <Link href={`/lugar/${vista.placeId}/especialidades`} className="boton-suave">
+                Ver especialidades ({vista.especialidades.length})
+              </Link>
+            ) : null}
+          </div>
+        </section>
       ) : null}
 
-      {vista.bloques.length > 0 ? (
-        <div className="grid gap-6">
-          <h2 className="text-2xl font-semibold">Quién atiende</h2>
+      {mostrarProfesionalesEnFicha && vista.bloques.length > 0 ? (
+        <div className="grid gap-6 border-t border-line pt-6">
+          <p className="text-sm font-semibold text-muted">Vista previa del detalle por profesional</p>
           {vista.bloques.map((bloque) => (
             <section key={bloque.shift} className="grid gap-4">
               <h3 className="text-xl font-semibold">{bloque.titulo}</h3>
-              {bloque.shift === "guardia" ? (
-                <p className="text-base text-muted">Es una guardia, no un horario de consultorio.</p>
-              ) : null}
               {bloque.lineas.map((linea) => (
                 <div key={linea.id} className="border-t border-line pt-4">
                   {enlazar && linea.personaId ? (
@@ -83,25 +96,11 @@ export function FichaLugar({
                     <p className="text-xl font-semibold">{linea.rotulo}</p>
                   )}
                   {linea.detalle ? <p className="mt-1">{linea.detalle}</p> : null}
-                  <p className="mt-2 text-base text-muted">{linea.actualizacion}</p>
-                  {linea.conflictoTexto ? <p className="mt-1 text-base text-warn">{linea.conflictoTexto}</p> : null}
+                  <p className="mt-2 text-xs text-muted">{linea.actualizacion}</p>
                 </div>
               ))}
             </section>
           ))}
-        </div>
-      ) : null}
-
-      {vista.cantidadProfesionales > 0 ? (
-        <div className="flex flex-wrap gap-3">
-          <Link href={`/lugar/${vista.placeId}/profesionales`} className="boton-suave">
-            Ver profesionales ({vista.cantidadProfesionales})
-          </Link>
-          {vista.especialidades.length > 0 ? (
-            <Link href={`/lugar/${vista.placeId}/especialidades`} className="boton-suave">
-              Ver especialidades ({vista.especialidades.length})
-            </Link>
-          ) : null}
         </div>
       ) : null}
 
@@ -134,7 +133,12 @@ export function FichaLugar({
               ejemplo ? (
                 <span className="boton w-fit cursor-default opacity-80">WhatsApp</span>
               ) : (
-                <a className="boton w-fit" href={enlaceWhatsApp(vista.whatsapp, MENSAJE_WHATSAPP)} target="_blank" rel="noopener noreferrer">
+                <a
+                  className="boton w-fit"
+                  href={enlaceWhatsApp(vista.whatsapp, MENSAJE_WHATSAPP)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   WhatsApp
                 </a>
               )
@@ -151,7 +155,7 @@ export function FichaLugar({
           </div>
         </section>
       ) : null}
-      <p className="text-base text-muted">{vista.actualizacion}</p>
+      <p className="text-xs text-muted">{vista.actualizacion}</p>
     </article>
   );
 }
