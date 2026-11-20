@@ -56,6 +56,17 @@ export function detalleHorario(days: string, time: string) {
   return [textoDias(diasDesdeTexto(days)), time.trim()].filter(Boolean).join(" · ");
 }
 
+export function notaHorarioLugar(days: string[], shift: string, time: string) {
+  const detalle = detalleHorario(days.join(","), time);
+  if (shift === "guardia") {
+    return [detalle, "Guardia"].filter(Boolean).join(" · ");
+  }
+  const turno = etiquetaTurno(shift);
+  if (!detalle) return shift === "manana" ? "" : turno;
+  if (shift === "manana" || !turno) return detalle;
+  return `${detalle} · ${turno}`;
+}
+
 export function textoPrecio(price: string) {
   const limpio = price.trim();
   if (!limpio) return "";

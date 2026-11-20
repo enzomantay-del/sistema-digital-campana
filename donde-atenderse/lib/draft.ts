@@ -64,10 +64,12 @@ export type BorradorLugar = {
   whatsapp: string;
   phone: string;
   scheduleNote: string;
+  scheduleDays: string[];
+  scheduleShift: string;
+  scheduleTime: string;
   obras: string[];
   otraObra: string;
   studies: EstudioBorrador[];
-  horarios: HorarioLugarBorrador[];
   dutyStart: string;
   dutyEnd: string;
   dutySource: string;

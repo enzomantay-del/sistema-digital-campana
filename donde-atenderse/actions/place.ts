@@ -3,7 +3,8 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { esAdmin, usuarioActual } from "@/lib/auth";
-import { AREAS, LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
+import { LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
+import { notaHorarioLugar } from "@/lib/format";
 import type { BorradorLugar } from "@/lib/draft";
 
 export type GuardadoLugar =
@@ -74,7 +75,10 @@ export async function guardarLugar(placeId: string, borrador: BorradorLugar): Pr
       address: borrador.address.trim(),
       whatsapp: borrador.whatsapp.trim(),
       phone: borrador.phone.trim(),
-      scheduleNote: borrador.scheduleNote.trim(),
+      scheduleNote: (
+        notaHorarioLugar(borrador.scheduleDays, borrador.scheduleShift, borrador.scheduleTime) ||
+        borrador.scheduleNote
+      ).trim(),
       published: esAdmin(user) ? lugar.published : lugar.published,
     },
   });
@@ -128,58 +132,5 @@ export async function guardarLugar(placeId: string, borrador: BorradorLugar): Pr
     }
   }
 
-  const actuales = await prisma.attendance.findMany({ where: { placeId } });
-  const conservados = new Set<string>();
-  const horarios: { key: string; id: string; professionalId: string }[] = [];
-  const ahora = new Date();
-
-  for (const horario of borrador.horarios) {
-    const dataLugar = {
-      placeDays: horario.days.join(","),
-      placeTime: horario.time.trim().slice(0, 80),
-      placeShift: horario.shift,
-      placeUpdatedAt: ahora,
-    };
-    const existente = horario.id ? actuales.find((item) => item.id === horario.id && item.placeId === placeId) : undefined;
-    if (existente) {
-      await prisma.attendance.update({ where: { id: existente.id }, data: dataLugar });
-      conservados.add(existente.id);
-      horarios.push({ key: horario.key, id: existente.id, professionalId: existente.professionalId });
-      continue;
-    }
-    if (horario.professionalName.trim().length < 2) continue;
-    if (!AREAS.some((area) => area.id === horario.area)) {
-      return { ok: false, error: "Elegí el área de la persona que agregaste." };
-    }
-    const persona = await prisma.professional.create({
-      data: {
-        fullName: horario.professionalName.trim().slice(0, 120),
-        specialty: horario.specialty.trim().slice(0, 120),
-        area: horario.area || "cuerpo",
-        license: horario.license.trim().slice(0, 40),
-        published: false,
-        reviewed: false,
-      },
-    });
-    const creado = await prisma.attendance.create({
-      data: { placeId, professionalId: persona.id, ...dataLugar },
-    });
-    conservados.add(creado.id);
-    horarios.push({ key: horario.key, id: creado.id, professionalId: persona.id });
-  }
-
-  for (const item of actuales) {
-    if (conservados.has(item.id)) continue;
-    const personaTieneDatos = Boolean(item.professionalDays || item.professionalTime || item.professionalShift);
-    if (personaTieneDatos) {
-      await prisma.attendance.update({
-        where: { id: item.id },
-        data: { placeDays: "", placeTime: "", placeShift: "", placeUpdatedAt: ahora },
-      });
-    } else {
-      await prisma.attendance.delete({ where: { id: item.id } });
-    }
-  }
-
-  return { ok: true, horarios, studies };
+  return { ok: true, horarios: [], studies };
 }

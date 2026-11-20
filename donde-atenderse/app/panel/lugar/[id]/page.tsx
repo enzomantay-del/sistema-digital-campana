@@ -5,7 +5,6 @@ import { AccionesAdmin } from "@/components/AccionesAdmin";
 import { EditorLugar } from "@/components/EditorLugar";
 import { esAdmin, usuarioActual } from "@/lib/auth";
 import { fechaInput } from "@/lib/format";
-import { horarioLugar } from "@/lib/map";
 import { prisma } from "@/lib/prisma";
 import { catalogoObras } from "@/lib/search";
 
@@ -28,7 +27,6 @@ export default async function PaginaEditorLugar({
     include: {
       obras: { include: { obra: true } },
       studies: true,
-      attendances: { include: { professional: true } },
       duties: { orderBy: { endsOn: "desc" }, take: 1 },
       editors: { include: { user: true } },
       suggestedBy: true,
@@ -107,6 +105,9 @@ export default async function PaginaEditorLugar({
           whatsapp: lugar.whatsapp,
           phone: lugar.phone,
           scheduleNote: lugar.scheduleNote,
+          scheduleDays: [],
+          scheduleShift: "manana",
+          scheduleTime: "",
           obras: lugar.obras.map((item) => item.obra.name),
           otraObra: "",
           studies: lugar.studies.map((estudio) => ({
@@ -116,7 +117,6 @@ export default async function PaginaEditorLugar({
             preparation: estudio.preparation,
             attention: estudio.attention,
           })),
-          horarios: lugar.attendances.map(horarioLugar),
           dutyStart: fechaInput(turno?.startsOn),
           dutyEnd: fechaInput(turno?.endsOn),
           dutySource: turno?.source ?? "",

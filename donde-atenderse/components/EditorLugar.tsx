@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { guardarLugar } from "@/actions/place";
 import { FichaLugar } from "@/components/FichaLugar";
-import { AREAS, DIAS, LOCALIDADES, OBRAS_INICIALES, TIPOS_LUGAR, TURNOS } from "@/lib/constants";
-import type { BorradorLugar, EstudioBorrador, HorarioLugarBorrador } from "@/lib/draft";
-import { filaHorario } from "@/lib/map";
+import { DIAS, LOCALIDADES, OBRAS_INICIALES, TIPOS_LUGAR, TURNOS } from "@/lib/constants";
+import type { BorradorLugar, EstudioBorrador } from "@/lib/draft";
+import { notaHorarioLugar } from "@/lib/format";
 import { armarVistaLugar } from "@/lib/view";
 
 function clave() {
@@ -48,10 +48,6 @@ export function EditorLugar({
     }
     const fusion = {
       ...ultimo.current,
-      horarios: ultimo.current.horarios.map((horario) => {
-        const guardado = resultado.horarios.find((fila) => fila.key === horario.key);
-        return guardado ? { ...horario, id: guardado.id, professionalId: guardado.professionalId } : horario;
-      }),
       studies: ultimo.current.studies.map((estudio) => {
         const guardado = resultado.studies.find((fila) => fila.key === estudio.key);
         return guardado ? { ...estudio, id: guardado.id } : estudio;
@@ -82,12 +78,15 @@ export function EditorLugar({
     setBorrador((actual) => ({ ...actual, ...parcial }));
   }
 
-  function cambiarHorario(key: string, parcial: Partial<HorarioLugarBorrador>) {
+  function cambiarHorarioLugar(parcial: Pick<BorradorLugar, "scheduleDays" | "scheduleShift" | "scheduleTime">) {
     pendiente.current = true;
-    setBorrador((actual) => ({
-      ...actual,
-      horarios: actual.horarios.map((horario) => (horario.key === key ? { ...horario, ...parcial } : horario)),
-    }));
+    setBorrador((actual) => {
+      const siguiente = { ...actual, ...parcial };
+      return {
+        ...siguiente,
+        scheduleNote: notaHorarioLugar(siguiente.scheduleDays, siguiente.scheduleShift, siguiente.scheduleTime),
+      };
+    });
   }
 
   function cambiarEstudio(key: string, parcial: Partial<EstudioBorrador>) {
@@ -98,6 +97,9 @@ export function EditorLugar({
     }));
   }
 
+  const horarioVista =
+    notaHorarioLugar(borrador.scheduleDays, borrador.scheduleShift, borrador.scheduleTime) || borrador.scheduleNote;
+
   const vista = armarVistaLugar({
     name: borrador.name || "Sin nombre",
     kind: borrador.kind,
@@ -105,33 +107,15 @@ export function EditorLugar({
     address: borrador.address,
     whatsapp: borrador.whatsapp,
     phone: borrador.phone,
-    scheduleNote: borrador.scheduleNote,
-    obras: [...borrador.obras, borrador.otraObra].map((item) => item.trim()).filter(Boolean),
+    scheduleNote: horarioVista,
+    obras: [...borrador.obras, borrador.otraObra].map((item) => item.trim()).filter(Boolean).sort((a, b) => a.localeCompare(b, "es")),
     updatedAt: new Date(),
     studies: borrador.studies.map((estudio) => ({
       name: estudio.name,
       preparation: estudio.preparation,
       attention: estudio.attention,
     })),
-    filas: borrador.horarios
-      .filter((horario) => horario.professionalName.trim())
-      .map((horario) =>
-        filaHorario({
-          id: horario.id || horario.key,
-          placeId,
-          professionalId: horario.professionalId,
-          professionalDays: horario.professionalDays.join(","),
-          professionalTime: horario.professionalTime,
-          professionalShift: horario.professionalShift,
-          professionalUpdatedAt: horario.professionalUpdatedAt ? new Date(horario.professionalUpdatedAt) : null,
-          placeDays: horario.days.join(","),
-          placeTime: horario.time,
-          placeShift: horario.shift,
-          placeUpdatedAt: new Date(),
-          place: { name: borrador.name, locality: borrador.locality },
-          professional: { fullName: horario.professionalName },
-        }),
-      ),
+    filas: [],
   });
 
   return (
@@ -171,20 +155,75 @@ export function EditorLugar({
             <input className="campo" value={borrador.whatsapp} onChange={(event) => cambiar({ whatsapp: event.target.value })} />
           </label>
           <label className="grid gap-1">
-            Teléfono
+            Teléfono fijo
             <input className="campo" value={borrador.phone} onChange={(event) => cambiar({ phone: event.target.value })} />
           </label>
-          <label className="grid gap-1">
-            Horario del lugar
-            <input className="campo" value={borrador.scheduleNote} onChange={(event) => cambiar({ scheduleNote: event.target.value })} />
-          </label>
           <fieldset className="grid gap-3">
-            <legend className="font-semibold">Obra social</legend>
+            <legend className="font-semibold">Horario del lugar</legend>
             <div className="flex flex-wrap gap-2">
+              {DIAS.map((dia) => {
+                const activo = borrador.scheduleDays.includes(dia.id);
+                return (
+                  <label key={dia.id} className={activo ? "pastilla pastilla-activa" : "pastilla"}>
+                    <input
+                      className="sr-only"
+                      type="checkbox"
+                      checked={activo}
+                      onChange={(event) =>
+                        cambiarHorarioLugar({
+                          scheduleDays: event.target.checked
+                            ? [...borrador.scheduleDays, dia.id]
+                            : borrador.scheduleDays.filter((item) => item !== dia.id),
+                          scheduleShift: borrador.scheduleShift,
+                          scheduleTime: borrador.scheduleTime,
+                        })
+                      }
+                    />
+                    {dia.label}
+                  </label>
+                );
+              })}
+            </div>
+            <select
+              className="campo"
+              value={borrador.scheduleShift}
+              onChange={(event) =>
+                cambiarHorarioLugar({
+                  scheduleDays: borrador.scheduleDays,
+                  scheduleShift: event.target.value,
+                  scheduleTime: borrador.scheduleTime,
+                })
+              }
+            >
+              {TURNOS.map((turno) => (
+                <option key={turno.id} value={turno.id}>
+                  {turno.label}
+                </option>
+              ))}
+            </select>
+            <input
+              className="campo"
+              placeholder="8 a 12"
+              value={borrador.scheduleTime}
+              onChange={(event) =>
+                cambiarHorarioLugar({
+                  scheduleDays: borrador.scheduleDays,
+                  scheduleShift: borrador.scheduleShift,
+                  scheduleTime: event.target.value,
+                })
+              }
+            />
+            {borrador.scheduleNote && borrador.scheduleDays.length === 0 && !borrador.scheduleTime ? (
+              <p className="text-sm text-muted">Horario cargado antes: {borrador.scheduleNote}</p>
+            ) : null}
+          </fieldset>
+          <fieldset className="grid gap-3">
+            <legend className="font-semibold">Obras sociales</legend>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {catalogo.map((obra) => {
                 const activa = borrador.obras.includes(obra);
                 return (
-                  <label key={obra} className={activa ? "pastilla pastilla-activa" : "pastilla"}>
+                  <label key={obra} className={activa ? "pastilla pastilla-compacta pastilla-activa" : "pastilla pastilla-compacta"}>
                     <input
                       className="sr-only"
                       type="checkbox"
@@ -200,7 +239,7 @@ export function EditorLugar({
                 );
               })}
             </div>
-            <input className="campo" placeholder="Otra" value={borrador.otraObra} onChange={(event) => cambiar({ otraObra: event.target.value })} />
+            <input className="campo" placeholder="Otra obra social" value={borrador.otraObra} onChange={(event) => cambiar({ otraObra: event.target.value })} />
           </fieldset>
         </section>
 
@@ -243,89 +282,6 @@ export function EditorLugar({
               onClick={() => cambiar({ studies: [...borrador.studies, { key: clave(), name: "", preparation: "", attention: "turno" }] })}
             >
               Agregar un estudio
-            </button>
-          </section>
-        )}
-
-        {borrador.kind === "farmacia" ? null : (
-          <section className="grid gap-4">
-            <h2 className="text-2xl font-semibold">Quién atiende</h2>
-            {borrador.horarios.map((horario) => (
-              <div key={horario.key} className="grid gap-3 border-t border-line pt-4">
-                {horario.professionalId ? <p className="font-semibold">{horario.professionalName}</p> : null}
-                {!horario.professionalId ? (
-                  <>
-                    <input className="campo" placeholder="Nombre" value={horario.professionalName} onChange={(event) => cambiarHorario(horario.key, { professionalName: event.target.value })} />
-                    <input className="campo" placeholder="Especialidad" value={horario.specialty} onChange={(event) => cambiarHorario(horario.key, { specialty: event.target.value })} />
-                    <input className="campo" placeholder="Matrícula" value={horario.license} onChange={(event) => cambiarHorario(horario.key, { license: event.target.value })} />
-                    <select className="campo" value={horario.area} onChange={(event) => cambiarHorario(horario.key, { area: event.target.value })}>
-                      {AREAS.map((area) => (
-                        <option key={area.id} value={area.id}>
-                          {area.label}
-                        </option>
-                      ))}
-                    </select>
-                  </>
-                ) : null}
-                <div className="flex flex-wrap gap-2">
-                  {DIAS.map((dia) => {
-                    const activo = horario.days.includes(dia.id);
-                    return (
-                      <label key={dia.id} className={activo ? "pastilla pastilla-activa" : "pastilla"}>
-                        <input
-                          className="sr-only"
-                          type="checkbox"
-                          checked={activo}
-                          onChange={(event) =>
-                            cambiarHorario(horario.key, {
-                              days: event.target.checked ? [...horario.days, dia.id] : horario.days.filter((item) => item !== dia.id),
-                            })
-                          }
-                        />
-                        {dia.label}
-                      </label>
-                    );
-                  })}
-                </div>
-                <select className="campo" value={horario.shift} onChange={(event) => cambiarHorario(horario.key, { shift: event.target.value })}>
-                  {TURNOS.map((turno) => (
-                    <option key={turno.id} value={turno.id}>
-                      {turno.label}
-                    </option>
-                  ))}
-                </select>
-                <input className="campo" placeholder="8 a 12" value={horario.time} onChange={(event) => cambiarHorario(horario.key, { time: event.target.value })} />
-                <button type="button" className="w-fit font-semibold text-accent" onClick={() => cambiar({ horarios: borrador.horarios.filter((item) => item.key !== horario.key) })}>
-                  Quitar
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              className="boton-suave w-fit"
-              onClick={() =>
-                cambiar({
-                  horarios: [
-                    ...borrador.horarios,
-                    {
-                      key: clave(),
-                      professionalName: "",
-                      specialty: "",
-                      area: "cuerpo",
-                      license: "",
-                      days: ["lun"],
-                      shift: "manana",
-                      time: "",
-                      professionalDays: [],
-                      professionalShift: "",
-                      professionalTime: "",
-                      professionalUpdatedAt: null,
-                    },
-                  ],
-                })
-              }
-            >
-              Agregar una persona
             </button>
           </section>
         )}

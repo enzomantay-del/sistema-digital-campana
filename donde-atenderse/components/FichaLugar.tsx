@@ -26,7 +26,7 @@ export function FichaLugar({
 
       {vista.horarioLugar ? <p>{vista.horarioLugar}</p> : null}
 
-      {vista.bloques.length === 0 ? <p>Todavía no cargaron quién atiende en este lugar.</p> : (
+      {vista.bloques.length > 0 ? (
         <div className="grid gap-6">
           <h2 className="text-2xl font-semibold">Quién atiende</h2>
           {vista.bloques.map((bloque) => (
@@ -52,7 +52,7 @@ export function FichaLugar({
             </section>
           ))}
         </div>
-      )}
+      ) : null}
 
       {vista.estudios.length > 0 ? (
         <section className="grid gap-3">
@@ -74,7 +74,7 @@ export function FichaLugar({
         </p>
       ) : null}
 
-      {vista.telefono ? <p>Teléfono {vista.telefono}</p> : null}
+      {vista.telefono ? <p>Teléfono fijo {vista.telefono}</p> : null}
       {vista.whatsapp ? (
         ejemplo ? (
           <p className="boton w-fit opacity-80">Escribir por WhatsApp</p>
