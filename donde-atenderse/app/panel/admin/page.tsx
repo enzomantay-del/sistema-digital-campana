@@ -8,10 +8,109 @@ import {
   publicarLugar,
   publicarProfesional,
 } from "@/actions/admin";
-import { AccionesAdmin } from "@/components/AccionesAdmin";
+import { GestionAdminLista, type FilaAdmin } from "@/components/GestionAdminLista";
 import { requiereAdmin } from "@/lib/auth";
 import { etiquetaArea, etiquetaLugar, fecha } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
+
+const accionesProfesional = {
+  publicar: publicarProfesional,
+  bajar: bajarProfesional,
+  eliminar: eliminarProfesional,
+};
+
+const accionesLugar = {
+  publicar: publicarLugar,
+  bajar: bajarLugar,
+  eliminar: eliminarLugar,
+};
+
+function filaProfesional(
+  persona: {
+    id: string;
+    fullName: string;
+    specialty: string;
+    area: string;
+    license: string;
+    whatsapp: string;
+    published: boolean;
+    reviewed: boolean;
+    example: boolean;
+    createdAt: Date;
+    user: { email: string } | null;
+  },
+  extra?: string,
+): FilaAdmin {
+  return {
+    id: persona.id,
+    titulo: persona.fullName,
+    detalle: [
+      persona.specialty || "Sin especialidad",
+      etiquetaArea(persona.area),
+      persona.published ? "Publicada" : "Sin publicar",
+      persona.reviewed ? null : "Sin revisar",
+      persona.example ? "Dato de ejemplo" : null,
+    ]
+      .filter(Boolean)
+      .join(" · "),
+    extra:
+      extra ??
+      [
+        persona.license ? `Mat. ${persona.license}` : null,
+        persona.whatsapp ? `WhatsApp ${persona.whatsapp}` : null,
+        persona.user?.email ?? null,
+      ]
+        .filter(Boolean)
+        .join(" · "),
+    published: persona.published,
+    reviewed: persona.reviewed,
+    example: persona.example,
+    area: persona.area,
+  };
+}
+
+function filaLugar(
+  lugar: {
+    id: string;
+    name: string;
+    kind: string;
+    locality: string;
+    address: string;
+    published: boolean;
+    example: boolean;
+    suggestedById: string | null;
+    suggestedBy?: { name: string; email: string } | null;
+  },
+  extra?: string,
+): FilaAdmin {
+  return {
+    id: lugar.id,
+    titulo: lugar.name,
+    detalle: [
+      etiquetaLugar(lugar.kind),
+      lugar.locality,
+      lugar.published ? "Publicado" : "Sin publicar",
+      lugar.example ? "Dato de ejemplo" : null,
+      lugar.suggestedById ? "Sugerido" : null,
+    ]
+      .filter(Boolean)
+      .join(" · "),
+    extra:
+      extra ??
+      [
+        lugar.address ? lugar.address : null,
+        lugar.suggestedBy ? `Sugerido por ${lugar.suggestedBy.name}` : null,
+      ]
+        .filter(Boolean)
+        .join(" · "),
+    hrefEditar: `/panel/lugar/${lugar.id}`,
+    published: lugar.published,
+    example: lugar.example,
+    locality: lugar.locality,
+    kind: lugar.kind,
+    sugerido: Boolean(lugar.suggestedById),
+  };
+}
 
 export default async function PanelAdmin() {
   const admin = await requiereAdmin();
@@ -22,7 +121,7 @@ export default async function PanelAdmin() {
       orderBy: { createdAt: "asc" },
     }),
     prisma.place.findMany({
-      where: { published: false, suggestedById: { not: null } },
+      where: { suggestedById: { not: null } },
       include: { suggestedBy: true },
       orderBy: { createdAt: "asc" },
     }),
@@ -35,12 +134,27 @@ export default async function PanelAdmin() {
     }),
   ]);
 
+  const filasPendientes: FilaAdmin[] = profesionalesPendientes.map((persona) =>
+    filaProfesional(persona, `Cargada el ${fecha(persona.createdAt)}`),
+  );
+  const filasSugeridos: FilaAdmin[] = lugaresSugeridos.map((lugar) =>
+    filaLugar(
+      lugar,
+      [
+        lugar.suggestedBy?.email ? `(${lugar.suggestedBy.email})` : null,
+        !lugar.published ? "Pendiente de publicación" : null,
+      ]
+        .filter(Boolean)
+        .join(" · "),
+    ),
+  );
+
   return (
     <div className="grid gap-12">
       <header className="grid max-w-3xl gap-3">
         <h1 className="text-4xl font-bold tracking-tight">Administración</h1>
         <p className="text-muted">
-          Hola, {admin.name}. Acá publicás, bajás o eliminás lugares y fichas, y revisás lo que entra nuevo.
+          Hola, {admin.name}. Filtrá, seleccioná varios y publicá, bajá o eliminá de una vez.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link href="/panel/lugar/nuevo" className="boton">
@@ -56,121 +170,35 @@ export default async function PanelAdmin() {
 
       <section className="grid gap-4">
         <h2 className="text-2xl font-semibold">Fichas a revisar</h2>
-        {profesionalesPendientes.length === 0 ? (
-          <p className="text-muted">No hay fichas pendientes.</p>
-        ) : (
-          <ul className="grid gap-4">
-            {profesionalesPendientes.map((persona) => (
-              <li key={persona.id} className="grid gap-3 border-t border-line pt-4 sm:grid-cols-[1fr_auto] sm:items-start">
-                <div className="grid gap-1">
-                  <p className="font-semibold">{persona.fullName}</p>
-                  <p className="text-muted">
-                    {persona.specialty || "Sin especialidad"} · {etiquetaArea(persona.area)}
-                    {persona.license ? ` · Mat. ${persona.license}` : ""}
-                    {persona.example ? " · Dato de ejemplo" : ""}
-                  </p>
-                  <p className="text-muted">
-                    WhatsApp: {persona.whatsapp || "—"} · {persona.user?.email ?? "Sin cuenta"}
-                  </p>
-                  <p className="text-sm text-muted">Cargada el {fecha(persona.createdAt)}</p>
-                </div>
-                <AccionesAdmin
-                  acciones={[
-                    { label: "Publicar", action: publicarProfesional, id: persona.id, tono: "boton" },
-                    { label: "Bajar", action: bajarProfesional, id: persona.id, tono: "suave" },
-                    {
-                      label: "Eliminar",
-                      action: eliminarProfesional,
-                      id: persona.id,
-                      tono: "peligro",
-                      confirmar: `¿Eliminar la ficha de ${persona.fullName}? No se puede deshacer.`,
-                    },
-                  ]}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
+        <GestionAdminLista
+          filas={filasPendientes}
+          vacio="No hay fichas pendientes."
+          etiquetaItem="ficha"
+          acciones={accionesProfesional}
+          filtros="profesional"
+        />
       </section>
 
       <section className="grid gap-4">
         <h2 className="text-2xl font-semibold">Lugares sugeridos</h2>
-        {lugaresSugeridos.length === 0 ? (
-          <p className="text-muted">No hay sugerencias pendientes.</p>
-        ) : (
-          <ul className="grid gap-4">
-            {lugaresSugeridos.map((lugar) => (
-              <li key={lugar.id} className="grid gap-3 border-t border-line pt-4 sm:grid-cols-[1fr_auto] sm:items-start">
-                <div className="grid gap-1">
-                  <p className="font-semibold">{lugar.name}</p>
-                  <p className="text-muted">
-                    {etiquetaLugar(lugar.kind)} · {lugar.locality}
-                    {lugar.address ? ` · ${lugar.address}` : ""}
-                  </p>
-                  <p className="text-muted">
-                    Sugerido por {lugar.suggestedBy?.name ?? "alguien"}
-                    {lugar.suggestedBy?.email ? ` (${lugar.suggestedBy.email})` : ""}
-                  </p>
-                </div>
-                <AccionesAdmin
-                  extra={
-                    <Link href={`/panel/lugar/${lugar.id}`} className="font-semibold text-link">
-                      Editar
-                    </Link>
-                  }
-                  acciones={[
-                    { label: "Publicar", action: publicarLugar, id: lugar.id, tono: "boton" },
-                    { label: "Bajar", action: bajarLugar, id: lugar.id, tono: "suave" },
-                    {
-                      label: "Eliminar",
-                      action: eliminarLugar,
-                      id: lugar.id,
-                      tono: "peligro",
-                      confirmar: `¿Eliminar ${lugar.name}? No se puede deshacer.`,
-                    },
-                  ]}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
+        <GestionAdminLista
+          filas={filasSugeridos}
+          vacio="No hay sugerencias."
+          etiquetaItem="lugar"
+          acciones={accionesLugar}
+          filtros="lugar"
+        />
       </section>
 
       <section className="grid gap-4">
         <h2 className="text-2xl font-semibold">Profesionales</h2>
-        {profesionales.length === 0 ? (
-          <p className="text-muted">Todavía no hay fichas.</p>
-        ) : (
-          <ul className="grid gap-3">
-            {profesionales.map((persona) => (
-              <li key={persona.id} className="grid gap-3 border-t border-line pt-3 sm:grid-cols-[1fr_auto] sm:items-center">
-                <div>
-                  <p className="font-semibold">{persona.fullName}</p>
-                  <p className="text-sm text-muted">
-                    {persona.specialty || "Sin especialidad"} · {etiquetaArea(persona.area)} ·{" "}
-                    {persona.published ? "Publicada" : "Sin publicar"}
-                    {persona.reviewed ? "" : " · Sin revisar"}
-                    {persona.example ? " · Dato de ejemplo" : ""}
-                    {persona.user?.email ? ` · ${persona.user.email}` : ""}
-                  </p>
-                </div>
-                <AccionesAdmin
-                  acciones={[
-                    { label: "Publicar", action: publicarProfesional, id: persona.id },
-                    { label: "Bajar", action: bajarProfesional, id: persona.id },
-                    {
-                      label: "Eliminar",
-                      action: eliminarProfesional,
-                      id: persona.id,
-                      tono: "peligro",
-                      confirmar: `¿Eliminar la ficha de ${persona.fullName}? No se puede deshacer.`,
-                    },
-                  ]}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
+        <GestionAdminLista
+          filas={profesionales.map((persona) => filaProfesional(persona))}
+          vacio="Todavía no hay fichas."
+          etiquetaItem="ficha"
+          acciones={accionesProfesional}
+          filtros="profesional"
+        />
       </section>
 
       <section className="grid gap-4">
@@ -180,43 +208,13 @@ export default async function PanelAdmin() {
             Cargar otro
           </Link>
         </div>
-        {lugares.length === 0 ? (
-          <p className="text-muted">Todavía no hay lugares. Empezá por cargar los del corredor.</p>
-        ) : (
-          <ul className="grid gap-3">
-            {lugares.map((lugar) => (
-              <li key={lugar.id} className="grid gap-3 border-t border-line pt-3 sm:grid-cols-[1fr_auto] sm:items-center">
-                <div>
-                  <Link href={`/panel/lugar/${lugar.id}`} className="font-semibold hover:text-link">
-                    {lugar.name}
-                  </Link>
-                  <p className="text-sm text-muted">
-                    {etiquetaLugar(lugar.kind)} · {lugar.locality} · {lugar.published ? "Publicado" : "Sin publicar"}
-                    {lugar.example ? " · Dato de ejemplo" : ""}
-                  </p>
-                </div>
-                <AccionesAdmin
-                  extra={
-                    <Link href={`/panel/lugar/${lugar.id}`} className="font-semibold text-link">
-                      Editar
-                    </Link>
-                  }
-                  acciones={[
-                    { label: "Publicar", action: publicarLugar, id: lugar.id },
-                    { label: "Bajar", action: bajarLugar, id: lugar.id },
-                    {
-                      label: "Eliminar",
-                      action: eliminarLugar,
-                      id: lugar.id,
-                      tono: "peligro",
-                      confirmar: `¿Eliminar ${lugar.name}? No se puede deshacer.`,
-                    },
-                  ]}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
+        <GestionAdminLista
+          filas={lugares.map((lugar) => filaLugar(lugar))}
+          vacio="Todavía no hay lugares."
+          etiquetaItem="lugar"
+          acciones={accionesLugar}
+          filtros="lugar"
+        />
       </section>
     </div>
   );

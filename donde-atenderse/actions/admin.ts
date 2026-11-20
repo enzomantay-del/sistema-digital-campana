@@ -12,16 +12,22 @@ function revalidarPublico() {
   revalidatePath("/panel/admin");
 }
 
-function idDe(formData: FormData) {
-  return String(formData.get("id") ?? "").trim();
+function idsDe(formData: FormData) {
+  const varios = formData
+    .getAll("ids")
+    .map((valor) => String(valor).trim())
+    .filter(Boolean);
+  if (varios.length > 0) return [...new Set(varios)];
+  const uno = String(formData.get("id") ?? "").trim();
+  return uno ? [uno] : [];
 }
 
 export async function publicarProfesional(formData: FormData) {
   await requiereAdmin();
-  const id = idDe(formData);
-  if (!id) redirect("/panel/admin");
-  await prisma.professional.update({
-    where: { id },
+  const ids = idsDe(formData);
+  if (ids.length === 0) redirect("/panel/admin");
+  await prisma.professional.updateMany({
+    where: { id: { in: ids } },
     data: { published: true, reviewed: true },
   });
   revalidarPublico();
@@ -30,10 +36,10 @@ export async function publicarProfesional(formData: FormData) {
 
 export async function bajarProfesional(formData: FormData) {
   await requiereAdmin();
-  const id = idDe(formData);
-  if (!id) redirect("/panel/admin");
-  await prisma.professional.update({
-    where: { id },
+  const ids = idsDe(formData);
+  if (ids.length === 0) redirect("/panel/admin");
+  await prisma.professional.updateMany({
+    where: { id: { in: ids } },
     data: { published: false },
   });
   revalidarPublico();
@@ -42,21 +48,21 @@ export async function bajarProfesional(formData: FormData) {
 
 export async function eliminarProfesional(formData: FormData) {
   await requiereAdmin();
-  const id = idDe(formData);
-  if (!id) redirect("/panel/admin");
-  await prisma.attendance.deleteMany({ where: { professionalId: id } });
-  await prisma.professionalObra.deleteMany({ where: { professionalId: id } });
-  await prisma.professional.delete({ where: { id } });
+  const ids = idsDe(formData);
+  if (ids.length === 0) redirect("/panel/admin");
+  await prisma.attendance.deleteMany({ where: { professionalId: { in: ids } } });
+  await prisma.professionalObra.deleteMany({ where: { professionalId: { in: ids } } });
+  await prisma.professional.deleteMany({ where: { id: { in: ids } } });
   revalidarPublico();
   redirect("/panel/admin");
 }
 
 export async function publicarLugar(formData: FormData) {
   await requiereAdmin();
-  const id = idDe(formData);
-  if (!id) redirect("/panel/admin");
-  await prisma.place.update({
-    where: { id },
+  const ids = idsDe(formData);
+  if (ids.length === 0) redirect("/panel/admin");
+  await prisma.place.updateMany({
+    where: { id: { in: ids } },
     data: { published: true },
   });
   revalidarPublico();
@@ -65,10 +71,10 @@ export async function publicarLugar(formData: FormData) {
 
 export async function bajarLugar(formData: FormData) {
   await requiereAdmin();
-  const id = idDe(formData);
-  if (!id) redirect("/panel/admin");
-  await prisma.place.update({
-    where: { id },
+  const ids = idsDe(formData);
+  if (ids.length === 0) redirect("/panel/admin");
+  await prisma.place.updateMany({
+    where: { id: { in: ids } },
     data: { published: false },
   });
   revalidarPublico();
@@ -77,14 +83,14 @@ export async function bajarLugar(formData: FormData) {
 
 export async function eliminarLugar(formData: FormData) {
   await requiereAdmin();
-  const id = idDe(formData);
-  if (!id) redirect("/panel/admin");
-  await prisma.attendance.deleteMany({ where: { placeId: id } });
-  await prisma.placeEditor.deleteMany({ where: { placeId: id } });
-  await prisma.placeObra.deleteMany({ where: { placeId: id } });
-  await prisma.study.deleteMany({ where: { placeId: id } });
-  await prisma.pharmacyDuty.deleteMany({ where: { placeId: id } });
-  await prisma.place.delete({ where: { id } });
+  const ids = idsDe(formData);
+  if (ids.length === 0) redirect("/panel/admin");
+  await prisma.attendance.deleteMany({ where: { placeId: { in: ids } } });
+  await prisma.placeEditor.deleteMany({ where: { placeId: { in: ids } } });
+  await prisma.placeObra.deleteMany({ where: { placeId: { in: ids } } });
+  await prisma.study.deleteMany({ where: { placeId: { in: ids } } });
+  await prisma.pharmacyDuty.deleteMany({ where: { placeId: { in: ids } } });
+  await prisma.place.deleteMany({ where: { id: { in: ids } } });
   revalidarPublico();
   redirect("/panel/admin");
 }
