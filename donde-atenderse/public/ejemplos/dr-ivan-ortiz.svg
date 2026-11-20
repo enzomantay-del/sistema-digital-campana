@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Foto ejemplo Dr. Iván Ortiz">
+  <rect width="240" height="240" fill="#1e3a5f"/>
+  <circle cx="120" cy="92" r="44" fill="#dbeafe"/>
+  <path d="M48 220c8-52 40-76 72-76s64 24 72 76" fill="#dbeafe"/>
+  <text x="120" y="228" text-anchor="middle" fill="#bfdbfe" font-family="system-ui,sans-serif" font-size="13" font-weight="600">Ejemplo</text>
+</svg>

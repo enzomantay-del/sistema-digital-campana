@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HorarioLugarPublico } from "@/components/HorarioLugarPublico";
+import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
 import { MENSAJE_WHATSAPP } from "@/lib/constants";
 import { enlaceMaps, enlaceTelefono, enlaceWhatsApp, etiquetaLugar } from "@/lib/format";
 import type { VistaLugar } from "@/lib/view";
@@ -38,6 +39,7 @@ export function FichaLugar({
               {etiquetaLugar(vista.kind)} · {vista.localidad}
             </p>
             <h1 className="text-4xl font-bold tracking-tight">{vista.nombre}</h1>
+            <InsigniaVerificacion activa={vista.datosVerificados} />
           </div>
         </div>
         {vista.direccion ? (

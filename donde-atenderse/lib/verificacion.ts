@@ -1,0 +1,16 @@
+export const DIAS_DATOS_FRESCOS = 30;
+
+export function datosActualizadosRecientes(valor: Date | null | undefined, ahora = new Date()) {
+  if (!valor) return false;
+  const limite = DIAS_DATOS_FRESCOS * 24 * 60 * 60 * 1000;
+  return ahora.getTime() - valor.getTime() <= limite;
+}
+
+export function fechaMasReciente(...valores: (Date | null | undefined)[]) {
+  let mejor: Date | null = null;
+  for (const valor of valores) {
+    if (!valor) continue;
+    if (!mejor || valor > mejor) mejor = valor;
+  }
+  return mejor;
+}

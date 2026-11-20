@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
 import { MENSAJE_WHATSAPP } from "@/lib/constants";
 import { enlaceTelefono, enlaceWhatsApp } from "@/lib/format";
 import type { VistaProfesional } from "@/lib/view";
@@ -35,6 +36,7 @@ export function FichaProfesional({
             </p>
             <h1 className="text-4xl font-bold tracking-tight">{vista.nombre}</h1>
             {vista.matricula ? <p>Matrícula {vista.matricula}</p> : null}
+            <InsigniaVerificacion activa={vista.datosVerificados} />
           </div>
         </div>
         {ejemplo ? <p className="text-base text-warn">Dato de ejemplo.</p> : null}

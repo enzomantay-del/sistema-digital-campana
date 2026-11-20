@@ -1,4 +1,5 @@
 import { etiquetaArea, etiquetaTurno, detalleHorario, fecha, textoPrecio } from "./format";
+import { datosActualizadosRecientes, fechaMasReciente } from "./verificacion";
 import { ObrasModoLugar, obrasModoEfectivo, presentacionObrasLugar } from "./placeObras";
 import { lineasHorarioLugar, textoHorarioLugarPublico } from "./placeSchedule";
 import { lineaHorario, ordenarTurnos, type FilaHorario, type LineaHorario } from "./schedule";
@@ -23,6 +24,7 @@ export type VistaProfesional = {
   telefono: string;
   obras: string[];
   actualizacion: string;
+  datosVerificados: boolean;
   bloques: { shift: string; titulo: string; lineas: VistaLinea[] }[];
 };
 
@@ -46,6 +48,7 @@ export type VistaLugar = {
   cantidadProfesionales: number;
   especialidades: string[];
   actualizacion: string;
+  datosVerificados: boolean;
   notaHospital: string;
   estudios: { nombre: string; preparacion: string; atencion: string }[];
   bloques: { shift: string; titulo: string; lineas: VistaLinea[] }[];
@@ -131,6 +134,9 @@ export function armarVistaProfesional(input: {
     telefono: input.phone.trim(),
     obras: input.obras,
     actualizacion: frase(ultima, nombre),
+    datosVerificados: datosActualizadosRecientes(
+      fechaMasReciente(input.updatedAt, ...input.filas.map((fila) => fila.professionalUpdatedAt)),
+    ),
     bloques: bloques(lineas),
   };
 }
@@ -179,6 +185,9 @@ export function armarVistaLugar(input: {
     cantidadProfesionales: input.cantidadProfesionales,
     especialidades: input.especialidades,
     actualizacion: frase(input.updatedAt, input.name),
+    datosVerificados: datosActualizadosRecientes(
+      fechaMasReciente(input.updatedAt, ...input.filas.map((fila) => fila.placeUpdatedAt)),
+    ),
     notaHospital: "",
     estudios: input.studies
       .filter((estudio) => estudio.name.trim())

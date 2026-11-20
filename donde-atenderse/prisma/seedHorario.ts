@@ -52,3 +52,8 @@ export const HORARIO_GUARDIA_SABADO = notaHorarioEjemplo({
   v: 2,
   franjas: [franja("ej-guardia", ["sab"], { guardia24: true })],
 });
+
+export const HORARIO_ORTIZ_JUEVES = notaHorarioEjemplo({
+  v: 2,
+  franjas: [franja("ej-ivan", ["jue"], { manana: ["10:00", "14:00"] })],
+});

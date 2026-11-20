@@ -1,11 +1,17 @@
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import { RUTA_PROFESIONAL_EJEMPLO } from "../lib/ejemplo";
-import { HORARIO_CONSULTORIO_TARDE, HORARIO_GUARDIA_SABADO, HORARIO_HOSPITAL_MANANA } from "./seedHorario";
+import {
+  HORARIO_CONSULTORIO_TARDE,
+  HORARIO_GUARDIA_SABADO,
+  HORARIO_HOSPITAL_MANANA,
+  HORARIO_ORTIZ_JUEVES,
+} from "./seedHorario";
 
 const prisma = new PrismaClient();
 
 const FOTO_EJEMPLO_ANA = "/ejemplos/dra-ana-lopez.svg";
+const FOTO_EJEMPLO_ORTIZ = "/ejemplos/dr-ivan-ortiz.svg";
 
 function dias(...ids: string[]) {
   return ids.join(",");
@@ -74,6 +80,39 @@ async function actualizarFichaEjemploAna() {
   console.log(`Ficha de ejemplo: ${RUTA_PROFESIONAL_EJEMPLO} (id ${ana.id})`);
 }
 
+async function actualizarFichaEjemploOrtiz() {
+  const ivan = await prisma.professional.findFirst({
+    where: { fullName: "Dr. Iván Ortiz" },
+    include: { attendances: true },
+  });
+  if (!ivan) return;
+
+  const ahora = new Date();
+  await prisma.professional.update({
+    where: { id: ivan.id },
+    data: {
+      photoUrl: FOTO_EJEMPLO_ORTIZ,
+      published: true,
+      reviewed: true,
+      example: true,
+      updatedAt: ahora,
+    },
+  });
+
+  for (const att of ivan.attendances) {
+    await prisma.attendance.update({
+      where: { id: att.id },
+      data: {
+        professionalScheduleNote: HORARIO_ORTIZ_JUEVES,
+        professionalDays: "jue",
+        professionalTime: "10 a 14",
+        professionalShift: "manana",
+        professionalUpdatedAt: ahora,
+      },
+    });
+  }
+}
+
 async function main() {
   await asegurarAdmin();
 
@@ -81,6 +120,7 @@ async function main() {
   if (yaHay > 0) {
     await publicarEjemplos();
     await actualizarFichaEjemploAna();
+    await actualizarFichaEjemploOrtiz();
     console.log("La base ya tiene datos. No se vuelve a cargar el ejemplo.");
     return;
   }
@@ -346,8 +386,10 @@ async function main() {
       license: "EJ-1006",
       area: "mental",
       specialty: "Psiquiatría",
+      photoUrl: FOTO_EJEMPLO_ORTIZ,
       whatsapp: "3743001008",
       example: true,
+      updatedAt: dia("2026-11-18"),
     },
   });
   const elena = await prisma.professional.create({
@@ -501,6 +543,7 @@ async function main() {
         professionalDays: dias("jue"),
         professionalTime: "10 a 14",
         professionalShift: "manana",
+        professionalScheduleNote: HORARIO_ORTIZ_JUEVES,
         placeDays: dias("jue"),
         placeTime: "10 a 14",
         placeShift: "manana",
@@ -533,6 +576,7 @@ async function main() {
 
   await publicarEjemplos();
   await actualizarFichaEjemploAna();
+  await actualizarFichaEjemploOrtiz();
   console.log("Ejemplo cargado. Las fichas no tienen usuario.");
 }
 

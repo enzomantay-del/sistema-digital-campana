@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 
 /** Nombre de la ficha modelo que el seed mantiene actualizada. */
 export const PROFESIONAL_EJEMPLO_MODELO = "Dra. Ana López";
+export const PROFESIONAL_PUBLICIDAD_ORTIZ = "Dr. Iván Ortiz";
 
 export const RUTA_PROFESIONAL_EJEMPLO = "/ejemplo/profesional";
 
