@@ -34,9 +34,11 @@ export function FichaProfesional({
             <p className="text-sm font-semibold uppercase tracking-[0.08em] text-menta">
               {vista.especialidad} · {vista.area}
             </p>
-            <h1 className="text-4xl font-bold tracking-tight">{vista.nombre}</h1>
+            <div className="flex items-start justify-between gap-3">
+              <h1 className="min-w-0 text-4xl font-bold tracking-tight">{vista.nombre}</h1>
+              <InsigniaVerificacion activa={vista.datosVerificados} />
+            </div>
             {vista.matricula ? <p>Matrícula {vista.matricula}</p> : null}
-            <InsigniaVerificacion activa={vista.datosVerificados} />
           </div>
         </div>
         {ejemplo ? <p className="text-base text-warn">Dato de ejemplo.</p> : null}

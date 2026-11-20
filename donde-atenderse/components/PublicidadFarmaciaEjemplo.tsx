@@ -6,38 +6,45 @@ import { enlaceWhatsApp } from "@/lib/format";
 export function PublicidadFarmaciaEjemplo() {
   const whatsapp = "3743000500";
   return (
-    <TarjetaPublicidad pie="Maqueta de anuncio pagado. No es contratación real.">
-      <div className="flex gap-3">
-        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-line bg-white">
-          <Image
-            src="/ejemplos/farmacia-lapachos.svg"
-            alt=""
-            fill
-            className="object-contain p-1"
-            sizes="48px"
-            unoptimized
-          />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-base font-bold leading-tight">Farmacia Los Lapachos</p>
-          <p className="text-xs text-muted">Jardín América · 20% vitaminas</p>
-        </div>
-        <div className="relative hidden h-12 w-24 shrink-0 overflow-hidden rounded-lg border border-line sm:block">
-          <Image src="/ejemplos/publicidad-farmacia-promo.svg" alt="" fill className="object-cover" sizes="96px" unoptimized />
+    <TarjetaPublicidad>
+      <div className="relative aspect-[2/1] overflow-hidden rounded-xl bg-[#0d9488]">
+        <Image
+          src="/ejemplos/publicidad-farmacia-promo.svg"
+          alt=""
+          fill
+          className="object-cover opacity-95"
+          sizes="400px"
+          unoptimized
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#12275c]/90 via-[#12275c]/30 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+          <p className="text-xs font-bold uppercase tracking-wide text-[#a7f3d0]">Oferta limitada</p>
+          <p className="text-xl font-extrabold leading-tight">20% OFF en vitaminas y dermocosmética</p>
         </div>
       </div>
-      <p className="text-sm text-muted">Lun a sáb 8 a 21 · dom 9 a 13 · entrega en el centro.</p>
-      <div className="flex flex-wrap gap-2">
-        <Link href="/farmacia" className="boton flex-1 min-w-[8rem] text-center text-sm">
-          Farmacia de turno
+      <div className="flex items-center gap-3">
+        <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-line bg-white">
+          <Image src="/ejemplos/farmacia-lapachos.svg" alt="" fill className="object-contain p-0.5" sizes="44px" unoptimized />
+        </div>
+        <div>
+          <p className="text-lg font-bold">Farmacia Los Lapachos</p>
+          <p className="text-sm text-muted">Jardín América · entrega en el centro</p>
+        </div>
+      </div>
+      <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-950">
+        Presentá este aviso en caja y llevá 3x2 en agua mineral. Válido hasta el domingo.
+      </p>
+      <div className="grid gap-2">
+        <Link href="/farmacia" className="boton w-full text-center text-base font-bold">
+          Ver farmacia de turno hoy
         </Link>
         <a
-          className="boton-suave flex-1 min-w-[8rem] text-center text-sm"
-          href={enlaceWhatsApp(whatsapp, "Hola, vi la publicación en Cercalud.")}
+          className="boton-suave w-full text-center text-sm font-semibold"
+          href={enlaceWhatsApp(whatsapp, "Hola, quiero consultar la promo que vi en Cercalud.")}
           target="_blank"
           rel="noopener noreferrer"
         >
-          WhatsApp
+          Pedir por WhatsApp
         </a>
       </div>
     </TarjetaPublicidad>

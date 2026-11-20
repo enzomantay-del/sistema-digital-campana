@@ -38,8 +38,10 @@ export function FichaLugar({
             <p className="text-sm font-semibold uppercase tracking-[0.08em] text-menta">
               {etiquetaLugar(vista.kind)} · {vista.localidad}
             </p>
-            <h1 className="text-4xl font-bold tracking-tight">{vista.nombre}</h1>
-            <InsigniaVerificacion activa={vista.datosVerificados} />
+            <div className="flex items-start justify-between gap-3">
+              <h1 className="min-w-0 text-4xl font-bold tracking-tight">{vista.nombre}</h1>
+              <InsigniaVerificacion activa={vista.datosVerificados} />
+            </div>
           </div>
         </div>
         {vista.direccion ? (

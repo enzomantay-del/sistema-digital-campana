@@ -5,7 +5,10 @@ import { catalogoObras } from "@/lib/search";
 
 const BENEFICIOS = [
   ["El corredor entero", "Si en tu pueblo no está esa atención, ves el pueblo de al lado."],
-  ["Con fecha", "Cada ficha dice quién la cargó y cuándo se actualizó."],
+  [
+    "Sello azul",
+    "El icono al lado del nombre indica que el lugar o el profesional actualizó su ficha en los últimos 30 días.",
+  ],
   ["Tres áreas juntas", "Salud del cuerpo, salud mental y odontología, en la misma búsqueda."],
   ["Sin turno desde acá", "Escribís directo al profesional o al lugar. Cercalud no reserva."],
 ];
