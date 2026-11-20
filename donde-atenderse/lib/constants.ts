@@ -17,6 +17,7 @@ export const TIPOS_LUGAR = [
   { id: "hospital", label: "Hospital" },
   { id: "sanatorio", label: "Sanatorio" },
   { id: "consultorio", label: "Consultorio particular" },
+  { id: "policonsultorio", label: "Policonsultorio" },
   { id: "imagenes", label: "Centro de diagnóstico por imágenes" },
   { id: "laboratorio", label: "Laboratorio" },
   { id: "farmacia", label: "Farmacia" },
