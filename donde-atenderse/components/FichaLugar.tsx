@@ -24,7 +24,15 @@ export function FichaLugar({
         {ejemplo ? <p className="text-base text-warn">Dato de ejemplo.</p> : null}
       </header>
 
-      {vista.horarioLugar ? <p>{vista.horarioLugar}</p> : null}
+      {vista.horarioLineas.length > 0 ? (
+        <div className="grid gap-1">
+          {vista.horarioLineas.map((linea) => (
+            <p key={linea}>{linea}</p>
+          ))}
+        </div>
+      ) : vista.horarioLugar ? (
+        <p>{vista.horarioLugar}</p>
+      ) : null}
 
       {vista.bloques.length > 0 ? (
         <div className="grid gap-6">

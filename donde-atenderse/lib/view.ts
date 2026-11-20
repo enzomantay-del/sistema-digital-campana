@@ -1,4 +1,5 @@
 import { etiquetaArea, etiquetaTurno, detalleHorario, fecha, textoPrecio } from "./format";
+import { lineasHorarioLugar, textoHorarioLugarPublico } from "./placeSchedule";
 import { lineaHorario, ordenarTurnos, type FilaHorario, type LineaHorario } from "./schedule";
 
 export type VistaLinea = LineaHorario & {
@@ -32,6 +33,7 @@ export type VistaLugar = {
   whatsapp: string;
   telefono: string;
   horarioLugar: string;
+  horarioLineas: string[];
   obras: string[];
   actualizacion: string;
   notaHospital: string;
@@ -142,7 +144,8 @@ export function armarVistaLugar(input: {
     direccion: input.address.trim(),
     whatsapp: input.whatsapp.trim(),
     telefono: input.phone.trim(),
-    horarioLugar: input.scheduleNote.trim(),
+    horarioLugar: textoHorarioLugarPublico(input.scheduleNote),
+    horarioLineas: lineasHorarioLugar(input.scheduleNote),
     obras: input.obras,
     actualizacion: frase(input.updatedAt, input.name),
     notaHospital:

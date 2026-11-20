@@ -1,3 +1,5 @@
+import type { HorarioLugarData } from "@/lib/placeSchedule";
+
 export type HorarioBorrador = {
   key: string;
   id?: string;
@@ -63,10 +65,9 @@ export type BorradorLugar = {
   address: string;
   whatsapp: string;
   phone: string;
+  schedule: HorarioLugarData;
   scheduleNote: string;
-  scheduleDays: string[];
-  scheduleShift: string;
-  scheduleTime: string;
+  scheduleLegacy: string | null;
   obras: string[];
   otraObra: string;
   studies: EstudioBorrador[];

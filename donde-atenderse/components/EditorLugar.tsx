@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { guardarLugar } from "@/actions/place";
 import { FichaLugar } from "@/components/FichaLugar";
-import { DIAS, LOCALIDADES, OBRAS_INICIALES, TIPOS_LUGAR, TURNOS } from "@/lib/constants";
+import { HorarioLugarEditor } from "@/components/HorarioLugarEditor";
+import { LOCALIDADES, OBRAS_INICIALES, TIPOS_LUGAR } from "@/lib/constants";
 import type { BorradorLugar, EstudioBorrador } from "@/lib/draft";
-import { notaHorarioLugar } from "@/lib/format";
+import { notaHorarioParaGuardar } from "@/lib/placeSchedule";
 import { armarVistaLugar } from "@/lib/view";
 
 function clave() {
@@ -78,17 +79,6 @@ export function EditorLugar({
     setBorrador((actual) => ({ ...actual, ...parcial }));
   }
 
-  function cambiarHorarioLugar(parcial: Pick<BorradorLugar, "scheduleDays" | "scheduleShift" | "scheduleTime">) {
-    pendiente.current = true;
-    setBorrador((actual) => {
-      const siguiente = { ...actual, ...parcial };
-      return {
-        ...siguiente,
-        scheduleNote: notaHorarioLugar(siguiente.scheduleDays, siguiente.scheduleShift, siguiente.scheduleTime),
-      };
-    });
-  }
-
   function cambiarEstudio(key: string, parcial: Partial<EstudioBorrador>) {
     pendiente.current = true;
     setBorrador((actual) => ({
@@ -97,9 +87,6 @@ export function EditorLugar({
     }));
   }
 
-  const horarioVista =
-    notaHorarioLugar(borrador.scheduleDays, borrador.scheduleShift, borrador.scheduleTime) || borrador.scheduleNote;
-
   const vista = armarVistaLugar({
     name: borrador.name || "Sin nombre",
     kind: borrador.kind,
@@ -107,7 +94,7 @@ export function EditorLugar({
     address: borrador.address,
     whatsapp: borrador.whatsapp,
     phone: borrador.phone,
-    scheduleNote: horarioVista,
+    scheduleNote: notaHorarioParaGuardar(borrador.schedule, borrador.scheduleLegacy),
     obras: [...borrador.obras, borrador.otraObra].map((item) => item.trim()).filter(Boolean).sort((a, b) => a.localeCompare(b, "es")),
     updatedAt: new Date(),
     studies: borrador.studies.map((estudio) => ({
@@ -160,62 +147,14 @@ export function EditorLugar({
           </label>
           <fieldset className="grid gap-3">
             <legend className="font-semibold">Horario del lugar</legend>
-            <div className="flex flex-wrap gap-2">
-              {DIAS.map((dia) => {
-                const activo = borrador.scheduleDays.includes(dia.id);
-                return (
-                  <label key={dia.id} className={activo ? "pastilla pastilla-activa" : "pastilla"}>
-                    <input
-                      className="sr-only"
-                      type="checkbox"
-                      checked={activo}
-                      onChange={(event) =>
-                        cambiarHorarioLugar({
-                          scheduleDays: event.target.checked
-                            ? [...borrador.scheduleDays, dia.id]
-                            : borrador.scheduleDays.filter((item) => item !== dia.id),
-                          scheduleShift: borrador.scheduleShift,
-                          scheduleTime: borrador.scheduleTime,
-                        })
-                      }
-                    />
-                    {dia.label}
-                  </label>
-                );
-              })}
-            </div>
-            <select
-              className="campo"
-              value={borrador.scheduleShift}
-              onChange={(event) =>
-                cambiarHorarioLugar({
-                  scheduleDays: borrador.scheduleDays,
-                  scheduleShift: event.target.value,
-                  scheduleTime: borrador.scheduleTime,
-                })
-              }
-            >
-              {TURNOS.map((turno) => (
-                <option key={turno.id} value={turno.id}>
-                  {turno.label}
-                </option>
-              ))}
-            </select>
-            <input
-              className="campo"
-              placeholder="8 a 12"
-              value={borrador.scheduleTime}
-              onChange={(event) =>
-                cambiarHorarioLugar({
-                  scheduleDays: borrador.scheduleDays,
-                  scheduleShift: borrador.scheduleShift,
-                  scheduleTime: event.target.value,
-                })
-              }
+            <HorarioLugarEditor
+              valor={borrador.schedule}
+              legacy={borrador.scheduleLegacy}
+              onChange={(schedule) => {
+                pendiente.current = true;
+                setBorrador((actual) => ({ ...actual, schedule }));
+              }}
             />
-            {borrador.scheduleNote && borrador.scheduleDays.length === 0 && !borrador.scheduleTime ? (
-              <p className="text-sm text-muted">Horario cargado antes: {borrador.scheduleNote}</p>
-            ) : null}
           </fieldset>
           <fieldset className="grid gap-3">
             <legend className="font-semibold">Obras sociales</legend>

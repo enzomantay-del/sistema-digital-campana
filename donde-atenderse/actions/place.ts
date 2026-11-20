@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { esAdmin, usuarioActual } from "@/lib/auth";
 import { LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
-import { notaHorarioLugar } from "@/lib/format";
+import { notaHorarioParaGuardar } from "@/lib/placeSchedule";
 import type { BorradorLugar } from "@/lib/draft";
 
 export type GuardadoLugar =
@@ -75,10 +75,7 @@ export async function guardarLugar(placeId: string, borrador: BorradorLugar): Pr
       address: borrador.address.trim(),
       whatsapp: borrador.whatsapp.trim(),
       phone: borrador.phone.trim(),
-      scheduleNote: (
-        notaHorarioLugar(borrador.scheduleDays, borrador.scheduleShift, borrador.scheduleTime) ||
-        borrador.scheduleNote
-      ).trim(),
+      scheduleNote: notaHorarioParaGuardar(borrador.schedule, borrador.scheduleLegacy),
       published: esAdmin(user) ? lugar.published : lugar.published,
     },
   });
