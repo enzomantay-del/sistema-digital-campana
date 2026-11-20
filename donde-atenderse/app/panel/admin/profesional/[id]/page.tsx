@@ -77,6 +77,7 @@ export default async function EditarProfesionalAdmin({ params }: { params: Promi
           license: persona.license,
           area: persona.area,
           specialty: persona.specialty,
+          photoUrl: persona.photoUrl,
           whatsapp: persona.whatsapp,
           phone: persona.phone,
           price: persona.price,

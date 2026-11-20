@@ -16,6 +16,7 @@ export type VistaProfesional = {
   especialidad: string;
   area: string;
   matricula: string;
+  fotoUrl: string;
   precio: string;
   precioFecha: string;
   whatsapp: string;
@@ -65,9 +66,13 @@ function conflictoTexto(linea: LineaHorario) {
 
 function decorar(linea: LineaHorario, nombreProfesional: string, rotulo: string, personaId?: string): VistaLinea {
   const quien = linea.source === "lugar" ? linea.placeName : nombreProfesional;
+  const detalle =
+    linea.horarioLineas.length > 0
+      ? linea.horarioLineas.join(" · ")
+      : detalleHorario(linea.days, linea.time);
   return {
     ...linea,
-    detalle: detalleHorario(linea.days, linea.time),
+    detalle,
     actualizacion: frase(linea.updatedAt, quien),
     conflictoTexto: conflictoTexto(linea),
     rotulo,
@@ -94,6 +99,7 @@ export function armarVistaProfesional(input: {
   specialty: string;
   area: string;
   license: string;
+  photoUrl?: string;
   price: string;
   priceUpdatedAt: Date | null;
   whatsapp: string;
@@ -117,6 +123,7 @@ export function armarVistaProfesional(input: {
     especialidad: input.specialty.trim() || "Especialidad sin cargar",
     area: etiquetaArea(input.area),
     matricula: input.license.trim(),
+    fotoUrl: input.photoUrl?.trim() ?? "",
     precio: textoPrecio(input.price),
     precioFecha: input.price.trim() ? fecha(input.priceUpdatedAt) : "",
     whatsapp: input.whatsapp.trim(),

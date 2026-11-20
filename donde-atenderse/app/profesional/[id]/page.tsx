@@ -16,6 +16,7 @@ export default async function PaginaProfesional({ params }: { params: Promise<{ 
     specialty: persona.specialty,
     area: persona.area,
     license: persona.license,
+    photoUrl: persona.photoUrl,
     price: persona.price,
     priceUpdatedAt: persona.priceUpdatedAt,
     whatsapp: persona.whatsapp,

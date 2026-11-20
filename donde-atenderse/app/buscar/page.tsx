@@ -48,6 +48,7 @@ export default async function PaginaBuscar({
             specialty: persona.specialty,
             area: persona.area,
             license: persona.license,
+            photoUrl: persona.photoUrl,
             price: persona.price,
             priceUpdatedAt: persona.priceUpdatedAt,
             whatsapp: persona.whatsapp,

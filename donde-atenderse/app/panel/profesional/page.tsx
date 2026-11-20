@@ -37,6 +37,7 @@ export default async function PaginaEditorProfesional() {
 
   return (
     <EditorProfesional
+      professionalId={completo.id}
       obras={obras}
       lugares={lugares}
       revisada={completo.reviewed}
@@ -46,6 +47,7 @@ export default async function PaginaEditorProfesional() {
         license: completo.license,
         area: completo.area,
         specialty: completo.specialty,
+        photoUrl: completo.photoUrl,
         whatsapp: completo.whatsapp,
         phone: completo.phone,
         price: completo.price,

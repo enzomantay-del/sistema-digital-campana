@@ -8,3 +8,5 @@ prisma/dev.db-journal
 next-env.d.ts
 public/uploads/logos/*
 !public/uploads/logos/.gitkeep
+public/uploads/profesionales/*
+!public/uploads/profesionales/.gitkeep

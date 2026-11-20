@@ -165,7 +165,7 @@ function grupoConDatos(grupo: GrupoHorarioLugar) {
   return [grupo.manana, grupo.tarde, grupo.noche].some((turno) => turno.activo);
 }
 
-function franjaConDatos(franja: FranjaHorarioLugar) {
+export function franjaConDatos(franja: FranjaHorarioLugar) {
   if (franja.dias.length === 0) return false;
   return franja.cerrado || grupoConDatos(franja);
 }

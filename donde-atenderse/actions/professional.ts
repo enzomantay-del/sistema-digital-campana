@@ -1,9 +1,14 @@
 "use server";
 
+import { mkdir, readdir, unlink, writeFile } from "fs/promises";
+import path from "path";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { esAdmin, usuarioActual } from "@/lib/auth";
 import { LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
 import type { BorradorProfesional } from "@/lib/draft";
+import { camposLegacyDesdeHorario } from "@/lib/professionalSchedule";
+import { horarioLugarParaGuardar, notaHorarioParaGuardar, validarHorarioLugar } from "@/lib/placeSchedule";
 
 export type GuardadoProfesional =
   | { ok: true; rows: { key: string; id: string; placeId: string }[] }
@@ -135,6 +140,10 @@ async function guardarProfesionalInterno(
 
     if (!placeId) continue;
 
+    const schedule = horarioLugarParaGuardar(horario.schedule);
+    const errorHorario = validarHorarioLugar(schedule);
+    if (errorHorario) return { ok: false, error: errorHorario };
+
     if (horario.sugerido) {
       const sugerido = await prisma.place.findUnique({ where: { id: placeId } });
       if (sugerido && !sugerido.published && sugerido.suggestedById === user.id) {
@@ -154,18 +163,21 @@ async function guardarProfesionalInterno(
     }
 
     const esEditor = editores.has(placeId);
+    const nota = notaHorarioParaGuardar(schedule, horario.scheduleLegacy);
+    const legacy = camposLegacyDesdeHorario(schedule);
 
     const dataProfesional = {
       placeId,
-      professionalDays: horario.days.join(","),
-      professionalTime: horario.time.trim().slice(0, 80),
-      professionalShift: horario.shift,
+      professionalDays: legacy.days,
+      professionalTime: legacy.time.trim().slice(0, 80),
+      professionalShift: legacy.shift,
+      professionalScheduleNote: nota,
       professionalUpdatedAt: ahora,
       ...(esEditor
         ? {
-            placeDays: horario.days.join(","),
-            placeTime: horario.time.trim().slice(0, 80),
-            placeShift: horario.shift,
+            placeDays: legacy.days,
+            placeTime: legacy.time.trim().slice(0, 80),
+            placeShift: legacy.shift,
             placeUpdatedAt: ahora,
           }
         : {}),
@@ -194,6 +206,7 @@ async function guardarProfesionalInterno(
           professionalDays: "",
           professionalTime: "",
           professionalShift: "",
+          professionalScheduleNote: "",
           professionalUpdatedAt: ahora,
         },
       });
@@ -202,5 +215,95 @@ async function guardarProfesionalInterno(
     }
   }
 
+  revalidatePath("/panel/profesional");
+  revalidatePath(`/profesional/${professional.id}`);
+  revalidatePath("/buscar");
+  if (modoAdmin) {
+    revalidatePath("/panel/admin");
+    revalidatePath(`/panel/admin/profesional/${professional.id}`);
+  }
+
   return { ok: true, rows };
+}
+
+const FOTO_MAX_BYTES = 2 * 1024 * 1024;
+const FOTO_TIPOS = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+
+function extensionFoto(tipo: string) {
+  if (tipo === "image/jpeg") return "jpg";
+  if (tipo === "image/png") return "png";
+  if (tipo === "image/webp") return "webp";
+  if (tipo === "image/gif") return "gif";
+  return null;
+}
+
+async function puedeEditarProfesional(
+  user: NonNullable<Awaited<ReturnType<typeof usuarioActual>>>,
+  professionalId: string,
+) {
+  if (esAdmin(user)) return true;
+  return user.professional?.id === professionalId;
+}
+
+async function borrarArchivosFoto(professionalId: string) {
+  const dir = path.join(process.cwd(), "public", "uploads", "profesionales");
+  try {
+    const archivos = await readdir(dir);
+    for (const nombre of archivos) {
+      if (nombre.startsWith(`${professionalId}.`)) {
+        await unlink(path.join(dir, nombre));
+      }
+    }
+  } catch {
+    /* carpeta vacía */
+  }
+}
+
+export async function subirFotoProfesional(
+  professionalId: string,
+  formData: FormData,
+): Promise<{ ok: true; photoUrl: string } | { ok: false; error: string }> {
+  const user = await usuarioActual();
+  if (!user) return { ok: false, error: "Tenés que entrar de nuevo." };
+  if (!(await puedeEditarProfesional(user, professionalId))) {
+    return { ok: false, error: "Esta ficha no está en tu cuenta." };
+  }
+  const archivo = formData.get("foto");
+  if (!archivo || !(archivo instanceof File) || archivo.size === 0) {
+    return { ok: false, error: "Elegí una imagen." };
+  }
+  if (!FOTO_TIPOS.has(archivo.type)) {
+    return { ok: false, error: "Usá JPG, PNG, WebP o GIF." };
+  }
+  if (archivo.size > FOTO_MAX_BYTES) {
+    return { ok: false, error: "La imagen no puede pesar más de 2 MB." };
+  }
+  const extension = extensionFoto(archivo.type);
+  if (!extension) return { ok: false, error: "Formato de imagen no admitido." };
+
+  const dir = path.join(process.cwd(), "public", "uploads", "profesionales");
+  await mkdir(dir, { recursive: true });
+  await borrarArchivosFoto(professionalId);
+  const nombre = `${professionalId}.${extension}`;
+  await writeFile(path.join(dir, nombre), Buffer.from(await archivo.arrayBuffer()));
+  const photoUrl = `/uploads/profesionales/${nombre}?v=${Date.now()}`;
+  await prisma.professional.update({ where: { id: professionalId }, data: { photoUrl } });
+  revalidatePath("/panel/profesional");
+  revalidatePath(`/profesional/${professionalId}`);
+  return { ok: true, photoUrl };
+}
+
+export async function quitarFotoProfesional(
+  professionalId: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const user = await usuarioActual();
+  if (!user) return { ok: false, error: "Tenés que entrar de nuevo." };
+  if (!(await puedeEditarProfesional(user, professionalId))) {
+    return { ok: false, error: "Esta ficha no está en tu cuenta." };
+  }
+  await borrarArchivosFoto(professionalId);
+  await prisma.professional.update({ where: { id: professionalId }, data: { photoUrl: "" } });
+  revalidatePath("/panel/profesional");
+  revalidatePath(`/profesional/${professionalId}`);
+  return { ok: true };
 }

@@ -12,6 +12,8 @@ export type HorarioBorrador = {
   ownsPlace: boolean;
   sugerido: boolean;
   publicado: boolean;
+  schedule: HorarioLugarData;
+  scheduleLegacy: string | null;
   days: string[];
   shift: string;
   time: string;
@@ -26,6 +28,7 @@ export type BorradorProfesional = {
   license: string;
   area: string;
   specialty: string;
+  photoUrl: string;
   whatsapp: string;
   phone: string;
   price: string;

@@ -27,6 +27,7 @@ model Professional {
   license        String             @default("")
   area           String             @default("cuerpo")
   specialty      String             @default("")
+  photoUrl       String             @default("")
   whatsapp       String             @default("")
   phone          String             @default("")
   price          String             @default("")
@@ -107,6 +108,7 @@ model Attendance {
   professionalDays      String       @default("")
   professionalTime      String       @default("")
   professionalShift     String       @default("")
+  professionalScheduleNote String    @default("")
   professionalUpdatedAt DateTime?
   placeDays             String       @default("")
   placeTime             String       @default("")

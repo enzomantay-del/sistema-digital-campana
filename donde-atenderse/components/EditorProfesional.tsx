@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useRef, useState } from "react";
 import { guardarProfesional, guardarProfesionalAdmin } from "@/actions/professional";
 import { FichaProfesional } from "@/components/FichaProfesional";
-import { AREAS, DIAS, LOCALIDADES, OBRAS_INICIALES, TIPOS_LUGAR, TURNOS } from "@/lib/constants";
+import { FotoProfesionalEditor } from "@/components/FotoProfesionalEditor";
+import { HorarioLugarEditor } from "@/components/HorarioLugarEditor";
+import { AREAS, LOCALIDADES, OBRAS_INICIALES, TIPOS_LUGAR } from "@/lib/constants";
 import type { BorradorProfesional, HorarioBorrador } from "@/lib/draft";
+import { horarioLugarParaGuardar, horarioLugarVacio, notaHorarioParaGuardar } from "@/lib/placeSchedule";
 import { armarVistaProfesional } from "@/lib/view";
 import type { FilaHorario } from "@/lib/schedule";
 
@@ -22,6 +26,8 @@ function horarioVacio(): HorarioBorrador {
     ownsPlace: false,
     sugerido: false,
     publicado: true,
+    schedule: horarioLugarVacio(),
+    scheduleLegacy: null,
     days: ["lun"],
     shift: "manana",
     time: "",
@@ -48,86 +54,102 @@ export function EditorProfesional({
   revisada: boolean;
   publicada: boolean;
   modoAdmin?: boolean;
-  professionalId?: string;
+  professionalId: string;
   ejemplo?: boolean;
 }) {
   const [borrador, setBorrador] = useState(inicial);
-  const [estado, setEstado] = useState("Se guarda solo.");
+  const [hayCambios, setHayCambios] = useState(false);
+  const [guardando, setGuardando] = useState(false);
+  const [guardadoOk, setGuardadoOk] = useState(false);
+  const [estado, setEstado] = useState("Cuando termines, tocá Guardar ficha para que quede en la ficha pública.");
   const ultimo = useRef(borrador);
-  const guardando = useRef(false);
-  const pendiente = useRef(false);
-  const silencio = useRef(false);
-  const montado = useRef(false);
   ultimo.current = borrador;
   const catalogo = Array.from(new Set([...OBRAS_INICIALES, ...obras])).sort((a, b) => a.localeCompare(b, "es"));
 
-  async function persistir() {
-    if (guardando.current) {
-      pendiente.current = true;
-      return;
-    }
-    const snapshot = ultimo.current;
-    guardando.current = true;
-    pendiente.current = false;
-    setEstado("Guardando…");
-    const resultado =
-      modoAdmin && professionalId
-        ? await guardarProfesionalAdmin(professionalId, snapshot)
-        : await guardarProfesional(snapshot);
-    guardando.current = false;
-    if (!resultado.ok) {
-      setEstado(resultado.error);
-      return;
-    }
-    const fusion = {
-      ...ultimo.current,
-      horarios: ultimo.current.horarios.map((horario) => {
-        const guardado = resultado.rows.find((fila) => fila.key === horario.key);
-        if (!guardado) return horario;
-        return {
-          ...horario,
-          id: guardado.id,
-          placeId: guardado.placeId,
-          sugerido: horario.sugerido && !horario.publicado ? true : horario.sugerido && !horario.publicado,
-          publicado: horario.sugerido ? false : horario.publicado,
-        };
-      }),
-    };
-    ultimo.current = fusion;
-    silencio.current = true;
-    setBorrador(fusion);
-    setEstado(
-      modoAdmin ? "Guardado." : revisada ? "Guardado." : "Guardado. Queda a la espera de revisión.",
-    );
-    if (pendiente.current) void persistir();
+  function marcarCambio() {
+    setHayCambios(true);
+    setGuardadoOk(false);
+    setEstado("Tenés cambios sin guardar.");
   }
 
-  useEffect(() => {
-    if (!montado.current) {
-      montado.current = true;
-      return;
+  async function guardarFicha() {
+    if (guardando) return;
+    const snapshot = ultimo.current;
+    setGuardando(true);
+    setEstado("Guardando…");
+    try {
+      const resultado =
+        modoAdmin && professionalId
+          ? await guardarProfesionalAdmin(professionalId, snapshot)
+          : await guardarProfesional(snapshot);
+      if (!resultado?.ok) {
+        setEstado(resultado?.error ?? "No se pudo guardar. Probá de nuevo.");
+        return;
+      }
+      const fusion = {
+        ...ultimo.current,
+        horarios: ultimo.current.horarios.map((horario) => {
+          const guardado = resultado.rows.find((fila) => fila.key === horario.key);
+          if (!guardado) return { ...horario, scheduleLegacy: null };
+          return {
+            ...horario,
+            id: guardado.id,
+            placeId: guardado.placeId,
+            scheduleLegacy: null,
+            sugerido: horario.sugerido && !horario.publicado ? true : horario.sugerido,
+            publicado: horario.sugerido ? false : horario.publicado,
+          };
+        }),
+      };
+      ultimo.current = fusion;
+      setBorrador(fusion);
+      setHayCambios(false);
+      setGuardadoOk(true);
+      setEstado(
+        modoAdmin
+          ? "Guardado. Los datos quedaron en la ficha del profesional."
+          : revisada
+            ? "Guardado. Los datos quedaron en tu ficha pública."
+            : "Guardado. Queda a la espera de revisión antes de aparecer en la búsqueda.",
+      );
+    } catch {
+      setEstado("Falló el guardado. Recargá la página y probá otra vez.");
+    } finally {
+      setGuardando(false);
     }
-    if (silencio.current) {
-      silencio.current = false;
-      return;
-    }
-    const espera = setTimeout(() => {
-      void persistir();
-    }, 700);
-    return () => clearTimeout(espera);
-  }, [borrador]);
+  }
 
   function cambiar(parcial: Partial<typeof borrador>) {
-    pendiente.current = true;
+    marcarCambio();
     setBorrador((actual) => ({ ...actual, ...parcial }));
   }
 
   function cambiarHorario(key: string, parcial: Partial<HorarioBorrador>) {
-    pendiente.current = true;
+    marcarCambio();
     setBorrador((actual) => ({
       ...actual,
       horarios: actual.horarios.map((horario) => (horario.key === key ? { ...horario, ...parcial } : horario)),
     }));
+  }
+
+  function BarraGuardar({ alFinal = false }: { alFinal?: boolean }) {
+    return (
+      <div className={`flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-[#f8fafc] p-4 ${alFinal ? "mt-2" : ""}`}>
+        <button type="button" className="boton" disabled={guardando} onClick={() => void guardarFicha()}>
+          {guardando ? "Guardando…" : "Guardar ficha"}
+        </button>
+        <p
+          className={`text-sm ${estado.includes("sin guardar") || estado.includes("Guardando") ? "text-warn" : guardadoOk && !hayCambios ? "text-menta" : "text-muted"}`}
+        >
+          {estado}
+        </p>
+        {guardadoOk && !hayCambios ? (
+          <Link href={`/profesional/${professionalId}`} className="text-sm font-semibold text-link">
+            Ver ficha pública
+          </Link>
+        ) : null}
+      </div>
+    );
   }
 
   const filas: FilaHorario[] = borrador.horarios
@@ -140,6 +162,10 @@ export function EditorProfesional({
       professionalDays: horario.days.join(","),
       professionalTime: horario.time,
       professionalShift: horario.shift,
+      professionalScheduleNote: notaHorarioParaGuardar(
+        horarioLugarParaGuardar(horario.schedule),
+        horario.scheduleLegacy,
+      ),
       professionalUpdatedAt: new Date(),
       placeDays: horario.ownsPlace ? horario.days.join(",") : horario.placeDays.join(","),
       placeTime: horario.ownsPlace ? horario.time : horario.placeTime,
@@ -152,6 +178,7 @@ export function EditorProfesional({
     specialty: borrador.specialty,
     area: borrador.area,
     license: borrador.license,
+    photoUrl: borrador.photoUrl,
     price: borrador.price,
     priceUpdatedAt:
       borrador.price === inicial.price && inicial.priceUpdatedAt
@@ -169,6 +196,7 @@ export function EditorProfesional({
   return (
     <div className="grid items-start gap-10 lg:grid-cols-2">
       <form className="tarjeta grid gap-8" onSubmit={(event) => event.preventDefault()}>
+        <BarraGuardar />
         {modoAdmin && ejemplo ? (
           <p className="rounded-2xl border border-warn/30 bg-paper px-4 py-3 text-base text-warn">
             Ficha de ejemplo. Los cambios se guardan y el cartel “Dato de ejemplo” sigue en la ficha pública.
@@ -184,9 +212,13 @@ export function EditorProfesional({
             Tu ficha está bajada. Podés seguir editándola; Cercalud la vuelve a publicar cuando corresponda.
           </p>
         ) : null}
-        <p className="text-base text-muted">{estado}</p>
         <section className="grid gap-4">
           <h2 className="text-2xl font-semibold">Tus datos</h2>
+          <FotoProfesionalEditor
+            professionalId={professionalId}
+            photoUrl={borrador.photoUrl}
+            onChange={(photoUrl) => setBorrador((actual) => ({ ...actual, photoUrl }))}
+          />
           <label className="grid gap-1">
             Nombre
             <input className="campo" value={borrador.fullName} onChange={(event) => cambiar({ fullName: event.target.value })} />
@@ -236,7 +268,7 @@ export function EditorProfesional({
             <input className="campo" value={borrador.whatsapp} onChange={(event) => cambiar({ whatsapp: event.target.value })} />
           </label>
           <label className="grid gap-1">
-            Teléfono
+            Teléfono fijo
             <input className="campo" value={borrador.phone} onChange={(event) => cambiar({ phone: event.target.value })} />
           </label>
           <fieldset className="grid gap-3">
@@ -278,7 +310,8 @@ export function EditorProfesional({
           <div className="grid gap-2">
             <h2 className="text-2xl font-semibold">Dónde atendés</h2>
             <p className="text-muted">
-              Elegí un lugar que ya esté en Cercalud. Si no está, sugerilo: lo revisamos y lo publicamos nosotros.
+              Elegí un lugar que ya esté en Cercalud. Si no está, sugerilo: lo revisamos y lo publicamos nosotros. En
+              cada lugar cargá el horario en el que atendés ahí.
             </p>
           </div>
           {borrador.horarios.map((horario) => (
@@ -378,54 +411,13 @@ export function EditorProfesional({
                   </label>
                 </>
               ) : null}
-              <fieldset className="grid gap-2">
-                <legend className="font-semibold">Días</legend>
-                <div className="flex flex-wrap gap-2">
-                  {DIAS.map((dia) => {
-                    const activo = horario.days.includes(dia.id);
-                    return (
-                      <label key={dia.id} className={activo ? "pastilla pastilla-activa" : "pastilla"}>
-                        <input
-                          className="sr-only"
-                          type="checkbox"
-                          checked={activo}
-                          onChange={(event) =>
-                            cambiarHorario(horario.key, {
-                              days: event.target.checked
-                                ? [...horario.days, dia.id]
-                                : horario.days.filter((item) => item !== dia.id),
-                            })
-                          }
-                        />
-                        {dia.label}
-                      </label>
-                    );
-                  })}
-                </div>
-              </fieldset>
-              <label className="grid gap-1">
-                Momento
-                <select
-                  className="campo"
-                  value={horario.shift}
-                  onChange={(event) => cambiarHorario(horario.key, { shift: event.target.value })}
-                >
-                  {TURNOS.map((turno) => (
-                    <option key={turno.id} value={turno.id}>
-                      {turno.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="grid gap-1">
-                Horario
-                <input
-                  className="campo"
-                  placeholder="8 a 12"
-                  value={horario.time}
-                  onChange={(event) => cambiarHorario(horario.key, { time: event.target.value })}
+              {(horario.placeId || horario.sugerido) && horario.placeName.trim() ? (
+                <HorarioLugarEditor
+                  valor={horario.schedule}
+                  legacy={horario.scheduleLegacy}
+                  onChange={(schedule) => cambiarHorario(horario.key, { schedule })}
                 />
-              </label>
+              ) : null}
               <button
                 type="button"
                 className="w-fit font-semibold text-accent"
@@ -443,6 +435,7 @@ export function EditorProfesional({
             Agregar un lugar
           </button>
         </section>
+        <BarraGuardar alFinal />
       </form>
       <aside className="grid gap-3 lg:sticky lg:top-24">
         <h2 className="text-2xl font-semibold">Así lo ve el paciente</h2>

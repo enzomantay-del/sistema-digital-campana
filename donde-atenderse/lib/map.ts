@@ -1,4 +1,5 @@
 import { diasDesdeTexto } from "./format";
+import { leerHorarioProfesional } from "./professionalSchedule";
 import type { FilaHorario } from "./schedule";
 
 export function filaHorario(item: {
@@ -8,6 +9,7 @@ export function filaHorario(item: {
   professionalDays: string;
   professionalTime: string;
   professionalShift: string;
+  professionalScheduleNote?: string;
   professionalUpdatedAt: Date | null;
   placeDays: string;
   placeTime: string;
@@ -24,6 +26,7 @@ export function filaHorario(item: {
     professionalDays: item.professionalDays,
     professionalTime: item.professionalTime,
     professionalShift: item.professionalShift,
+    professionalScheduleNote: item.professionalScheduleNote,
     professionalUpdatedAt: item.professionalUpdatedAt,
     placeDays: item.placeDays,
     placeTime: item.placeTime,
@@ -41,6 +44,7 @@ export function horarioProfesional(
     professionalDays: string;
     professionalTime: string;
     professionalShift: string;
+    professionalScheduleNote: string;
     placeDays: string;
     placeTime: string;
     placeShift: string;
@@ -56,6 +60,12 @@ export function horarioProfesional(
   },
   ownsPlace: boolean,
 ) {
+  const horario = leerHorarioProfesional(
+    item.professionalScheduleNote,
+    item.professionalDays,
+    item.professionalTime,
+    item.professionalShift,
+  );
   return {
     key: item.id,
     id: item.id,
@@ -67,6 +77,8 @@ export function horarioProfesional(
     ownsPlace,
     sugerido: !item.place.published,
     publicado: item.place.published,
+    schedule: horario.schedule,
+    scheduleLegacy: horario.legacy,
     days: diasDesdeTexto(item.professionalDays || item.placeDays),
     shift: item.professionalShift || item.placeShift || "manana",
     time: item.professionalTime || item.placeTime,
