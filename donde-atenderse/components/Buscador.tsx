@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { AREAS, LOCALIDADES } from "@/lib/constants";
 import { puebloMasCercano } from "@/lib/geo";
 
+const MINIMO_BUSQUEDA = 3;
+
 type SugerenciaPersona = { id: string; nombre: string; especialidad: string };
+type SugerenciaLugar = { id: string; nombre: string; tipo: string; localidad: string };
 
 export function Buscador({
   q = "",
@@ -15,6 +18,7 @@ export function Buscador({
   obras = [],
   estudios = false,
   mostrarArea = false,
+  placeholder = "Nombre del profesional, especialidad o centro de salud",
 }: {
   q?: string;
   localidad?: string;
@@ -23,6 +27,7 @@ export function Buscador({
   obras?: string[];
   estudios?: boolean;
   mostrarArea?: boolean;
+  placeholder?: string;
 }) {
   const router = useRouter();
   const listaId = useId();
@@ -30,10 +35,14 @@ export function Buscador({
   const [texto, setTexto] = useState(q);
   const [personas, setPersonas] = useState<SugerenciaPersona[]>([]);
   const [especialidades, setEspecialidades] = useState<string[]>([]);
+  const [lugares, setLugares] = useState<SugerenciaLugar[]>([]);
+  const [cargandoSugerencias, setCargandoSugerencias] = useState(false);
   const [abierto, setAbierto] = useState(false);
   const [ubicacion, setUbicacion] = useState<"pidiendo" | "cerca" | "manual">("pidiendo");
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [pueblo, setPueblo] = useState("");
+
+  const haySugerencias = personas.length > 0 || especialidades.length > 0 || lugares.length > 0;
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -58,23 +67,33 @@ export function Buscador({
 
   useEffect(() => {
     const consulta = texto.trim();
-    if (consulta.length < 1) {
+    if (consulta.length < MINIMO_BUSQUEDA) {
       setPersonas([]);
       setEspecialidades([]);
+      setLugares([]);
       setAbierto(false);
+      setCargandoSugerencias(false);
       return;
     }
     const control = new AbortController();
+    setCargandoSugerencias(true);
     const espera = window.setTimeout(async () => {
       try {
         const respuesta = await fetch(`/api/sugerencias?q=${encodeURIComponent(consulta)}`, { signal: control.signal });
         if (!respuesta.ok) return;
-        const datos = (await respuesta.json()) as { personas: SugerenciaPersona[]; especialidades: string[] };
+        const datos = (await respuesta.json()) as {
+          personas: SugerenciaPersona[];
+          especialidades: string[];
+          lugares: SugerenciaLugar[];
+        };
         setPersonas(datos.personas);
         setEspecialidades(datos.especialidades);
-        setAbierto(datos.personas.length > 0 || datos.especialidades.length > 0);
+        setLugares(datos.lugares ?? []);
+        setAbierto(datos.personas.length > 0 || datos.especialidades.length > 0 || (datos.lugares?.length ?? 0) > 0);
       } catch {
         if (!control.signal.aborted) setAbierto(false);
+      } finally {
+        if (!control.signal.aborted) setCargandoSugerencias(false);
       }
     }, 150);
     return () => {
@@ -91,6 +110,16 @@ export function Buscador({
     return () => document.removeEventListener("mousedown", cerrar);
   }, []);
 
+  function irABuscar(consulta: string) {
+    const params = new URLSearchParams({ q: consulta });
+    if (obra) params.set("obra", obra);
+    if (coords && ubicacion === "cerca") {
+      params.set("lat", String(coords.lat));
+      params.set("lng", String(coords.lng));
+    }
+    router.push(`/buscar?${params.toString()}`);
+  }
+
   return (
     <form action="/buscar" className="grid gap-3 text-left">
       {estudios ? <input type="hidden" name="estudios" value="1" /> : null}
@@ -103,7 +132,7 @@ export function Buscador({
       <div className="flex flex-col gap-3 sm:flex-row">
         <div ref={caja} className="relative min-w-0 flex-1">
           <label className="sr-only" htmlFor="q">
-            Buscar un profesional o una especialidad
+            Profesional, especialidad o centro de salud
           </label>
           <input
             id="q"
@@ -114,15 +143,47 @@ export function Buscador({
             aria-controls={listaId}
             aria-autocomplete="list"
             autoComplete="off"
-            placeholder="Nombre o especialidad"
+            placeholder={placeholder}
             className="campo-buscar"
-            onChange={(evento) => setTexto(evento.target.value)}
+            onChange={(evento) => {
+              setTexto(evento.target.value);
+              if (evento.target.value.trim().length >= MINIMO_BUSQUEDA) setAbierto(true);
+            }}
             onFocus={() => {
-              if (personas.length > 0 || especialidades.length > 0) setAbierto(true);
+              if (texto.trim().length >= MINIMO_BUSQUEDA && (haySugerencias || cargandoSugerencias)) setAbierto(true);
             }}
           />
-          {abierto ? (
-            <ul id={listaId} role="listbox" className="absolute z-30 mt-2 max-h-80 w-full overflow-auto rounded-2xl border border-line bg-white py-2 text-left shadow-[0_12px_32px_rgba(18,39,92,0.12)]">
+          {abierto && texto.trim().length >= MINIMO_BUSQUEDA ? (
+            <ul
+              id={listaId}
+              role="listbox"
+              className="absolute z-30 mt-2 max-h-80 w-full overflow-auto rounded-2xl border border-line bg-white py-2 text-left shadow-[0_12px_32px_rgba(18,39,92,0.12)]"
+            >
+              {cargandoSugerencias && !haySugerencias ? (
+                <li className="px-4 py-2 text-sm text-muted">Buscando…</li>
+              ) : null}
+              {!cargandoSugerencias && !haySugerencias ? (
+                <li className="px-4 py-2 text-sm text-muted">No hay coincidencias todavía.</li>
+              ) : null}
+              {lugares.map((lugar) => (
+                <li key={lugar.id}>
+                  <button
+                    type="button"
+                    className="block w-full px-4 py-2 text-left hover:bg-paper"
+                    onMouseDown={(evento) => evento.preventDefault()}
+                    onClick={() => {
+                      setAbierto(false);
+                      router.push(`/lugar/${lugar.id}`);
+                    }}
+                  >
+                    <span className="block text-xs font-bold uppercase tracking-[0.06em] text-menta">Centro de salud</span>
+                    <span className="block font-semibold">{lugar.nombre}</span>
+                    <span className="text-sm text-muted">
+                      {lugar.tipo} · {lugar.localidad}
+                    </span>
+                  </button>
+                </li>
+              ))}
               {especialidades.map((especialidad) => (
                 <li key={especialidad}>
                   <button
@@ -132,13 +193,7 @@ export function Buscador({
                     onClick={() => {
                       setTexto(especialidad);
                       setAbierto(false);
-                      const params = new URLSearchParams({ q: especialidad });
-                      if (obra) params.set("obra", obra);
-                      if (coords && ubicacion === "cerca") {
-                        params.set("lat", String(coords.lat));
-                        params.set("lng", String(coords.lng));
-                      }
-                      router.push(`/buscar?${params.toString()}`);
+                      irABuscar(especialidad);
                     }}
                   >
                     <span className="block text-xs font-bold uppercase tracking-[0.06em] text-menta">Especialidad</span>
@@ -152,8 +207,12 @@ export function Buscador({
                     type="button"
                     className="block w-full px-4 py-2 text-left hover:bg-paper"
                     onMouseDown={(evento) => evento.preventDefault()}
-                    onClick={() => router.push(`/profesional/${persona.id}`)}
+                    onClick={() => {
+                      setAbierto(false);
+                      router.push(`/profesional/${persona.id}`);
+                    }}
                   >
+                    <span className="block text-xs font-bold uppercase tracking-[0.06em] text-menta">Profesional</span>
                     <span className="block font-semibold">{persona.nombre}</span>
                     <span className="text-sm text-muted">{persona.especialidad}</span>
                   </button>

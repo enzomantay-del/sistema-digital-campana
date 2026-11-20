@@ -1,22 +1,48 @@
-import { normalizar } from "@/lib/format";
+import { etiquetaLugar, normalizar } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
+
+const MINIMO = 3;
 
 export async function GET(request: Request) {
   const q = new URL(request.url).searchParams.get("q")?.trim() ?? "";
-  if (q.length < 1) return Response.json({ personas: [], especialidades: [] });
+  if (q.length < MINIMO) return Response.json({ personas: [], especialidades: [], lugares: [] });
   const consulta = normalizar(q);
-  const personas = await prisma.professional.findMany({
-    where: { published: true },
-    select: { id: true, fullName: true, specialty: true },
-    orderBy: { fullName: "asc" },
-  });
+  const [personas, lugares] = await Promise.all([
+    prisma.professional.findMany({
+      where: { published: true },
+      select: { id: true, fullName: true, specialty: true },
+      orderBy: { fullName: "asc" },
+    }),
+    prisma.place.findMany({
+      where: { published: true, kind: { not: "farmacia" } },
+      select: { id: true, name: true, kind: true, locality: true },
+      orderBy: { name: "asc" },
+    }),
+  ]);
   const porNombre = personas
-    .filter((persona) => normalizar(persona.fullName).includes(consulta))
+    .filter(
+      (persona) =>
+        normalizar(persona.fullName).includes(consulta) || normalizar(persona.specialty).includes(consulta),
+    )
     .slice(0, 6)
     .map((persona) => ({ id: persona.id, nombre: persona.fullName, especialidad: persona.specialty }));
   const especialidades = [...new Set(personas.map((persona) => persona.specialty.trim()).filter(Boolean))]
     .filter((especialidad) => normalizar(especialidad).includes(consulta))
     .sort((a, b) => a.localeCompare(b, "es"))
     .slice(0, 6);
-  return Response.json({ personas: porNombre, especialidades });
+  const lugaresCoincidentes = lugares
+    .filter(
+      (lugar) =>
+        normalizar(lugar.name).includes(consulta) ||
+        normalizar(lugar.locality).includes(consulta) ||
+        normalizar(etiquetaLugar(lugar.kind)).includes(consulta),
+    )
+    .slice(0, 6)
+    .map((lugar) => ({
+      id: lugar.id,
+      nombre: lugar.name,
+      tipo: etiquetaLugar(lugar.kind),
+      localidad: lugar.locality,
+    }));
+  return Response.json({ personas: porNombre, especialidades, lugares: lugaresCoincidentes });
 }
