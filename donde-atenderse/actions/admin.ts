@@ -12,9 +12,13 @@ function revalidarPublico() {
   revalidatePath("/panel/admin");
 }
 
+function idDe(formData: FormData) {
+  return String(formData.get("id") ?? "").trim();
+}
+
 export async function publicarProfesional(formData: FormData) {
   await requiereAdmin();
-  const id = String(formData.get("id") ?? "");
+  const id = idDe(formData);
   if (!id) redirect("/panel/admin");
   await prisma.professional.update({
     where: { id },
@@ -26,7 +30,7 @@ export async function publicarProfesional(formData: FormData) {
 
 export async function bajarProfesional(formData: FormData) {
   await requiereAdmin();
-  const id = String(formData.get("id") ?? "");
+  const id = idDe(formData);
   if (!id) redirect("/panel/admin");
   await prisma.professional.update({
     where: { id },
@@ -36,9 +40,20 @@ export async function bajarProfesional(formData: FormData) {
   redirect("/panel/admin");
 }
 
+export async function eliminarProfesional(formData: FormData) {
+  await requiereAdmin();
+  const id = idDe(formData);
+  if (!id) redirect("/panel/admin");
+  await prisma.attendance.deleteMany({ where: { professionalId: id } });
+  await prisma.professionalObra.deleteMany({ where: { professionalId: id } });
+  await prisma.professional.delete({ where: { id } });
+  revalidarPublico();
+  redirect("/panel/admin");
+}
+
 export async function publicarLugar(formData: FormData) {
   await requiereAdmin();
-  const id = String(formData.get("id") ?? "");
+  const id = idDe(formData);
   if (!id) redirect("/panel/admin");
   await prisma.place.update({
     where: { id },
@@ -50,7 +65,7 @@ export async function publicarLugar(formData: FormData) {
 
 export async function bajarLugar(formData: FormData) {
   await requiereAdmin();
-  const id = String(formData.get("id") ?? "");
+  const id = idDe(formData);
   if (!id) redirect("/panel/admin");
   await prisma.place.update({
     where: { id },
@@ -60,12 +75,10 @@ export async function bajarLugar(formData: FormData) {
   redirect("/panel/admin");
 }
 
-export async function rechazarSugerencia(formData: FormData) {
+export async function eliminarLugar(formData: FormData) {
   await requiereAdmin();
-  const id = String(formData.get("id") ?? "");
+  const id = idDe(formData);
   if (!id) redirect("/panel/admin");
-  const lugar = await prisma.place.findUnique({ where: { id } });
-  if (!lugar || lugar.published) redirect("/panel/admin");
   await prisma.attendance.deleteMany({ where: { placeId: id } });
   await prisma.placeEditor.deleteMany({ where: { placeId: id } });
   await prisma.placeObra.deleteMany({ where: { placeId: id } });
@@ -74,6 +87,11 @@ export async function rechazarSugerencia(formData: FormData) {
   await prisma.place.delete({ where: { id } });
   revalidarPublico();
   redirect("/panel/admin");
+}
+
+/** @deprecated Usar eliminarLugar */
+export async function rechazarSugerencia(formData: FormData) {
+  return eliminarLugar(formData);
 }
 
 export async function asignarEditor(formData: FormData) {

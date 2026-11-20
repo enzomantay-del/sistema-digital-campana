@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { asignarEditor, bajarLugar, publicarLugar, quitarEditor } from "@/actions/admin";
+import { asignarEditor, bajarLugar, eliminarLugar, publicarLugar, quitarEditor } from "@/actions/admin";
+import { AccionesAdmin } from "@/components/AccionesAdmin";
 import { EditorLugar } from "@/components/EditorLugar";
 import { esAdmin, usuarioActual } from "@/lib/auth";
 import { fechaInput } from "@/lib/format";
@@ -50,23 +51,19 @@ export default async function PaginaEditorLugar({
               {lugar.suggestedBy ? ` · Sugerido por ${lugar.suggestedBy.name}` : ""}
             </span>
           </div>
-          <div className="flex flex-wrap gap-3">
-            {lugar.published ? (
-              <form action={bajarLugar}>
-                <input type="hidden" name="id" value={lugar.id} />
-                <button className="boton-suave" type="submit">
-                  Bajar lugar
-                </button>
-              </form>
-            ) : (
-              <form action={publicarLugar}>
-                <input type="hidden" name="id" value={lugar.id} />
-                <button className="boton" type="submit">
-                  Publicar lugar
-                </button>
-              </form>
-            )}
-          </div>
+          <AccionesAdmin
+            acciones={[
+              { label: "Publicar", action: publicarLugar, id: lugar.id, tono: "boton" },
+              { label: "Bajar", action: bajarLugar, id: lugar.id, tono: "suave" },
+              {
+                label: "Eliminar",
+                action: eliminarLugar,
+                id: lugar.id,
+                tono: "peligro",
+                confirmar: `¿Eliminar ${lugar.name}? No se puede deshacer.`,
+              },
+            ]}
+          />
           <form action={asignarEditor} className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
             <label className="grid gap-1">
               Asignar editor por correo
