@@ -16,6 +16,12 @@ npm run dev
 
 Abrí http://localhost:3000
 
+Si en el navegador ves **Internal Server Error** con `npm run dev`, cortá el servidor y arrancá de nuevo con caché limpia:
+
+```bash
+npm run dev:limpio
+```
+
 Para crear una cuenta, definí `AUTH_SECRET` en el entorno con una frase larga. No la subas al repositorio.
 
 Los profesionales y lugares que aparecen al entrar son datos de ejemplo. No tienen usuario ni contraseña.
