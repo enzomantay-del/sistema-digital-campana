@@ -22,7 +22,9 @@ Si en el navegador ves **Internal Server Error** con `npm run dev`, cortá el se
 npm run dev:limpio
 ```
 
-No corras `npm run build` mientras `npm run dev` sigue abierto en la misma carpeta: mezcla archivos en `.next` y la web puede romperse hasta reiniciar con `dev:limpio`.
+`npm run build` ya compila en **`.next-prod`** (el dev usa **`.next`**), para que no se rompa la web al verificar cambios con el servidor abierto.
+
+Si igual ves **Internal Server Error**, usá `npm run dev:limpio`. Más detalle: [docs/errores-desarrollo.md](docs/errores-desarrollo.md).
 
 Para probar con un servidor más estable (por ejemplo detrás de un túnel durante horas):
 

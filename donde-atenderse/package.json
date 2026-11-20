@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "dev:limpio": "rm -rf .next && next dev",
-    "preview": "prisma generate && next build && next start -p 3000",
-    "build": "prisma generate && next build",
-    "start": "next start",
+    "preview": "prisma generate && NEXT_BUILD_DIR=prod next build && NEXT_BUILD_DIR=prod next start -p 3000",
+    "build": "prisma generate && NEXT_BUILD_DIR=prod next build",
+    "start": "NEXT_BUILD_DIR=prod next start",
     "lint": "next lint",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
