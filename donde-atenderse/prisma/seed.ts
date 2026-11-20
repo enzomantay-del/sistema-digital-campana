@@ -11,7 +11,7 @@ import {
 const prisma = new PrismaClient();
 
 const FOTO_EJEMPLO_ANA = "/ejemplos/dra-ana-lopez.svg";
-const FOTO_EJEMPLO_ORTIZ = "/ejemplos/dr-ivan-ortiz.svg";
+const FOTO_EJEMPLO_ORTIZ = "/ejemplos/dr-ivan-ortiz.png";
 
 function dias(...ids: string[]) {
   return ids.join(",");

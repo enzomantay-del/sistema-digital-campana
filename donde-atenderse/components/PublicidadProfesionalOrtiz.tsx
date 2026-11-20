@@ -13,7 +13,7 @@ export async function PublicidadProfesionalOrtiz() {
   });
   if (!persona) return null;
 
-  const foto = persona.photoUrl?.trim() || "/ejemplos/dr-ivan-ortiz.svg";
+  const foto = persona.photoUrl?.trim() || "/ejemplos/dr-ivan-ortiz.png";
   const primerLugar = persona.attendances[0];
   const horario =
     primerLugar &&
