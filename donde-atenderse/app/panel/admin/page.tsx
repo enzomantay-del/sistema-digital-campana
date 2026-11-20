@@ -150,13 +150,13 @@ export default async function PanelAdmin() {
   );
 
   return (
-    <div className="panel-admin grid max-w-5xl gap-7">
-      <header className="grid gap-2">
+    <div className="panel-admin mx-auto grid w-full max-w-4xl gap-7">
+      <header className="mx-auto grid w-full max-w-2xl gap-2 text-center">
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Administración</h1>
         <p className="text-sm text-muted">
           Hola, {admin.name}. Filtrá, seleccioná varios y publicá, bajá o eliminá de una vez.
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap justify-center gap-2">
           <Link href="/panel/lugar/nuevo" className="boton">
             Cargar un lugar
           </Link>
@@ -169,7 +169,7 @@ export default async function PanelAdmin() {
       </header>
 
       <section className="grid gap-2">
-        <h2 className="text-lg font-semibold">Fichas a revisar</h2>
+        <h2 className="text-center text-lg font-semibold">Fichas a revisar</h2>
         <GestionAdminLista
           filas={filasPendientes}
           vacio="No hay fichas pendientes."
@@ -180,7 +180,7 @@ export default async function PanelAdmin() {
       </section>
 
       <section className="grid gap-2">
-        <h2 className="text-lg font-semibold">Lugares sugeridos</h2>
+        <h2 className="text-center text-lg font-semibold">Lugares sugeridos</h2>
         <GestionAdminLista
           filas={filasSugeridos}
           vacio="No hay sugerencias."
@@ -191,7 +191,7 @@ export default async function PanelAdmin() {
       </section>
 
       <section className="grid gap-2">
-        <h2 className="text-lg font-semibold">Profesionales</h2>
+        <h2 className="text-center text-lg font-semibold">Profesionales</h2>
         <GestionAdminLista
           filas={profesionales.map((persona) => filaProfesional(persona))}
           vacio="Todavía no hay fichas."
@@ -202,7 +202,7 @@ export default async function PanelAdmin() {
       </section>
 
       <section className="grid gap-2">
-        <div className="flex flex-wrap items-end justify-between gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center">
           <h2 className="text-lg font-semibold">Lugares</h2>
           <Link href="/panel/lugar/nuevo" className="text-sm font-semibold text-link">
             Cargar otro
