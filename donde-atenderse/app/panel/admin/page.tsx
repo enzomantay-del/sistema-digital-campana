@@ -62,6 +62,7 @@ function filaProfesional(
       ]
         .filter(Boolean)
         .join(" · "),
+    hrefEditar: `/panel/admin/profesional/${persona.id}`,
     published: persona.published,
     reviewed: persona.reviewed,
     example: persona.example,

@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { usuarioActual } from "@/lib/auth";
+import { esAdmin, usuarioActual } from "@/lib/auth";
 import { LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
 import type { BorradorProfesional } from "@/lib/draft";
 
@@ -23,8 +23,28 @@ async function obraId(nombre: string) {
 export async function guardarProfesional(borrador: BorradorProfesional): Promise<GuardadoProfesional> {
   const user = await usuarioActual();
   if (!user) return { ok: false, error: "Tenés que entrar de nuevo." };
+  return guardarProfesionalInterno(user, borrador, null);
+}
 
-  let professional = user.professional;
+export async function guardarProfesionalAdmin(
+  professionalId: string,
+  borrador: BorradorProfesional,
+): Promise<GuardadoProfesional> {
+  const user = await usuarioActual();
+  if (!user || !esAdmin(user)) return { ok: false, error: "Solo administración puede editar otra ficha." };
+  return guardarProfesionalInterno(user, borrador, professionalId);
+}
+
+async function guardarProfesionalInterno(
+  user: NonNullable<Awaited<ReturnType<typeof usuarioActual>>>,
+  borrador: BorradorProfesional,
+  professionalId: string | null,
+): Promise<GuardadoProfesional> {
+  const modoAdmin = Boolean(professionalId && esAdmin(user));
+  let professional = modoAdmin
+    ? await prisma.professional.findUnique({ where: { id: professionalId! } })
+    : user.professional;
+  if (modoAdmin && !professional) return { ok: false, error: "Esa ficha ya no está." };
   if (!professional) {
     professional = await prisma.professional.create({
       data: {
@@ -98,13 +118,16 @@ export async function guardarProfesional(borrador: BorradorProfesional): Promise
       const lugar = await prisma.place.findUnique({ where: { id: horario.placeId } });
       if (!lugar) return { ok: false, error: "Ese lugar ya no está." };
       const propio = lugar.suggestedById === user.id;
-      if (!lugar.published && !propio && !editores.has(lugar.id)) {
+      if (!modoAdmin && !lugar.published && !propio && !editores.has(lugar.id)) {
         return { ok: false, error: "Ese lugar todavía no está publicado." };
       }
       placeId = lugar.id;
     } else if (placeId && horario.placeId && horario.placeId !== placeId) {
       const lugar = await prisma.place.findUnique({ where: { id: horario.placeId } });
-      if (!lugar || (!lugar.published && lugar.suggestedById !== user.id && !editores.has(lugar.id))) {
+      if (
+        !lugar ||
+        (!modoAdmin && !lugar.published && lugar.suggestedById !== user.id && !editores.has(lugar.id))
+      ) {
         return { ok: false, error: "No podés cambiar a ese lugar." };
       }
       placeId = lugar.id;

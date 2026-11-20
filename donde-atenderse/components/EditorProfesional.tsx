@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { guardarProfesional } from "@/actions/professional";
+import { guardarProfesional, guardarProfesionalAdmin } from "@/actions/professional";
 import { FichaProfesional } from "@/components/FichaProfesional";
 import { AREAS, DIAS, LOCALIDADES, OBRAS_INICIALES, TIPOS_LUGAR, TURNOS } from "@/lib/constants";
 import type { BorradorProfesional, HorarioBorrador } from "@/lib/draft";
@@ -38,12 +38,18 @@ export function EditorProfesional({
   obras,
   revisada,
   publicada,
+  modoAdmin = false,
+  professionalId,
+  ejemplo = false,
 }: {
   inicial: BorradorProfesional & { priceUpdatedAt: string | null };
   lugares: { id: string; name: string; locality: string; kind: string }[];
   obras: string[];
   revisada: boolean;
   publicada: boolean;
+  modoAdmin?: boolean;
+  professionalId?: string;
+  ejemplo?: boolean;
 }) {
   const [borrador, setBorrador] = useState(inicial);
   const [estado, setEstado] = useState("Se guarda solo.");
@@ -64,7 +70,10 @@ export function EditorProfesional({
     guardando.current = true;
     pendiente.current = false;
     setEstado("Guardando…");
-    const resultado = await guardarProfesional(snapshot);
+    const resultado =
+      modoAdmin && professionalId
+        ? await guardarProfesionalAdmin(professionalId, snapshot)
+        : await guardarProfesional(snapshot);
     guardando.current = false;
     if (!resultado.ok) {
       setEstado(resultado.error);
@@ -87,7 +96,9 @@ export function EditorProfesional({
     ultimo.current = fusion;
     silencio.current = true;
     setBorrador(fusion);
-    setEstado(revisada ? "Guardado." : "Guardado. Queda a la espera de revisión.");
+    setEstado(
+      modoAdmin ? "Guardado." : revisada ? "Guardado." : "Guardado. Queda a la espera de revisión.",
+    );
     if (pendiente.current) void persistir();
   }
 
@@ -158,12 +169,17 @@ export function EditorProfesional({
   return (
     <div className="grid items-start gap-10 lg:grid-cols-2">
       <form className="tarjeta grid gap-8" onSubmit={(event) => event.preventDefault()}>
-        {!revisada ? (
+        {modoAdmin && ejemplo ? (
+          <p className="rounded-2xl border border-warn/30 bg-paper px-4 py-3 text-base text-warn">
+            Ficha de ejemplo. Los cambios se guardan y el cartel “Dato de ejemplo” sigue en la ficha pública.
+          </p>
+        ) : null}
+        {!modoAdmin && !revisada ? (
           <p className="rounded-2xl border border-line bg-paper px-4 py-3 text-base">
             La primera vez revisamos nombre, matrícula y WhatsApp. Mientras tanto tu ficha no aparece en la búsqueda
             pública.
           </p>
-        ) : !publicada ? (
+        ) : !modoAdmin && !publicada ? (
           <p className="rounded-2xl border border-line bg-paper px-4 py-3 text-base">
             Tu ficha está bajada. Podés seguir editándola; Cercalud la vuelve a publicar cuando corresponda.
           </p>
