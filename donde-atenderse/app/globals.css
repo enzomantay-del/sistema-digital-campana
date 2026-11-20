@@ -11,6 +11,11 @@ body {
   color: #12275c;
   font-size: 1.0625rem;
   line-height: 1.55;
+  overflow-x: clip;
+}
+
+main:has(.inicio-bandas) + footer {
+  margin-top: 0;
 }
 
 ::selection {
