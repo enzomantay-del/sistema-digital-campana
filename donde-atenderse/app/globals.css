@@ -80,3 +80,25 @@ button {
   background: #e7f3fb;
   color: #1478c0;
 }
+
+.panel-admin {
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.panel-admin .campo {
+  @apply rounded-xl px-3 py-2 text-[0.9375rem];
+}
+
+.panel-admin .campo:focus,
+.panel-admin .campo-buscar:focus {
+  box-shadow: 0 0 0 3px rgb(20 120 192 / 0.14);
+}
+
+.panel-admin .boton {
+  @apply rounded-xl px-3.5 py-2 text-sm font-semibold;
+}
+
+.panel-admin .boton-suave {
+  @apply rounded-xl px-3.5 py-2 text-sm font-semibold;
+}

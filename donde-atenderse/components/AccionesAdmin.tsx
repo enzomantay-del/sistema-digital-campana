@@ -20,12 +20,18 @@ function clase(tono: Accion["tono"]) {
 export function AccionesAdmin({
   acciones,
   extra,
+  compacto = false,
 }: {
   acciones: Accion[];
   extra?: ReactNode;
+  compacto?: boolean;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+    <div
+      className={
+        compacto ? "flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.875rem]" : "flex flex-wrap items-center gap-x-4 gap-y-2"
+      }
+    >
       {extra}
       {acciones.map((accion) => (
         <form

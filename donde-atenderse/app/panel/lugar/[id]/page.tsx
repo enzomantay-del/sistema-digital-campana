@@ -41,7 +41,7 @@ export default async function PaginaEditorLugar({
   return (
     <div className="grid gap-8">
       {admin ? (
-        <section className="grid max-w-3xl gap-4 rounded-3xl border border-line bg-white p-6">
+        <section className="panel-admin grid max-w-3xl gap-3 rounded-2xl border border-line bg-white p-4">
           <div className="flex flex-wrap items-center gap-3">
             <Link href="/panel/admin" className="font-semibold text-link">
               Volver al panel
@@ -52,6 +52,7 @@ export default async function PaginaEditorLugar({
             </span>
           </div>
           <AccionesAdmin
+            compacto
             acciones={[
               { label: "Publicar", action: publicarLugar, id: lugar.id, tono: "boton" },
               { label: "Bajar", action: bajarLugar, id: lugar.id, tono: "suave" },

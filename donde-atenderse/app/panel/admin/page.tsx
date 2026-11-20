@@ -150,13 +150,13 @@ export default async function PanelAdmin() {
   );
 
   return (
-    <div className="grid gap-12">
-      <header className="grid max-w-3xl gap-3">
-        <h1 className="text-4xl font-bold tracking-tight">Administración</h1>
-        <p className="text-muted">
+    <div className="panel-admin grid max-w-5xl gap-7">
+      <header className="grid gap-2">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Administración</h1>
+        <p className="text-sm text-muted">
           Hola, {admin.name}. Filtrá, seleccioná varios y publicá, bajá o eliminá de una vez.
         </p>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2">
           <Link href="/panel/lugar/nuevo" className="boton">
             Cargar un lugar
           </Link>
@@ -168,8 +168,8 @@ export default async function PanelAdmin() {
         </div>
       </header>
 
-      <section className="grid gap-4">
-        <h2 className="text-2xl font-semibold">Fichas a revisar</h2>
+      <section className="grid gap-2">
+        <h2 className="text-lg font-semibold">Fichas a revisar</h2>
         <GestionAdminLista
           filas={filasPendientes}
           vacio="No hay fichas pendientes."
@@ -179,8 +179,8 @@ export default async function PanelAdmin() {
         />
       </section>
 
-      <section className="grid gap-4">
-        <h2 className="text-2xl font-semibold">Lugares sugeridos</h2>
+      <section className="grid gap-2">
+        <h2 className="text-lg font-semibold">Lugares sugeridos</h2>
         <GestionAdminLista
           filas={filasSugeridos}
           vacio="No hay sugerencias."
@@ -190,8 +190,8 @@ export default async function PanelAdmin() {
         />
       </section>
 
-      <section className="grid gap-4">
-        <h2 className="text-2xl font-semibold">Profesionales</h2>
+      <section className="grid gap-2">
+        <h2 className="text-lg font-semibold">Profesionales</h2>
         <GestionAdminLista
           filas={profesionales.map((persona) => filaProfesional(persona))}
           vacio="Todavía no hay fichas."
@@ -201,10 +201,10 @@ export default async function PanelAdmin() {
         />
       </section>
 
-      <section className="grid gap-4">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <h2 className="text-2xl font-semibold">Lugares</h2>
-          <Link href="/panel/lugar/nuevo" className="font-semibold text-link">
+      <section className="grid gap-2">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <h2 className="text-lg font-semibold">Lugares</h2>
+          <Link href="/panel/lugar/nuevo" className="text-sm font-semibold text-link">
             Cargar otro
           </Link>
         </div>
