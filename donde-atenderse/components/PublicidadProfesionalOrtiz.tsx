@@ -9,7 +9,7 @@ import { lineasHorarioLugar } from "@/lib/placeSchedule";
 export async function PublicidadProfesionalOrtiz() {
   const persona = await prisma.professional.findFirst({
     where: { published: true, fullName: PROFESIONAL_PUBLICIDAD_ORTIZ },
-    include: { attendances: { include: { place: true }, take: 2 } },
+    include: { attendances: { include: { place: true }, take: 1 } },
   });
   if (!persona) return null;
 
@@ -18,35 +18,40 @@ export async function PublicidadProfesionalOrtiz() {
   const horario =
     primerLugar &&
     (lineasHorarioLugar(primerLugar.professionalScheduleNote)[0] ||
-      `${primerLugar.professionalTime || "Consultar horario"} en ${primerLugar.place.name}`);
+      `${primerLugar.professionalTime || "Consultar horario"}`);
+  const lugar = primerLugar ? `${primerLugar.place.name} · ${primerLugar.place.locality}` : etiquetaArea(persona.area);
 
   return (
     <TarjetaPublicidad>
-      <div className="relative overflow-hidden rounded-xl border border-line">
-        <div className="relative aspect-[5/4] w-full bg-[#1e3a5f]">
-          <Image src={foto} alt="" fill className="object-cover object-top" sizes="400px" priority unoptimized />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#12275c] via-[#12275c]/40 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-            <p className="text-sm font-bold text-sky-200">{persona.specialty} · {etiquetaArea(persona.area)}</p>
-            <p className="text-2xl font-extrabold tracking-tight">{persona.fullName}</p>
-          </div>
+      <div className="relative aspect-[2/1] overflow-hidden rounded-xl bg-[#1e3a5f]">
+        <Image src={foto} alt="" fill className="object-cover object-[center_18%]" sizes="400px" unoptimized />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#12275c]/95 via-[#12275c]/35 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+          <p className="text-xs font-bold uppercase tracking-wide text-sky-200">Turnos esta semana</p>
+          <p className="text-xl font-extrabold leading-tight">Consulta psiquiátrica sin demoras</p>
         </div>
       </div>
-      <p className="text-lg font-bold leading-snug text-ink">¿Consulta psiquiátrica sin lista de espera?</p>
-      <p className="text-sm text-muted">
-        Pedí turno directo. Atiende con horario publicado en Cercalud para que sepas cuándo ir.
-      </p>
+      <div className="flex items-center gap-3">
+        <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border border-line bg-white">
+          <Image src={foto} alt="" fill className="object-cover object-top" sizes="44px" unoptimized />
+        </div>
+        <div className="min-w-0">
+          <p className="text-lg font-bold leading-tight">{persona.fullName}</p>
+          <p className="truncate text-sm text-muted">
+            {persona.specialty} · {lugar}
+          </p>
+        </div>
+      </div>
       {horario ? (
-        <p className="rounded-xl border border-line bg-[#f0f9ff] px-3 py-2 text-sm">
-          <span className="font-semibold">Próximo bloque: </span>
-          {horario}
+        <p className="rounded-xl bg-sky-50 px-3 py-2 text-sm font-semibold text-sky-950">
+          Próximo bloque: {horario}
         </p>
       ) : null}
       <div className="grid gap-2">
         {persona.whatsapp ? (
           <a
             className="boton w-full text-center text-base font-bold"
-            href={enlaceWhatsApp(persona.whatsapp, `Hola Dr., quiero pedir un turno. Vi su aviso en Cercalud.`)}
+            href={enlaceWhatsApp(persona.whatsapp, "Hola Dr., quiero pedir un turno. Vi su aviso en Cercalud.")}
             target="_blank"
             rel="noopener noreferrer"
           >

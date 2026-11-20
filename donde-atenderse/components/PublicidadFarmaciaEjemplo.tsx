@@ -26,13 +26,13 @@ export function PublicidadFarmaciaEjemplo() {
         <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-line bg-white">
           <Image src="/ejemplos/farmacia-lapachos.svg" alt="" fill className="object-contain p-0.5" sizes="44px" unoptimized />
         </div>
-        <div>
-          <p className="text-lg font-bold">Farmacia Los Lapachos</p>
+        <div className="min-w-0">
+          <p className="text-lg font-bold leading-tight">Farmacia Los Lapachos</p>
           <p className="text-sm text-muted">Jardín América · entrega en el centro</p>
         </div>
       </div>
       <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-950">
-        Presentá este aviso en caja y llevá 3x2 en agua mineral. Válido hasta el domingo.
+        3x2 en agua mineral presentando este aviso. Válido hasta el domingo.
       </p>
       <div className="grid gap-2">
         <Link href="/farmacia" className="boton w-full text-center text-base font-bold">

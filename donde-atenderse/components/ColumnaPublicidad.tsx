@@ -3,7 +3,7 @@ import { PublicidadProfesionalOrtiz } from "@/components/PublicidadProfesionalOr
 
 export async function ColumnaPublicidad() {
   return (
-    <aside className="grid w-full gap-4" aria-label="Espacios publicitarios">
+    <aside className="grid w-full auto-rows-max gap-4" aria-label="Espacios publicitarios">
       <PublicidadFarmaciaEjemplo />
       <PublicidadProfesionalOrtiz />
     </aside>
