@@ -69,7 +69,7 @@ export function franjaHorarioVacia(dias: string[] = ["lun", "mar", "mie", "jue",
 }
 
 export function horarioLugarVacio(): HorarioLugarData {
-  return { v: 2, franjas: [franjaHorarioVacia()] };
+  return { v: 2, franjas: [franjaHorarioVacia([])] };
 }
 
 export function normalizarHora(valor: string): string {
@@ -179,13 +179,14 @@ export function validarHorarioLugar(data: HorarioLugarData): string | null {
   if (conflictos.length) {
     return `Cada día debe estar en una sola franja. Revisá: ${etiquetasDias(conflictos)}.`;
   }
-  for (const franja of data.franjas) {
-    if (franja.dias.length === 0) continue;
-    if (!franja.cerrado && !grupoConDatos(franja)) {
-      return `En ${etiquetasDias(franja.dias)} marcá turnos, guardia 24 h o “cerrado”.`;
-    }
-  }
   return null;
+}
+
+export function horarioLugarParaGuardar(data: HorarioLugarData): HorarioLugarData {
+  return {
+    v: 2,
+    franjas: data.franjas.filter((franja) => franja.dias.length > 0 && (franja.cerrado || grupoConDatos(franja))),
+  };
 }
 
 export function serializarHorarioLugar(data: HorarioLugarData) {

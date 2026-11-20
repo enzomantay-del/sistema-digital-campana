@@ -45,25 +45,30 @@ export function EditorLugar({
     const snapshot = ultimo.current;
     setGuardando(true);
     setEstado("Guardando…");
-    const resultado = await guardarLugar(placeId, snapshot);
-    setGuardando(false);
-    if (!resultado.ok) {
-      setEstado(resultado.error);
-      return;
+    try {
+      const resultado = await guardarLugar(placeId, snapshot);
+      if (!resultado?.ok) {
+        setEstado(resultado?.error ?? "No se pudo guardar. Probá de nuevo.");
+        return;
+      }
+      const fusion = {
+        ...ultimo.current,
+        scheduleLegacy: null,
+        studies: ultimo.current.studies.map((estudio) => {
+          const guardado = resultado.studies.find((fila) => fila.key === estudio.key);
+          return guardado ? { ...estudio, id: guardado.id } : estudio;
+        }),
+      };
+      ultimo.current = fusion;
+      setBorrador(fusion);
+      setHayCambios(false);
+      setGuardadoOk(true);
+      setEstado("Guardado. Los datos quedaron en la ficha del lugar.");
+    } catch {
+      setEstado("Falló el guardado. Recargá la página y probá otra vez.");
+    } finally {
+      setGuardando(false);
     }
-    const fusion = {
-      ...ultimo.current,
-      scheduleLegacy: null,
-      studies: ultimo.current.studies.map((estudio) => {
-        const guardado = resultado.studies.find((fila) => fila.key === estudio.key);
-        return guardado ? { ...estudio, id: guardado.id } : estudio;
-      }),
-    };
-    ultimo.current = fusion;
-    setBorrador(fusion);
-    setHayCambios(false);
-    setGuardadoOk(true);
-    setEstado("Guardado. Los datos quedaron en la ficha del lugar.");
   }
 
   function cambiar(parcial: Partial<BorradorLugar>) {

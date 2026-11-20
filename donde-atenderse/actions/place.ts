@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { esAdmin, usuarioActual } from "@/lib/auth";
 import { LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
 import { MODOS_OBRAS_LUGAR, obrasModoDefault, obrasModoEfectivo } from "@/lib/placeObras";
-import { notaHorarioParaGuardar, validarHorarioLugar } from "@/lib/placeSchedule";
+import { horarioLugarParaGuardar, notaHorarioParaGuardar, validarHorarioLugar } from "@/lib/placeSchedule";
 import type { BorradorLugar } from "@/lib/draft";
 
 export type GuardadoLugar =
@@ -58,13 +58,15 @@ export async function guardarLugar(placeId: string, borrador: BorradorLugar): Pr
     return { ok: false, error: "Esta ficha no está en tu cuenta." };
   }
 
-  if (borrador.name.trim().length < 2) return { ok: false, error: "Escribí el nombre del lugar." };
-  if (!TIPOS_LUGAR.some((tipo) => tipo.id === borrador.kind)) return { ok: false, error: "Elegí el tipo de lugar." };
-  if (!LOCALIDADES.includes(borrador.locality as (typeof LOCALIDADES)[number])) {
+  const schedule = horarioLugarParaGuardar(borrador.schedule);
+  const borradorLimpio = { ...borrador, schedule };
+  if (borradorLimpio.name.trim().length < 2) return { ok: false, error: "Escribí el nombre del lugar." };
+  if (!TIPOS_LUGAR.some((tipo) => tipo.id === borradorLimpio.kind)) return { ok: false, error: "Elegí el tipo de lugar." };
+  if (!LOCALIDADES.includes(borradorLimpio.locality as (typeof LOCALIDADES)[number])) {
     return { ok: false, error: "Elegí una localidad del corredor." };
   }
 
-  const errorHorario = validarHorarioLugar(borrador.schedule);
+  const errorHorario = validarHorarioLugar(borradorLimpio.schedule);
   if (errorHorario) return { ok: false, error: errorHorario };
 
   const lugar = await prisma.place.findUnique({ where: { id: placeId } });
@@ -73,25 +75,25 @@ export async function guardarLugar(placeId: string, borrador: BorradorLugar): Pr
   await prisma.place.update({
     where: { id: placeId },
     data: {
-      name: borrador.name.trim(),
-      kind: borrador.kind,
-      locality: borrador.locality,
-      address: borrador.address.trim(),
-      whatsapp: borrador.whatsapp.trim(),
-      phone: borrador.phone.trim(),
-      scheduleNote: notaHorarioParaGuardar(borrador.schedule, borrador.scheduleLegacy),
-      obrasMode: MODOS_OBRAS_LUGAR.some((item) => item.id === borrador.obrasMode)
-        ? borrador.obrasMode
-        : obrasModoEfectivo(borrador.kind, lugar.obrasMode),
+      name: borradorLimpio.name.trim(),
+      kind: borradorLimpio.kind,
+      locality: borradorLimpio.locality,
+      address: borradorLimpio.address.trim(),
+      whatsapp: borradorLimpio.whatsapp.trim(),
+      phone: borradorLimpio.phone.trim(),
+      scheduleNote: notaHorarioParaGuardar(borradorLimpio.schedule, borradorLimpio.scheduleLegacy),
+      obrasMode: MODOS_OBRAS_LUGAR.some((item) => item.id === borradorLimpio.obrasMode)
+        ? borradorLimpio.obrasMode
+        : obrasModoEfectivo(borradorLimpio.kind, lugar.obrasMode),
       published: esAdmin(user) ? lugar.published : lugar.published,
     },
   });
 
-  const modo = obrasModoEfectivo(borrador.kind, borrador.obrasMode);
+  const modo = obrasModoEfectivo(borradorLimpio.kind, borradorLimpio.obrasMode);
   if (modo === "por_profesional") {
     await prisma.placeObra.deleteMany({ where: { placeId } });
   } else {
-    const nombres = [...borrador.obras, borrador.otraObra].map((item) => item.trim()).filter(Boolean);
+    const nombres = [...borradorLimpio.obras, borradorLimpio.otraObra].map((item) => item.trim()).filter(Boolean);
     const ids = (await Promise.all(nombres.map(obraId))).filter((id): id is string => Boolean(id));
     await prisma.placeObra.deleteMany({ where: { placeId } });
     if (ids.length) {
@@ -102,7 +104,7 @@ export async function guardarLugar(placeId: string, borrador: BorradorLugar): Pr
   const estudiosActuales = await prisma.study.findMany({ where: { placeId } });
   const estudiosConservados = new Set<string>();
   const studies: { key: string; id: string }[] = [];
-  for (const estudio of borrador.studies) {
+  for (const estudio of borradorLimpio.studies) {
     if (!estudio.name.trim()) continue;
     const data = { name: estudio.name.trim(), preparation: estudio.preparation.trim(), attention: estudio.attention };
     const existente = estudio.id ? estudiosActuales.find((item) => item.id === estudio.id) : undefined;
@@ -122,9 +124,9 @@ export async function guardarLugar(placeId: string, borrador: BorradorLugar): Pr
     await prisma.study.deleteMany({ where: { placeId, id: { notIn: [...estudiosConservados] } } });
   }
 
-  if (borrador.kind === "farmacia" && borrador.dutyStart && borrador.dutyEnd) {
-    const startsOn = new Date(`${borrador.dutyStart}T00:00:00-03:00`);
-    const endsOn = new Date(`${borrador.dutyEnd}T23:59:00-03:00`);
+  if (borradorLimpio.kind === "farmacia" && borradorLimpio.dutyStart && borradorLimpio.dutyEnd) {
+    const startsOn = new Date(`${borradorLimpio.dutyStart}T00:00:00-03:00`);
+    const endsOn = new Date(`${borradorLimpio.dutyEnd}T23:59:00-03:00`);
     if (Number.isNaN(startsOn.getTime()) || Number.isNaN(endsOn.getTime()) || endsOn < startsOn) {
       return { ok: false, error: "Revisá las fechas del turno." };
     }
@@ -132,7 +134,7 @@ export async function guardarLugar(placeId: string, borrador: BorradorLugar): Pr
     if (previo) {
       await prisma.pharmacyDuty.update({
         where: { id: previo.id },
-        data: { startsOn, endsOn, source: borrador.dutySource.trim() },
+        data: { startsOn, endsOn, source: borradorLimpio.dutySource.trim() },
       });
     } else {
       await prisma.pharmacyDuty.create({
