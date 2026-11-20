@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MENSAJE_WHATSAPP } from "@/lib/constants";
-import { enlaceWhatsApp, etiquetaLugar } from "@/lib/format";
+import { enlaceMaps, enlaceTelefono, enlaceWhatsApp, etiquetaLugar } from "@/lib/format";
 import type { VistaLugar } from "@/lib/view";
 
 export function FichaLugar({
@@ -19,7 +19,20 @@ export function FichaLugar({
           {etiquetaLugar(vista.kind)} · {vista.localidad}
         </p>
         <h1 className="text-4xl font-bold tracking-tight">{vista.nombre}</h1>
-        {vista.direccion ? <p>{vista.direccion}</p> : null}
+        {vista.direccion ? (
+          ejemplo ? (
+            <p>{vista.direccion}</p>
+          ) : (
+            <a
+              href={enlaceMaps(vista.direccion, vista.localidad, vista.nombre)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-fit font-medium text-link underline-offset-2 hover:underline"
+            >
+              {vista.direccion}
+            </a>
+          )
+        ) : null}
         {vista.notaHospital ? <p className="text-base text-muted">{vista.notaHospital}</p> : null}
         {ejemplo ? <p className="text-base text-warn">Dato de ejemplo.</p> : null}
       </header>
@@ -96,15 +109,30 @@ export function FichaLugar({
         </p>
       ) : null}
 
-      {vista.telefono ? <p>Teléfono fijo {vista.telefono}</p> : null}
-      {vista.whatsapp ? (
-        ejemplo ? (
-          <p className="boton w-fit opacity-80">Escribir por WhatsApp</p>
-        ) : (
-          <a className="boton w-fit" href={enlaceWhatsApp(vista.whatsapp, MENSAJE_WHATSAPP)}>
-            Escribir por WhatsApp
-          </a>
-        )
+      {vista.whatsapp || vista.telefono ? (
+        <section className="grid gap-3">
+          <h2 className="text-xl font-semibold">Contacto</h2>
+          <div className="flex flex-wrap gap-3">
+            {vista.whatsapp ? (
+              ejemplo ? (
+                <span className="boton w-fit cursor-default opacity-80">WhatsApp</span>
+              ) : (
+                <a className="boton w-fit" href={enlaceWhatsApp(vista.whatsapp, MENSAJE_WHATSAPP)} target="_blank" rel="noopener noreferrer">
+                  WhatsApp
+                </a>
+              )
+            ) : null}
+            {vista.telefono ? (
+              ejemplo ? (
+                <span className="boton-suave w-fit cursor-default opacity-80">Teléfono fijo</span>
+              ) : (
+                <a className="boton-suave w-fit" href={enlaceTelefono(vista.telefono)}>
+                  Teléfono fijo
+                </a>
+              )
+            ) : null}
+          </div>
+        </section>
       ) : null}
       <p className="text-base text-muted">{vista.actualizacion}</p>
     </article>

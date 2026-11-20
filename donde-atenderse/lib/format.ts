@@ -65,12 +65,26 @@ export function textoPrecio(price: string) {
   return limpio;
 }
 
-export function enlaceWhatsApp(phone: string, message: string) {
+function digitosArgentina(phone: string) {
   let digits = phone.replace(/\D/g, "");
   if (digits.startsWith("0")) digits = digits.slice(1);
   if (!digits.startsWith("54")) digits = `54${digits}`;
+  return digits;
+}
+
+export function enlaceWhatsApp(phone: string, message: string) {
+  let digits = digitosArgentina(phone);
   if (digits.startsWith("54") && !digits.startsWith("549")) digits = `549${digits.slice(2)}`;
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+}
+
+export function enlaceTelefono(phone: string) {
+  return `tel:+${digitosArgentina(phone)}`;
+}
+
+export function enlaceMaps(direccion: string, localidad: string, nombre = "") {
+  const consulta = [nombre.trim(), direccion.trim(), `${localidad.trim()}, Misiones, Argentina`].filter(Boolean).join(", ");
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(consulta)}`;
 }
 
 export function fechaInput(date: Date | string | null | undefined) {
