@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useRef, useState } from "react";
 import { guardarLugar } from "@/actions/place";
 import { FichaLugar } from "@/components/FichaLugar";
 import { HorarioLugarEditor } from "@/components/HorarioLugarEditor";
@@ -25,68 +26,75 @@ export function EditorLugar({
   obras: string[];
 }) {
   const [borrador, setBorrador] = useState(inicial);
-  const [estado, setEstado] = useState("Se guarda solo.");
+  const [hayCambios, setHayCambios] = useState(false);
+  const [guardando, setGuardando] = useState(false);
+  const [guardadoOk, setGuardadoOk] = useState(false);
+  const [estado, setEstado] = useState("Cuando termines, tocá Guardar ficha para que quede en la ficha pública.");
   const ultimo = useRef(borrador);
-  const guardando = useRef(false);
-  const pendiente = useRef(false);
-  const silencio = useRef(false);
-  const montado = useRef(false);
   ultimo.current = borrador;
   const catalogo = Array.from(new Set([...OBRAS_INICIALES, ...obras])).sort((a, b) => a.localeCompare(b, "es"));
 
-  async function persistir() {
-    if (guardando.current) {
-      pendiente.current = true;
-      return;
-    }
+  function marcarCambio() {
+    setHayCambios(true);
+    setGuardadoOk(false);
+    setEstado("Tenés cambios sin guardar.");
+  }
+
+  async function guardarFicha() {
+    if (guardando) return;
     const snapshot = ultimo.current;
-    guardando.current = true;
-    pendiente.current = false;
+    setGuardando(true);
     setEstado("Guardando…");
     const resultado = await guardarLugar(placeId, snapshot);
-    guardando.current = false;
+    setGuardando(false);
     if (!resultado.ok) {
       setEstado(resultado.error);
       return;
     }
     const fusion = {
       ...ultimo.current,
+      scheduleLegacy: null,
       studies: ultimo.current.studies.map((estudio) => {
         const guardado = resultado.studies.find((fila) => fila.key === estudio.key);
         return guardado ? { ...estudio, id: guardado.id } : estudio;
       }),
     };
     ultimo.current = fusion;
-    silencio.current = true;
     setBorrador(fusion);
-    setEstado("Guardado.");
-    if (pendiente.current) void persistir();
+    setHayCambios(false);
+    setGuardadoOk(true);
+    setEstado("Guardado. Los datos quedaron en la ficha del lugar.");
   }
 
-  useEffect(() => {
-    if (!montado.current) {
-      montado.current = true;
-      return;
-    }
-    if (silencio.current) {
-      silencio.current = false;
-      return;
-    }
-    const espera = setTimeout(() => void persistir(), 700);
-    return () => clearTimeout(espera);
-  }, [borrador]);
-
   function cambiar(parcial: Partial<BorradorLugar>) {
-    pendiente.current = true;
+    marcarCambio();
     setBorrador((actual) => ({ ...actual, ...parcial }));
   }
 
   function cambiarEstudio(key: string, parcial: Partial<EstudioBorrador>) {
-    pendiente.current = true;
+    marcarCambio();
     setBorrador((actual) => ({
       ...actual,
       studies: actual.studies.map((estudio) => (estudio.key === key ? { ...estudio, ...parcial } : estudio)),
     }));
+  }
+
+  function BarraGuardar({ alFinal = false }: { alFinal?: boolean }) {
+    return (
+      <div className={`flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-[#f8fafc] p-4 ${alFinal ? "mt-2" : ""}`}>
+        <button type="button" className="boton" disabled={guardando} onClick={() => void guardarFicha()}>
+          {guardando ? "Guardando…" : "Guardar ficha"}
+        </button>
+        <p className={`text-sm ${estado.includes("sin guardar") || estado.includes("Guardando") ? "text-warn" : guardadoOk && !hayCambios ? "text-menta" : "text-muted"}`}>
+          {estado}
+        </p>
+        {guardadoOk && !hayCambios ? (
+          <Link href={`/lugar/${placeId}`} className="text-sm font-semibold text-link">
+            Ver ficha pública
+          </Link>
+        ) : null}
+      </div>
+    );
   }
 
   const vista = armarVistaLugar({
@@ -114,7 +122,7 @@ export function EditorLugar({
   return (
     <div className="grid items-start gap-10 lg:grid-cols-2">
       <form className="tarjeta grid gap-8" onSubmit={(event) => event.preventDefault()}>
-        <p className="text-base text-muted">{estado}</p>
+        <BarraGuardar />
         <section className="grid gap-4">
           <h2 className="text-2xl font-semibold">El lugar</h2>
           <label className="grid gap-1">
@@ -164,7 +172,7 @@ export function EditorLugar({
               valor={borrador.schedule}
               legacy={borrador.scheduleLegacy}
               onChange={(schedule) => {
-                pendiente.current = true;
+                marcarCambio();
                 setBorrador((actual) => ({ ...actual, schedule }));
               }}
             />
@@ -268,6 +276,7 @@ export function EditorLugar({
             </button>
           </section>
         )}
+        <BarraGuardar alFinal />
       </form>
       <aside className="grid gap-3 lg:sticky lg:top-24">
         <h2 className="text-2xl font-semibold">Así lo ve el paciente</h2>
