@@ -3,8 +3,7 @@
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { cerrarSesion, crearSesion, cuentasDisponibles } from "@/lib/auth";
-import { LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
+import { cerrarSesion, crearSesion, cuentasDisponibles, esAdmin } from "@/lib/auth";
 
 export type Resultado = { ok: true } | { ok: false; error: string };
 
@@ -24,14 +23,13 @@ export async function entrar(_estado: Resultado | null, formData: FormData): Pro
   }
   const sesion = await crearSesion(user.id);
   if (!sesion) return { ok: false, error: "En este momento no se pueden usar las cuentas." };
-  redirect("/panel");
+  redirect(esAdmin(user) ? "/panel/admin" : "/panel");
 }
 
 export async function crearCuenta(_estado: Resultado | null, formData: FormData): Promise<Resultado> {
   const name = String(formData.get("name") ?? "").trim();
   const email = correo(formData.get("email"));
   const password = String(formData.get("password") ?? "");
-  const tipo = String(formData.get("tipo") ?? "profesional");
   const license = String(formData.get("license") ?? "").trim().slice(0, 40);
 
   if (!cuentasDisponibles()) {
@@ -41,35 +39,23 @@ export async function crearCuenta(_estado: Resultado | null, formData: FormData)
   if (!email.includes("@")) return { ok: false, error: "El correo no parece válido." };
   if (password.length < 8) return { ok: false, error: "La contraseña necesita al menos 8 caracteres." };
 
-  const placeName = String(formData.get("placeName") ?? "").trim();
-  const kind = String(formData.get("kind") ?? "");
-  const locality = String(formData.get("locality") ?? "");
-  if (tipo === "lugar") {
-    if (placeName.length < 2) return { ok: false, error: "Escribí el nombre del lugar." };
-    if (!TIPOS_LUGAR.some((tipoLugar) => tipoLugar.id === kind)) {
-      return { ok: false, error: "Elegí qué tipo de lugar es." };
-    }
-    if (!LOCALIDADES.includes(locality as (typeof LOCALIDADES)[number])) {
-      return { ok: false, error: "Elegí una localidad del corredor." };
-    }
-  }
-
   const existe = await prisma.user.findUnique({ where: { email } });
   if (existe) return { ok: false, error: "Ya hay una cuenta con ese correo." };
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = await prisma.user.create({ data: { name, email, passwordHash } });
+  const user = await prisma.user.create({
+    data: { name, email, passwordHash, role: "profesional" },
+  });
 
-  if (tipo === "lugar") {
-    const place = await prisma.place.create({
-      data: { name: placeName, kind, locality, published: true },
-    });
-    await prisma.placeEditor.create({ data: { userId: user.id, placeId: place.id } });
-  } else {
-    await prisma.professional.create({
-      data: { userId: user.id, fullName: name, license, published: true },
-    });
-  }
+  await prisma.professional.create({
+    data: {
+      userId: user.id,
+      fullName: name,
+      license,
+      published: false,
+      reviewed: false,
+    },
+  });
 
   const sesion = await crearSesion(user.id);
   if (!sesion) return { ok: false, error: "En este momento no se pueden usar las cuentas." };

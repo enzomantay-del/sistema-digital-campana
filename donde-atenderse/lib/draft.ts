@@ -5,7 +5,10 @@ export type HorarioBorrador = {
   placeName: string;
   locality: string;
   address: string;
+  kind: string;
   ownsPlace: boolean;
+  sugerido: boolean;
+  publicado: boolean;
   days: string[];
   shift: string;
   time: string;

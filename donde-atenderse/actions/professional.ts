@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { usuarioActual } from "@/lib/auth";
-import { LOCALIDADES } from "@/lib/constants";
+import { LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
 import type { BorradorProfesional } from "@/lib/draft";
 
 export type GuardadoProfesional =
@@ -27,7 +27,12 @@ export async function guardarProfesional(borrador: BorradorProfesional): Promise
   let professional = user.professional;
   if (!professional) {
     professional = await prisma.professional.create({
-      data: { userId: user.id, fullName: user.name, published: true },
+      data: {
+        userId: user.id,
+        fullName: user.name,
+        published: false,
+        reviewed: false,
+      },
     });
   }
 
@@ -47,7 +52,6 @@ export async function guardarProfesional(borrador: BorradorProfesional): Promise
       phone: borrador.phone.trim(),
       price,
       priceUpdatedAt: precioCambio ? new Date() : professional.priceUpdatedAt,
-      published: true,
     },
   });
 
@@ -72,45 +76,64 @@ export async function guardarProfesional(borrador: BorradorProfesional): Promise
       : undefined;
     let placeId = existente?.placeId;
 
-    if (!placeId && !horario.placeId && horario.ownsPlace) {
+    if (!placeId && horario.sugerido && !horario.placeId) {
       if (horario.placeName.trim().length < 2) continue;
       if (!LOCALIDADES.includes(horario.locality as (typeof LOCALIDADES)[number])) {
-        return { ok: false, error: "El consultorio necesita una localidad del corredor." };
+        return { ok: false, error: "El lugar sugerido necesita una localidad del corredor." };
       }
+      const kind = TIPOS_LUGAR.some((tipo) => tipo.id === horario.kind) ? horario.kind : "consultorio";
       const place = await prisma.place.create({
         data: {
           name: horario.placeName.trim(),
-          kind: "consultorio",
+          kind,
           locality: horario.locality,
           address: horario.address.trim().slice(0, 200),
-          published: true,
+          published: false,
+          suggestedById: user.id,
+          suggestionNote: "Sugerido desde la ficha del profesional.",
         },
       });
-      await prisma.placeEditor.create({ data: { userId: user.id, placeId: place.id } });
-      editores.add(place.id);
       placeId = place.id;
-    } else if (!placeId && horario.placeId && editores.has(horario.placeId)) {
-      placeId = horario.placeId;
+    } else if (!placeId && horario.placeId) {
+      const lugar = await prisma.place.findUnique({ where: { id: horario.placeId } });
+      if (!lugar) return { ok: false, error: "Ese lugar ya no está." };
+      const propio = lugar.suggestedById === user.id;
+      if (!lugar.published && !propio && !editores.has(lugar.id)) {
+        return { ok: false, error: "Ese lugar todavía no está publicado." };
+      }
+      placeId = lugar.id;
+    } else if (placeId && horario.placeId && horario.placeId !== placeId) {
+      const lugar = await prisma.place.findUnique({ where: { id: horario.placeId } });
+      if (!lugar || (!lugar.published && lugar.suggestedById !== user.id && !editores.has(lugar.id))) {
+        return { ok: false, error: "No podés cambiar a ese lugar." };
+      }
+      placeId = lugar.id;
     }
 
     if (!placeId) continue;
-    const esEditor = editores.has(placeId);
-    const mismaFicha = !existente || !horario.placeId || horario.placeId === existente.placeId;
 
-    if (esEditor && horario.ownsPlace && mismaFicha) {
-      await prisma.place.update({
-        where: { id: placeId },
-        data: {
-          name: horario.placeName.trim() || undefined,
-          locality: LOCALIDADES.includes(horario.locality as (typeof LOCALIDADES)[number])
-            ? horario.locality
-            : undefined,
-          address: horario.address.trim().slice(0, 200),
-        },
-      });
+    if (horario.sugerido) {
+      const sugerido = await prisma.place.findUnique({ where: { id: placeId } });
+      if (sugerido && !sugerido.published && sugerido.suggestedById === user.id) {
+        const kind = TIPOS_LUGAR.some((tipo) => tipo.id === horario.kind) ? horario.kind : sugerido.kind;
+        await prisma.place.update({
+          where: { id: placeId },
+          data: {
+            name: horario.placeName.trim() || sugerido.name,
+            kind,
+            locality: LOCALIDADES.includes(horario.locality as (typeof LOCALIDADES)[number])
+              ? horario.locality
+              : sugerido.locality,
+            address: horario.address.trim().slice(0, 200),
+          },
+        });
+      }
     }
 
+    const esEditor = editores.has(placeId);
+
     const dataProfesional = {
+      placeId,
       professionalDays: horario.days.join(","),
       professionalTime: horario.time.trim().slice(0, 80),
       professionalShift: horario.shift,
@@ -129,9 +152,9 @@ export async function guardarProfesional(borrador: BorradorProfesional): Promise
       await prisma.attendance.update({ where: { id: existente.id }, data: dataProfesional });
       conservados.add(existente.id);
       rows.push({ key: horario.key, id: existente.id, placeId });
-    } else if (esEditor) {
+    } else {
       const creado = await prisma.attendance.create({
-        data: { professionalId: professional.id, placeId, ...dataProfesional },
+        data: { professionalId: professional.id, ...dataProfesional },
       });
       conservados.add(creado.id);
       rows.push({ key: horario.key, id: creado.id, placeId });

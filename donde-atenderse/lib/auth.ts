@@ -1,8 +1,11 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { SignJWT, jwtVerify } from "jose";
 import { prisma } from "./prisma";
 
 const COOKIE = "sesion";
+
+export type UsuarioSesion = NonNullable<Awaited<ReturnType<typeof usuarioActual>>>;
 
 function claveSesion() {
   const valor = process.env.AUTH_SECRET?.trim() ?? "";
@@ -12,6 +15,10 @@ function claveSesion() {
 
 export function cuentasDisponibles() {
   return claveSesion() !== null;
+}
+
+export function esAdmin(usuario: { role: string } | null | undefined) {
+  return usuario?.role === "admin";
 }
 
 export async function crearSesion(userId: string) {
@@ -57,4 +64,16 @@ export async function usuarioActual() {
   } catch {
     return null;
   }
+}
+
+export async function requiereUsuario() {
+  const usuario = await usuarioActual();
+  if (!usuario) redirect("/entrar");
+  return usuario;
+}
+
+export async function requiereAdmin() {
+  const usuario = await requiereUsuario();
+  if (!esAdmin(usuario)) redirect("/panel");
+  return usuario;
 }

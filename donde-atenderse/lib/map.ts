@@ -34,18 +34,28 @@ export function filaHorario(item: {
   };
 }
 
-export function horarioProfesional(item: {
-  id: string;
-  placeId: string;
-  professionalDays: string;
-  professionalTime: string;
-  professionalShift: string;
-  placeDays: string;
-  placeTime: string;
-  placeShift: string;
-  placeUpdatedAt: Date | null;
-  place: { name: string; locality: string; address: string };
-}, ownsPlace: boolean) {
+export function horarioProfesional(
+  item: {
+    id: string;
+    placeId: string;
+    professionalDays: string;
+    professionalTime: string;
+    professionalShift: string;
+    placeDays: string;
+    placeTime: string;
+    placeShift: string;
+    placeUpdatedAt: Date | null;
+    place: {
+      name: string;
+      locality: string;
+      address: string;
+      kind: string;
+      published: boolean;
+      suggestedById: string | null;
+    };
+  },
+  ownsPlace: boolean,
+) {
   return {
     key: item.id,
     id: item.id,
@@ -53,7 +63,10 @@ export function horarioProfesional(item: {
     placeName: item.place.name,
     locality: item.place.locality,
     address: item.place.address,
+    kind: item.place.kind,
     ownsPlace,
+    sugerido: !item.place.published,
+    publicado: item.place.published,
     days: diasDesdeTexto(item.professionalDays || item.placeDays),
     shift: item.professionalShift || item.placeShift || "manana",
     time: item.professionalTime || item.placeTime,

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { guardarProfesional } from "@/actions/professional";
 import { FichaProfesional } from "@/components/FichaProfesional";
-import { AREAS, DIAS, LOCALIDADES, OBRAS_INICIALES, TURNOS } from "@/lib/constants";
+import { AREAS, DIAS, LOCALIDADES, OBRAS_INICIALES, TIPOS_LUGAR, TURNOS } from "@/lib/constants";
 import type { BorradorProfesional, HorarioBorrador } from "@/lib/draft";
 import { armarVistaProfesional } from "@/lib/view";
 import type { FilaHorario } from "@/lib/schedule";
@@ -18,7 +18,10 @@ function horarioVacio(): HorarioBorrador {
     placeName: "",
     locality: "Jardín América",
     address: "",
-    ownsPlace: true,
+    kind: "consultorio",
+    ownsPlace: false,
+    sugerido: false,
+    publicado: true,
     days: ["lun"],
     shift: "manana",
     time: "",
@@ -33,10 +36,14 @@ export function EditorProfesional({
   inicial,
   lugares,
   obras,
+  revisada,
+  publicada,
 }: {
   inicial: BorradorProfesional & { priceUpdatedAt: string | null };
-  lugares: { id: string; name: string; locality: string }[];
+  lugares: { id: string; name: string; locality: string; kind: string }[];
   obras: string[];
+  revisada: boolean;
+  publicada: boolean;
 }) {
   const [borrador, setBorrador] = useState(inicial);
   const [estado, setEstado] = useState("Se guarda solo.");
@@ -67,13 +74,20 @@ export function EditorProfesional({
       ...ultimo.current,
       horarios: ultimo.current.horarios.map((horario) => {
         const guardado = resultado.rows.find((fila) => fila.key === horario.key);
-        return guardado ? { ...horario, id: guardado.id, placeId: guardado.placeId } : horario;
+        if (!guardado) return horario;
+        return {
+          ...horario,
+          id: guardado.id,
+          placeId: guardado.placeId,
+          sugerido: horario.sugerido && !horario.publicado ? true : horario.sugerido && !horario.publicado,
+          publicado: horario.sugerido ? false : horario.publicado,
+        };
       }),
     };
     ultimo.current = fusion;
     silencio.current = true;
     setBorrador(fusion);
-    setEstado("Guardado.");
+    setEstado(revisada ? "Guardado." : "Guardado. Queda a la espera de revisión.");
     if (pendiente.current) void persistir();
   }
 
@@ -110,7 +124,7 @@ export function EditorProfesional({
     .map((horario) => ({
       id: horario.id || horario.key,
       placeId: horario.placeId || horario.key,
-      placeName: horario.placeName || "Consultorio",
+      placeName: horario.placeName || "Lugar",
       locality: horario.locality,
       professionalDays: horario.days.join(","),
       professionalTime: horario.time,
@@ -129,7 +143,11 @@ export function EditorProfesional({
     license: borrador.license,
     price: borrador.price,
     priceUpdatedAt:
-      borrador.price === inicial.price && inicial.priceUpdatedAt ? new Date(inicial.priceUpdatedAt) : borrador.price ? new Date() : null,
+      borrador.price === inicial.price && inicial.priceUpdatedAt
+        ? new Date(inicial.priceUpdatedAt)
+        : borrador.price
+          ? new Date()
+          : null,
     whatsapp: borrador.whatsapp,
     phone: borrador.phone,
     obras: [...borrador.obras, borrador.otraObra].map((item) => item.trim()).filter(Boolean),
@@ -140,6 +158,16 @@ export function EditorProfesional({
   return (
     <div className="grid items-start gap-10 lg:grid-cols-2">
       <form className="tarjeta grid gap-8" onSubmit={(event) => event.preventDefault()}>
+        {!revisada ? (
+          <p className="rounded-2xl border border-line bg-paper px-4 py-3 text-base">
+            La primera vez revisamos nombre, matrícula y WhatsApp. Mientras tanto tu ficha no aparece en la búsqueda
+            pública.
+          </p>
+        ) : !publicada ? (
+          <p className="rounded-2xl border border-line bg-paper px-4 py-3 text-base">
+            Tu ficha está bajada. Podés seguir editándola; Cercalud la vuelve a publicar cuando corresponda.
+          </p>
+        ) : null}
         <p className="text-base text-muted">{estado}</p>
         <section className="grid gap-4">
           <h2 className="text-2xl font-semibold">Tus datos</h2>
@@ -170,7 +198,19 @@ export function EditorProfesional({
               onChange={(event) => cambiar({ specialty: event.target.value })}
             />
             <datalist id="especialidades">
-              {["Clínica médica", "Pediatría", "Traumatología", "Ginecología", "Cardiología", "Oftalmología", "Psiquiatría", "Psicología", "Odontología", "Kinesiología", "Nutrición"].map((item) => (
+              {[
+                "Clínica médica",
+                "Pediatría",
+                "Traumatología",
+                "Ginecología",
+                "Cardiología",
+                "Oftalmología",
+                "Psiquiatría",
+                "Psicología",
+                "Odontología",
+                "Kinesiología",
+                "Nutrición",
+              ].map((item) => (
                 <option key={item} value={item} />
               ))}
             </datalist>
@@ -196,7 +236,9 @@ export function EditorProfesional({
                       checked={activa}
                       onChange={(event) =>
                         cambiar({
-                          obras: event.target.checked ? [...borrador.obras, obra] : borrador.obras.filter((item) => item !== obra),
+                          obras: event.target.checked
+                            ? [...borrador.obras, obra]
+                            : borrador.obras.filter((item) => item !== obra),
                         })
                       }
                     />
@@ -217,53 +259,94 @@ export function EditorProfesional({
         </section>
 
         <section className="grid gap-5">
-          <h2 className="text-2xl font-semibold">Dónde atendés</h2>
+          <div className="grid gap-2">
+            <h2 className="text-2xl font-semibold">Dónde atendés</h2>
+            <p className="text-muted">
+              Elegí un lugar que ya esté en Cercalud. Si no está, sugerilo: lo revisamos y lo publicamos nosotros.
+            </p>
+          </div>
           {borrador.horarios.map((horario) => (
             <div key={horario.key} className="grid gap-3 border-t border-line pt-4">
-              {horario.placeId && !horario.ownsPlace ? (
+              {horario.placeId && !horario.sugerido ? (
                 <p>
                   {horario.placeName} · {horario.locality}
+                  {horario.publicado ? null : " · Pendiente de publicación"}
                 </p>
               ) : (
-              <label className="grid gap-1">
-                Lugar
-                <select
-                  className="campo"
-                  value={horario.ownsPlace && !horario.placeId ? "__nuevo" : horario.placeId || ""}
-                  onChange={(event) => {
-                    if (event.target.value === "__nuevo") {
-                      cambiarHorario(horario.key, { placeId: undefined, ownsPlace: true, placeName: "", address: "" });
-                      return;
-                    }
-                    const lugar = lugares.find((item) => item.id === event.target.value);
-                    if (!lugar) return;
-                    cambiarHorario(horario.key, {
-                      placeId: lugar.id,
-                      ownsPlace: true,
-                      placeName: lugar.name,
-                      locality: lugar.locality,
-                    });
-                  }}
-                >
-                  <option value="">Elegí un lugar</option>
-                  <option value="__nuevo">Mi consultorio particular</option>
-                  {lugares.map((lugar) => (
-                    <option key={lugar.id} value={lugar.id}>
-                      {lugar.name} · {lugar.locality}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                <label className="grid gap-1">
+                  Lugar
+                  <select
+                    className="campo"
+                    value={horario.sugerido ? "__sugerir" : horario.placeId || ""}
+                    onChange={(event) => {
+                      if (event.target.value === "__sugerir") {
+                        cambiarHorario(horario.key, {
+                          placeId: undefined,
+                          sugerido: true,
+                          publicado: false,
+                          ownsPlace: false,
+                          placeName: "",
+                          address: "",
+                          kind: "consultorio",
+                        });
+                        return;
+                      }
+                      const lugar = lugares.find((item) => item.id === event.target.value);
+                      if (!lugar) return;
+                      cambiarHorario(horario.key, {
+                        placeId: lugar.id,
+                        sugerido: false,
+                        publicado: true,
+                        ownsPlace: false,
+                        placeName: lugar.name,
+                        locality: lugar.locality,
+                        kind: lugar.kind,
+                        address: "",
+                      });
+                    }}
+                  >
+                    <option value="">Elegí un lugar</option>
+                    <option value="__sugerir">El lugar no está · sugerirlo</option>
+                    {lugares.map((lugar) => (
+                      <option key={lugar.id} value={lugar.id}>
+                        {lugar.name} · {lugar.locality}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               )}
-              {horario.ownsPlace && !horario.placeId ? (
+              {horario.sugerido ? (
                 <>
+                  <p className="text-sm text-muted">Sugerencia pendiente de revisión.</p>
                   <label className="grid gap-1">
-                    Nombre del consultorio
-                    <input className="campo" value={horario.placeName} onChange={(event) => cambiarHorario(horario.key, { placeName: event.target.value })} />
+                    Nombre del lugar
+                    <input
+                      className="campo"
+                      value={horario.placeName}
+                      onChange={(event) => cambiarHorario(horario.key, { placeName: event.target.value })}
+                    />
+                  </label>
+                  <label className="grid gap-1">
+                    Tipo
+                    <select
+                      className="campo"
+                      value={horario.kind}
+                      onChange={(event) => cambiarHorario(horario.key, { kind: event.target.value })}
+                    >
+                      {TIPOS_LUGAR.filter((tipo) => tipo.id !== "farmacia").map((tipo) => (
+                        <option key={tipo.id} value={tipo.id}>
+                          {tipo.label}
+                        </option>
+                      ))}
+                    </select>
                   </label>
                   <label className="grid gap-1">
                     Localidad
-                    <select className="campo" value={horario.locality} onChange={(event) => cambiarHorario(horario.key, { locality: event.target.value })}>
+                    <select
+                      className="campo"
+                      value={horario.locality}
+                      onChange={(event) => cambiarHorario(horario.key, { locality: event.target.value })}
+                    >
                       {LOCALIDADES.map((localidad) => (
                         <option key={localidad}>{localidad}</option>
                       ))}
@@ -271,7 +354,11 @@ export function EditorProfesional({
                   </label>
                   <label className="grid gap-1">
                     Dirección
-                    <input className="campo" value={horario.address} onChange={(event) => cambiarHorario(horario.key, { address: event.target.value })} />
+                    <input
+                      className="campo"
+                      value={horario.address}
+                      onChange={(event) => cambiarHorario(horario.key, { address: event.target.value })}
+                    />
                   </label>
                 </>
               ) : null}
@@ -288,7 +375,9 @@ export function EditorProfesional({
                           checked={activo}
                           onChange={(event) =>
                             cambiarHorario(horario.key, {
-                              days: event.target.checked ? [...horario.days, dia.id] : horario.days.filter((item) => item !== dia.id),
+                              days: event.target.checked
+                                ? [...horario.days, dia.id]
+                                : horario.days.filter((item) => item !== dia.id),
                             })
                           }
                         />
@@ -300,7 +389,11 @@ export function EditorProfesional({
               </fieldset>
               <label className="grid gap-1">
                 Momento
-                <select className="campo" value={horario.shift} onChange={(event) => cambiarHorario(horario.key, { shift: event.target.value })}>
+                <select
+                  className="campo"
+                  value={horario.shift}
+                  onChange={(event) => cambiarHorario(horario.key, { shift: event.target.value })}
+                >
                   {TURNOS.map((turno) => (
                     <option key={turno.id} value={turno.id}>
                       {turno.label}
@@ -310,7 +403,12 @@ export function EditorProfesional({
               </label>
               <label className="grid gap-1">
                 Horario
-                <input className="campo" placeholder="8 a 12" value={horario.time} onChange={(event) => cambiarHorario(horario.key, { time: event.target.value })} />
+                <input
+                  className="campo"
+                  placeholder="8 a 12"
+                  value={horario.time}
+                  onChange={(event) => cambiarHorario(horario.key, { time: event.target.value })}
+                />
               </label>
               <button
                 type="button"
@@ -321,7 +419,11 @@ export function EditorProfesional({
               </button>
             </div>
           ))}
-          <button type="button" className="boton-suave w-fit" onClick={() => cambiar({ horarios: [...borrador.horarios, horarioVacio()] })}>
+          <button
+            type="button"
+            className="boton-suave w-fit"
+            onClick={() => cambiar({ horarios: [...borrador.horarios, horarioVacio()] })}
+          >
             Agregar un lugar
           </button>
         </section>

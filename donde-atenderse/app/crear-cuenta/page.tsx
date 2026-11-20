@@ -9,7 +9,8 @@ export default async function CrearCuenta() {
     <div className="grid gap-6">
       <h1 className="text-4xl font-bold tracking-tight">Crear cuenta</h1>
       <p className="max-w-xl text-muted">
-        Creás tu propia ficha. No se une a una ficha que ya está publicada.
+        Creás tu ficha de profesional. La primera vez la revisamos antes de publicarla. Los lugares del corredor los
+        carga Cercalud.
       </p>
       <FormularioCuenta />
       <p>

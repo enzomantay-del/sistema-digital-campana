@@ -8,13 +8,15 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(cuid())
-  email        String        @unique
-  passwordHash String
-  name         String
-  createdAt    DateTime      @default(now())
-  professional Professional?
-  places       PlaceEditor[]
+  id              String        @id @default(cuid())
+  email           String        @unique
+  passwordHash    String
+  name            String
+  role            String        @default("profesional")
+  createdAt       DateTime      @default(now())
+  professional    Professional?
+  places          PlaceEditor[]
+  suggestedPlaces Place[]       @relation("PlaceSuggestions")
 }
 
 model Professional {
@@ -30,7 +32,8 @@ model Professional {
   price          String             @default("")
   priceUpdatedAt DateTime?
   example        Boolean            @default(false)
-  published      Boolean            @default(true)
+  reviewed       Boolean            @default(false)
+  published      Boolean            @default(false)
   updatedAt      DateTime           @updatedAt
   createdAt      DateTime           @default(now())
   obras          ProfessionalObra[]
@@ -38,23 +41,26 @@ model Professional {
 }
 
 model Place {
-  id           String         @id @default(cuid())
-  name         String
-  kind         String
-  locality     String
-  address      String         @default("")
-  whatsapp     String         @default("")
-  phone        String         @default("")
-  scheduleNote String         @default("")
-  example      Boolean        @default(false)
-  published    Boolean        @default(true)
-  updatedAt    DateTime       @updatedAt
-  createdAt    DateTime       @default(now())
-  editors      PlaceEditor[]
-  obras        PlaceObra[]
-  studies      Study[]
-  attendances  Attendance[]
-  duties       PharmacyDuty[]
+  id            String         @id @default(cuid())
+  name          String
+  kind          String
+  locality      String
+  address       String         @default("")
+  whatsapp      String         @default("")
+  phone         String         @default("")
+  scheduleNote  String         @default("")
+  example       Boolean        @default(false)
+  published     Boolean        @default(false)
+  suggestedById String?
+  suggestedBy   User?          @relation("PlaceSuggestions", fields: [suggestedById], references: [id])
+  suggestionNote String        @default("")
+  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime       @default(now())
+  editors       PlaceEditor[]
+  obras         PlaceObra[]
+  studies       Study[]
+  attendances   Attendance[]
+  duties        PharmacyDuty[]
 }
 
 model PlaceEditor {

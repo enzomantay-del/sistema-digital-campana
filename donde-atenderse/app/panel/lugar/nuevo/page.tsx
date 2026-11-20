@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { crearLugar } from "@/actions/place";
-import { usuarioActual } from "@/lib/auth";
+import { esAdmin, usuarioActual } from "@/lib/auth";
 import { LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
 
 export default async function NuevoLugar({
@@ -10,13 +10,22 @@ export default async function NuevoLugar({
 }) {
   const usuario = await usuarioActual();
   if (!usuario) redirect("/entrar");
+  if (!esAdmin(usuario)) redirect("/panel");
+
   const { error } = await searchParams;
   const mensaje =
-    error === "nombre" ? "Escribí el nombre del lugar." : error === "localidad" ? "Elegí una localidad del corredor." : error ? "Revisá los datos del lugar." : "";
+    error === "nombre"
+      ? "Escribí el nombre del lugar."
+      : error === "localidad"
+        ? "Elegí una localidad del corredor."
+        : error
+          ? "Revisá los datos del lugar."
+          : "";
 
   return (
     <form action={crearLugar} className="grid max-w-xl gap-4">
       <h1 className="text-4xl font-semibold tracking-tight">Cargar un lugar</h1>
+      <p className="text-muted">Hospitales, sanatorios, consultorios, estudios y farmacias del corredor.</p>
       <label className="grid gap-1">
         Nombre
         <input name="name" className="campo" required />
@@ -38,6 +47,10 @@ export default async function NuevoLugar({
             <option key={localidad}>{localidad}</option>
           ))}
         </select>
+      </label>
+      <label className="grid gap-1">
+        Dirección
+        <input name="address" className="campo" />
       </label>
       {mensaje ? <p className="text-warn">{mensaje}</p> : null}
       <button className="boton w-fit">Continuar</button>

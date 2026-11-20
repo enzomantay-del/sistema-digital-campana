@@ -8,8 +8,8 @@ export function Pie({ ejemplo }: { ejemplo: boolean }) {
         <Marca oficial />
         <p className="max-w-3xl text-base leading-relaxed text-muted">
           Cercalud es el directorio privado de información de salud de Jardín América y la zona.
-          No da ni gestiona turnos: te mostramos los datos y el turno lo pedís directo por WhatsApp.
-          No es un servicio de la Municipalidad ni de la Provincia, y no reemplaza una consulta.
+          Los lugares los carga Cercalud; cada profesional mantiene su ficha. No da ni gestiona turnos:
+          te mostramos los datos y el turno lo pedís directo por WhatsApp. No reemplaza una consulta.
         </p>
         {ejemplo ? (
           <p className="max-w-3xl text-base text-ink">

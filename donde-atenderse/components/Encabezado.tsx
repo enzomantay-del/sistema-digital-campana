@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Marca } from "@/components/Marca";
-import { usuarioActual } from "@/lib/auth";
+import { esAdmin, usuarioActual } from "@/lib/auth";
 
 const ENLACES = [
   { href: "/buscar", label: "Profesionales" },
@@ -11,6 +11,7 @@ const ENLACES = [
 
 export async function Encabezado({ ejemplo }: { ejemplo: boolean }) {
   const usuario = await usuarioActual();
+  const admin = esAdmin(usuario);
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-page items-center gap-4 px-4 py-3">
@@ -32,8 +33,11 @@ export async function Encabezado({ ejemplo }: { ejemplo: boolean }) {
               Datos de ejemplo
             </span>
           ) : null}
-          <Link href={usuario ? "/panel" : "/entrar"} className="whitespace-nowrap text-[15px] font-semibold hover:text-link">
-            {usuario ? "Mi ficha" : "Soy profesional"}
+          <Link
+            href={usuario ? (admin ? "/panel/admin" : "/panel") : "/entrar"}
+            className="whitespace-nowrap text-[15px] font-semibold hover:text-link"
+          >
+            {usuario ? (admin ? "Administración" : "Mi ficha") : "Soy profesional"}
           </Link>
         </div>
       </div>

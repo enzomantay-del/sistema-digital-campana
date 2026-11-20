@@ -20,6 +20,10 @@ const PREGUNTAS = [
     "Sí. Elegís tu obra social en el buscador y ves quién la atiende. Están las que se usan en Misiones. Si una ficha no tiene la tuya, ese profesional todavía no la cargó.",
   ],
   ["¿Cercalud saca turnos?", "No. Muestra los datos para que le escribas al profesional o al lugar."],
+  [
+    "¿Quién carga los datos?",
+    "Los lugares los carga Cercalud. Cada profesional carga su ficha y los días en que atiende. La primera vez revisamos nombre, matrícula y WhatsApp.",
+  ],
   ["¿Por qué pide mi ubicación?", "Para mostrar primero lo que tenés más cerca. Si no la activás, elegís el pueblo. No se guarda."],
   ["¿Los datos que veo son reales?", "Si aparece “Datos de ejemplo”, son para probar la web. No son profesionales ni lugares de la zona."],
   ["¿Dónde miro la farmacia de turno?", "En su página, con la fecha que cargaron. Si esa fecha ya pasó, no es el turno de hoy."],

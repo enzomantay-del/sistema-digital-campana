@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { usuarioActual } from "@/lib/auth";
+import { esAdmin, usuarioActual } from "@/lib/auth";
 import { AREAS, LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
 import type { BorradorLugar } from "@/lib/draft";
 
@@ -25,31 +25,45 @@ async function obraId(nombre: string) {
   return obra.id;
 }
 
+async function puedeEditarLugar(user: NonNullable<Awaited<ReturnType<typeof usuarioActual>>>, placeId: string) {
+  if (esAdmin(user)) return true;
+  return user.places.some((item) => item.placeId === placeId);
+}
+
 export async function crearLugar(formData: FormData) {
   const user = await usuarioActual();
   if (!user) redirect("/entrar");
+  if (!esAdmin(user)) redirect("/panel");
+
   const name = String(formData.get("name") ?? "").trim();
   const kind = String(formData.get("kind") ?? "");
   const locality = String(formData.get("locality") ?? "");
+  const address = String(formData.get("address") ?? "").trim();
   if (name.length < 2) redirect("/panel/lugar/nuevo?error=nombre");
   if (!TIPOS_LUGAR.some((tipo) => tipo.id === kind)) redirect("/panel/lugar/nuevo?error=tipo");
   if (!LOCALIDADES.includes(locality as (typeof LOCALIDADES)[number])) redirect("/panel/lugar/nuevo?error=localidad");
-  const place = await prisma.place.create({ data: { name, kind, locality, published: true } });
-  await prisma.placeEditor.create({ data: { userId: user.id, placeId: place.id } });
+
+  const place = await prisma.place.create({
+    data: { name, kind, locality, address, published: true },
+  });
   redirect(`/panel/lugar/${place.id}`);
 }
 
 export async function guardarLugar(placeId: string, borrador: BorradorLugar): Promise<GuardadoLugar> {
   const user = await usuarioActual();
   if (!user) return { ok: false, error: "Tenés que entrar de nuevo." };
-  const editor = user.places.find((item) => item.placeId === placeId);
-  if (!editor) return { ok: false, error: "Esta ficha no está en tu cuenta." };
+  if (!(await puedeEditarLugar(user, placeId))) {
+    return { ok: false, error: "Esta ficha no está en tu cuenta." };
+  }
 
   if (borrador.name.trim().length < 2) return { ok: false, error: "Escribí el nombre del lugar." };
   if (!TIPOS_LUGAR.some((tipo) => tipo.id === borrador.kind)) return { ok: false, error: "Elegí el tipo de lugar." };
   if (!LOCALIDADES.includes(borrador.locality as (typeof LOCALIDADES)[number])) {
     return { ok: false, error: "Elegí una localidad del corredor." };
   }
+
+  const lugar = await prisma.place.findUnique({ where: { id: placeId } });
+  if (!lugar) return { ok: false, error: "Ese lugar ya no está." };
 
   await prisma.place.update({
     where: { id: placeId },
@@ -61,7 +75,7 @@ export async function guardarLugar(placeId: string, borrador: BorradorLugar): Pr
       whatsapp: borrador.whatsapp.trim(),
       phone: borrador.phone.trim(),
       scheduleNote: borrador.scheduleNote.trim(),
-      published: true,
+      published: esAdmin(user) ? lugar.published : lugar.published,
     },
   });
 
@@ -143,7 +157,8 @@ export async function guardarLugar(placeId: string, borrador: BorradorLugar): Pr
         specialty: horario.specialty.trim().slice(0, 120),
         area: horario.area || "cuerpo",
         license: horario.license.trim().slice(0, 40),
-        published: true,
+        published: false,
+        reviewed: false,
       },
     });
     const creado = await prisma.attendance.create({

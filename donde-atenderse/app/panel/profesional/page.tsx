@@ -11,7 +11,12 @@ export default async function PaginaEditorProfesional() {
   const professional =
     usuario.professional ??
     (await prisma.professional.create({
-      data: { userId: usuario.id, fullName: usuario.name, published: true },
+      data: {
+        userId: usuario.id,
+        fullName: usuario.name,
+        published: false,
+        reviewed: false,
+      },
     }));
   const completo = await prisma.professional.findUniqueOrThrow({
     where: { id: professional.id },
@@ -22,9 +27,9 @@ export default async function PaginaEditorProfesional() {
   });
   const [lugares, obras] = await Promise.all([
     prisma.place.findMany({
-      where: { editors: { some: { userId: usuario.id } }, kind: { not: "farmacia" } },
-      select: { id: true, name: true, locality: true },
-      orderBy: { name: "asc" },
+      where: { published: true, kind: { not: "farmacia" } },
+      select: { id: true, name: true, locality: true, kind: true },
+      orderBy: [{ locality: "asc" }, { name: "asc" }],
     }),
     catalogoObras(),
   ]);
@@ -34,6 +39,8 @@ export default async function PaginaEditorProfesional() {
     <EditorProfesional
       obras={obras}
       lugares={lugares}
+      revisada={completo.reviewed}
+      publicada={completo.published}
       inicial={{
         fullName: completo.fullName,
         license: completo.license,

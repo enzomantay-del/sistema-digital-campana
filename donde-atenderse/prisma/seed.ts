@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -10,9 +11,37 @@ function dia(iso: string) {
   return new Date(`${iso}T12:00:00-03:00`);
 }
 
+async function asegurarAdmin() {
+  const email = (process.env.ADMIN_EMAIL ?? "admin@cercalud.local").trim().toLowerCase();
+  const password = process.env.ADMIN_PASSWORD ?? "cercalud-admin";
+  const passwordHash = await bcrypt.hash(password, 10);
+  await prisma.user.upsert({
+    where: { email },
+    update: { role: "admin", name: "Administración Cercalud", passwordHash },
+    create: {
+      email,
+      name: "Administración Cercalud",
+      role: "admin",
+      passwordHash,
+    },
+  });
+  console.log(`Admin listo: ${email}`);
+}
+
+async function publicarEjemplos() {
+  await prisma.place.updateMany({ where: { example: true }, data: { published: true } });
+  await prisma.professional.updateMany({
+    where: { example: true },
+    data: { published: true, reviewed: true },
+  });
+}
+
 async function main() {
+  await asegurarAdmin();
+
   const yaHay = await prisma.professional.count();
   if (yaHay > 0) {
+    await publicarEjemplos();
     console.log("La base ya tiene datos. No se vuelve a cargar el ejemplo.");
     return;
   }
@@ -459,6 +488,7 @@ async function main() {
     ],
   });
 
+  await publicarEjemplos();
   console.log("Ejemplo cargado. Las fichas no tienen usuario.");
 }
 
