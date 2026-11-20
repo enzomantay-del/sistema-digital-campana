@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
+import { RUTA_PROFESIONAL_EJEMPLO } from "../lib/ejemplo";
 import { HORARIO_CONSULTORIO_TARDE, HORARIO_GUARDIA_SABADO, HORARIO_HOSPITAL_MANANA } from "./seedHorario";
 
 const prisma = new PrismaClient();
@@ -70,7 +71,7 @@ async function actualizarFichaEjemploAna() {
     });
   }
 
-  console.log(`Ficha de ejemplo lista: Dra. Ana López (${ana.id})`);
+  console.log(`Ficha de ejemplo: ${RUTA_PROFESIONAL_EJEMPLO} (id ${ana.id})`);
 }
 
 async function main() {

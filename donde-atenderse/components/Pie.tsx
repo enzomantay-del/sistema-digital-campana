@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Marca } from "@/components/Marca";
+import { RUTA_PROFESIONAL_EJEMPLO } from "@/lib/ejemplo";
 
 export function Pie({ ejemplo }: { ejemplo: boolean }) {
   return (
@@ -14,7 +15,11 @@ export function Pie({ ejemplo }: { ejemplo: boolean }) {
         {ejemplo ? (
           <p className="max-w-3xl text-base text-ink">
             Los datos que ves ahora son de ejemplo, para probar la web. No son profesionales ni
-            lugares reales de la zona.
+            lugares reales de la zona.{" "}
+            <Link href={RUTA_PROFESIONAL_EJEMPLO} className="font-semibold text-link">
+              Ver ficha de ejemplo
+            </Link>
+            .
           </p>
         ) : null}
         <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-link">

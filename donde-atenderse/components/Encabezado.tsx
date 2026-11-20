@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Marca } from "@/components/Marca";
 import { esAdmin, usuarioActual } from "@/lib/auth";
+import { RUTA_PROFESIONAL_EJEMPLO } from "@/lib/ejemplo";
 
 const ENLACES = [
   { href: "/buscar", label: "Profesionales" },
@@ -25,13 +26,14 @@ export async function Encabezado({ ejemplo }: { ejemplo: boolean }) {
         </nav>
         <div className="ml-auto flex items-center gap-3">
           {ejemplo ? (
-            <span
-              className="inline-flex items-center gap-2 rounded-full border border-line bg-paper px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em]"
-              title="Los datos que ves ahora son de ejemplo. No son profesionales ni lugares reales."
+            <Link
+              href={RUTA_PROFESIONAL_EJEMPLO}
+              className="inline-flex items-center gap-2 rounded-full border border-line bg-paper px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] hover:border-menta"
+              title="Ver la ficha de profesional de ejemplo (foto, horarios y contacto)."
             >
               <span className="size-2 rounded-full bg-menta" />
-              Datos de ejemplo
-            </span>
+              Ver ficha de ejemplo
+            </Link>
           ) : null}
           <Link
             href={usuario ? (admin ? "/panel/admin" : "/panel") : "/entrar"}
