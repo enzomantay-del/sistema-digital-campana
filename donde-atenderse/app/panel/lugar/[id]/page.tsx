@@ -5,6 +5,7 @@ import { AccionesAdmin } from "@/components/AccionesAdmin";
 import { EditorLugar } from "@/components/EditorLugar";
 import { esAdmin, usuarioActual } from "@/lib/auth";
 import { fechaInput } from "@/lib/format";
+import { obrasModoEfectivo } from "@/lib/placeObras";
 import { leerHorarioLugarDesdeNota } from "@/lib/placeSchedule";
 import { prisma } from "@/lib/prisma";
 import { catalogoObras } from "@/lib/search";
@@ -109,6 +110,7 @@ export default async function PaginaEditorLugar({
           schedule: horario.data,
           scheduleNote: lugar.scheduleNote,
           scheduleLegacy: horario.legacy,
+          obrasMode: obrasModoEfectivo(lugar.kind, lugar.obrasMode),
           obras: lugar.obras.map((item) => item.obra.name),
           otraObra: "",
           studies: lugar.studies.map((estudio) => ({

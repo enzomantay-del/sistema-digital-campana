@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { esAdmin, usuarioActual } from "@/lib/auth";
 import { LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
+import { MODOS_OBRAS_LUGAR, obrasModoDefault, obrasModoEfectivo } from "@/lib/placeObras";
 import { notaHorarioParaGuardar, validarHorarioLugar } from "@/lib/placeSchedule";
 import type { BorradorLugar } from "@/lib/draft";
 
@@ -45,7 +46,7 @@ export async function crearLugar(formData: FormData) {
   if (!LOCALIDADES.includes(locality as (typeof LOCALIDADES)[number])) redirect("/panel/lugar/nuevo?error=localidad");
 
   const place = await prisma.place.create({
-    data: { name, kind, locality, address, published: true },
+    data: { name, kind, locality, address, published: true, obrasMode: obrasModoDefault(kind) },
   });
   redirect(`/panel/lugar/${place.id}`);
 }
@@ -79,15 +80,23 @@ export async function guardarLugar(placeId: string, borrador: BorradorLugar): Pr
       whatsapp: borrador.whatsapp.trim(),
       phone: borrador.phone.trim(),
       scheduleNote: notaHorarioParaGuardar(borrador.schedule, borrador.scheduleLegacy),
+      obrasMode: MODOS_OBRAS_LUGAR.some((item) => item.id === borrador.obrasMode)
+        ? borrador.obrasMode
+        : obrasModoEfectivo(borrador.kind, lugar.obrasMode),
       published: esAdmin(user) ? lugar.published : lugar.published,
     },
   });
 
-  const nombres = [...borrador.obras, borrador.otraObra].map((item) => item.trim()).filter(Boolean);
-  const ids = (await Promise.all(nombres.map(obraId))).filter((id): id is string => Boolean(id));
-  await prisma.placeObra.deleteMany({ where: { placeId } });
-  if (ids.length) {
-    await prisma.placeObra.createMany({ data: ids.map((id) => ({ placeId, obraId: id })) });
+  const modo = obrasModoEfectivo(borrador.kind, borrador.obrasMode);
+  if (modo === "por_profesional") {
+    await prisma.placeObra.deleteMany({ where: { placeId } });
+  } else {
+    const nombres = [...borrador.obras, borrador.otraObra].map((item) => item.trim()).filter(Boolean);
+    const ids = (await Promise.all(nombres.map(obraId))).filter((id): id is string => Boolean(id));
+    await prisma.placeObra.deleteMany({ where: { placeId } });
+    if (ids.length) {
+      await prisma.placeObra.createMany({ data: ids.map((id) => ({ placeId, obraId: id })) });
+    }
   }
 
   const estudiosActuales = await prisma.study.findMany({ where: { placeId } });

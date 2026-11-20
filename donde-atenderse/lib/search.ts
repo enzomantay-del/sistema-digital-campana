@@ -1,4 +1,5 @@
 import { OBRAS_MISIONES } from "./constants";
+import { lugarAtiendeObra, obrasModoEfectivo } from "./placeObras";
 import { incluye } from "./format";
 import { distanciaALocalidad } from "./geo";
 import { prisma } from "./prisma";
@@ -11,7 +12,7 @@ const profesionalConRelaciones = {
 const lugarConRelaciones = {
   obras: { include: { obra: true } },
   studies: true,
-  attendances: { include: { professional: true, place: true } },
+  attendances: { include: { professional: { include: { obras: { include: { obra: true } } } }, place: true } },
   duties: true,
 } as const;
 
@@ -62,18 +63,39 @@ export async function buscar(filtros: {
     if (q && !incluye(texto, q)) return false;
     if (area && persona.area !== area) return false;
     if (localidad && !lugares.some((lugar) => lugar.locality === localidad)) return false;
-    if (obra && !obras.includes(obra) && !lugares.some((lugar) => places.find((place) => place.id === lugar.id)?.obras.some((item) => item.obra.name === obra))) {
-      return false;
+    if (obra && !obras.includes(obra)) {
+      const cubreLugar = lugares.some((lugar) => {
+        const centro = places.find((place) => place.id === lugar.id);
+        if (!centro) return false;
+        const modo = obrasModoEfectivo(centro.kind, centro.obrasMode);
+        if (modo === "por_profesional") return false;
+        const obrasCentro = centro.obras.map((item) => item.obra.name);
+        if (modo === "del_lugar") return obrasCentro.includes(obra);
+        const enCentro = obrasCentro.includes(obra);
+        const enColegas = centro.attendances.some(
+          (item) => item.professional.published && item.professional.obras.some((fila) => fila.obra.name === obra),
+        );
+        return enCentro || enColegas;
+      });
+      if (!cubreLugar) return false;
     }
     return true;
   });
 
   const centros = places.filter((lugar) => {
     const obras = lugar.obras.map((item) => item.obra.name);
+    const obrasEnProfesionales = Array.from(
+      new Set(
+        lugar.attendances
+          .filter((item) => item.professional.published)
+          .flatMap((item) => item.professional.obras.map((fila) => fila.obra.name)),
+      ),
+    );
+    const modoObras = obrasModoEfectivo(lugar.kind, lugar.obrasMode);
     const texto = [lugar.name, lugar.address, ...lugar.studies.map((estudio) => estudio.name)].join(" ");
     if (q && !incluye(texto, q)) return false;
     if (localidad && lugar.locality !== localidad) return false;
-    if (obra && !obras.includes(obra)) return false;
+    if (obra && !lugarAtiendeObra(modoObras, obras, obra, obrasEnProfesionales)) return false;
     if (area) {
       const coincide = lugar.attendances.some((item) => item.professional.area === area);
       const estudio = area === "cuerpo" && (lugar.kind === "imagenes" || lugar.kind === "laboratorio" || lugar.kind === "hospital" || lugar.kind === "sanatorio");

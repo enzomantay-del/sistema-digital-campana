@@ -6,6 +6,8 @@ import { FichaLugar } from "@/components/FichaLugar";
 import { HorarioLugarEditor } from "@/components/HorarioLugarEditor";
 import { LOCALIDADES, OBRAS_INICIALES, TIPOS_LUGAR } from "@/lib/constants";
 import type { BorradorLugar, EstudioBorrador } from "@/lib/draft";
+import { MODOS_OBRAS_LUGAR, obrasModoDefault } from "@/lib/placeObras";
+import type { ObrasModoLugar } from "@/lib/placeObras";
 import { notaHorarioParaGuardar } from "@/lib/placeSchedule";
 import { armarVistaLugar } from "@/lib/view";
 
@@ -88,6 +90,7 @@ export function EditorLugar({
   }
 
   const vista = armarVistaLugar({
+    placeId,
     name: borrador.name || "Sin nombre",
     kind: borrador.kind,
     locality: borrador.locality,
@@ -95,7 +98,10 @@ export function EditorLugar({
     whatsapp: borrador.whatsapp,
     phone: borrador.phone,
     scheduleNote: notaHorarioParaGuardar(borrador.schedule, borrador.scheduleLegacy),
+    obrasMode: borrador.obrasMode,
     obras: [...borrador.obras, borrador.otraObra].map((item) => item.trim()).filter(Boolean).sort((a, b) => a.localeCompare(b, "es")),
+    cantidadProfesionales: 0,
+    especialidades: [],
     updatedAt: new Date(),
     studies: borrador.studies.map((estudio) => ({
       name: estudio.name,
@@ -117,7 +123,14 @@ export function EditorLugar({
           </label>
           <label className="grid gap-1">
             Tipo
-            <select className="campo" value={borrador.kind} onChange={(event) => cambiar({ kind: event.target.value })}>
+            <select
+              className="campo"
+              value={borrador.kind}
+              onChange={(event) => {
+                const kind = event.target.value;
+                cambiar({ kind, obrasMode: obrasModoDefault(kind) });
+              }}
+            >
               {TIPOS_LUGAR.map((tipo) => (
                 <option key={tipo.id} value={tipo.id}>
                   {tipo.label}
@@ -158,27 +171,58 @@ export function EditorLugar({
           </fieldset>
           <fieldset className="grid gap-3">
             <legend className="font-semibold">Obras sociales</legend>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {catalogo.map((obra) => {
-                const activa = borrador.obras.includes(obra);
-                return (
-                  <label key={obra} className={activa ? "pastilla pastilla-compacta pastilla-activa" : "pastilla pastilla-compacta"}>
-                    <input
-                      className="sr-only"
-                      type="checkbox"
-                      checked={activa}
-                      onChange={(event) =>
-                        cambiar({
-                          obras: event.target.checked ? [...borrador.obras, obra] : borrador.obras.filter((item) => item !== obra),
-                        })
-                      }
-                    />
-                    {obra}
-                  </label>
-                );
-              })}
-            </div>
-            <input className="campo" placeholder="Otra obra social" value={borrador.otraObra} onChange={(event) => cambiar({ otraObra: event.target.value })} />
+            <label className="grid gap-1">
+              Cómo publicar las obras
+              <select
+                className="campo"
+                value={borrador.obrasMode}
+                onChange={(event) => cambiar({ obrasMode: event.target.value as ObrasModoLugar })}
+              >
+                {MODOS_OBRAS_LUGAR.map((modo) => (
+                  <option key={modo.id} value={modo.id}>
+                    {modo.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="text-sm text-muted">{MODOS_OBRAS_LUGAR.find((item) => item.id === borrador.obrasMode)?.descripcion}</p>
+            {borrador.obrasMode === "por_profesional" ? (
+              <p className="text-sm text-muted">No hace falta marcar obras acá. Cada profesional las carga en su ficha.</p>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {catalogo.map((obra) => {
+                    const activa = borrador.obras.includes(obra);
+                    return (
+                      <label
+                        key={obra}
+                        className={activa ? "pastilla pastilla-compacta pastilla-activa" : "pastilla pastilla-compacta"}
+                      >
+                        <input
+                          className="sr-only"
+                          type="checkbox"
+                          checked={activa}
+                          onChange={(event) =>
+                            cambiar({
+                              obras: event.target.checked
+                                ? [...borrador.obras, obra]
+                                : borrador.obras.filter((item) => item !== obra),
+                            })
+                          }
+                        />
+                        {obra}
+                      </label>
+                    );
+                  })}
+                </div>
+                <input
+                  className="campo"
+                  placeholder="Otra obra social"
+                  value={borrador.otraObra}
+                  onChange={(event) => cambiar({ otraObra: event.target.value })}
+                />
+              </>
+            )}
           </fieldset>
         </section>
 

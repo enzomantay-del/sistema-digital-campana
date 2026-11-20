@@ -49,6 +49,7 @@ model Place {
   whatsapp      String         @default("")
   phone         String         @default("")
   scheduleNote  String         @default("")
+  obrasMode     String         @default("del_lugar")
   example       Boolean        @default(false)
   published     Boolean        @default(false)
   suggestedById String?

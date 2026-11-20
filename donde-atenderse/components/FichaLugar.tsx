@@ -62,6 +62,19 @@ export function FichaLugar({
         </div>
       ) : null}
 
+      {vista.cantidadProfesionales > 0 ? (
+        <div className="flex flex-wrap gap-3">
+          <Link href={`/lugar/${vista.placeId}/profesionales`} className="boton-suave">
+            Ver profesionales ({vista.cantidadProfesionales})
+          </Link>
+          {vista.especialidades.length > 0 ? (
+            <Link href={`/lugar/${vista.placeId}/especialidades`} className="boton-suave">
+              Ver especialidades ({vista.especialidades.length})
+            </Link>
+          ) : null}
+        </div>
+      ) : null}
+
       {vista.estudios.length > 0 ? (
         <section className="grid gap-3">
           <h2 className="text-2xl font-semibold">Estudios</h2>
@@ -75,7 +88,8 @@ export function FichaLugar({
         </section>
       ) : null}
 
-      {vista.obras.length > 0 ? (
+      {vista.obrasNota ? <p className="text-sm text-muted">{vista.obrasNota}</p> : null}
+      {vista.mostrarObrasLista && vista.obras.length > 0 ? (
         <p>
           <span className="text-muted">Obra social: </span>
           {vista.obras.join(" · ")}

@@ -1,4 +1,5 @@
 import { etiquetaArea, etiquetaTurno, detalleHorario, fecha, textoPrecio } from "./format";
+import { ObrasModoLugar, obrasModoEfectivo, presentacionObrasLugar } from "./placeObras";
 import { lineasHorarioLugar, textoHorarioLugarPublico } from "./placeSchedule";
 import { lineaHorario, ordenarTurnos, type FilaHorario, type LineaHorario } from "./schedule";
 
@@ -35,6 +36,12 @@ export type VistaLugar = {
   horarioLugar: string;
   horarioLineas: string[];
   obras: string[];
+  obrasMode: ObrasModoLugar;
+  obrasNota: string | null;
+  mostrarObrasLista: boolean;
+  placeId: string;
+  cantidadProfesionales: number;
+  especialidades: string[];
   actualizacion: string;
   notaHospital: string;
   estudios: { nombre: string; preparacion: string; atencion: string }[];
@@ -120,6 +127,7 @@ export function armarVistaProfesional(input: {
 }
 
 export function armarVistaLugar(input: {
+  placeId: string;
   name: string;
   kind: string;
   locality: string;
@@ -127,11 +135,16 @@ export function armarVistaLugar(input: {
   whatsapp: string;
   phone: string;
   scheduleNote: string;
+  obrasMode?: string | null;
   obras: string[];
+  cantidadProfesionales: number;
+  especialidades: string[];
   updatedAt: Date | null;
   studies: { name: string; preparation: string; attention: string }[];
   filas: (FilaHorario & { professionalName: string; professionalId: string })[];
 }): VistaLugar {
+  const modo = obrasModoEfectivo(input.kind, input.obrasMode);
+  const obrasPresentacion = presentacionObrasLugar(modo, input.obras);
   const lineas = input.filas.flatMap((fila) => {
     const linea = lineaHorario(fila);
     return linea ? [decorar(linea, fila.professionalName, fila.professionalName, fila.professionalId)] : [];
@@ -146,7 +159,13 @@ export function armarVistaLugar(input: {
     telefono: input.phone.trim(),
     horarioLugar: textoHorarioLugarPublico(input.scheduleNote),
     horarioLineas: lineasHorarioLugar(input.scheduleNote),
-    obras: input.obras,
+    obras: obrasPresentacion.mostrarLista ? input.obras : [],
+    obrasMode: modo,
+    obrasNota: obrasPresentacion.nota,
+    mostrarObrasLista: obrasPresentacion.mostrarLista,
+    placeId: input.placeId,
+    cantidadProfesionales: input.cantidadProfesionales,
+    especialidades: input.especialidades,
     actualizacion: frase(input.updatedAt, input.name),
     notaHospital:
       input.kind === "hospital" || input.kind === "sanatorio"

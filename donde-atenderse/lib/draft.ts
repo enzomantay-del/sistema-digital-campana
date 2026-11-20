@@ -1,3 +1,4 @@
+import type { ObrasModoLugar } from "@/lib/placeObras";
 import type { HorarioLugarData } from "@/lib/placeSchedule";
 
 export type HorarioBorrador = {
@@ -68,6 +69,7 @@ export type BorradorLugar = {
   schedule: HorarioLugarData;
   scheduleNote: string;
   scheduleLegacy: string | null;
+  obrasMode: ObrasModoLugar;
   obras: string[];
   otraObra: string;
   studies: EstudioBorrador[];
