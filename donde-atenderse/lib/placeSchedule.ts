@@ -1,3 +1,6 @@
+import { DIAS } from "./constants";
+import { textoDias } from "./format";
+
 export const SCHEDULE_MAGIC = "\x1ESCHED\x1E";
 
 export type TurnoHorarioLugar = {
@@ -13,10 +16,22 @@ export type GrupoHorarioLugar = {
   guardia24: boolean;
 };
 
-export type HorarioLugarData = {
+/** Una franja = un horario que aplica a los días que elijas (cualquier combinación). */
+export type FranjaHorarioLugar = GrupoHorarioLugar & {
+  key: string;
+  dias: string[];
+  cerrado: boolean;
+};
+
+export type HorarioLugarDataV1 = {
   v: 1;
   semana: GrupoHorarioLugar;
   finde: GrupoHorarioLugar;
+};
+
+export type HorarioLugarData = {
+  v: 2;
+  franjas: FranjaHorarioLugar[];
 };
 
 export const TURNOS_HORARIO_LUGAR = [
@@ -31,14 +46,30 @@ function turnoVacio(): TurnoHorarioLugar {
   return { activo: false, desde: "", hasta: "" };
 }
 
-export function horarioLugarVacio(): HorarioLugarData {
-  const grupo = (): GrupoHorarioLugar => ({
+export function grupoHorarioVacio(): GrupoHorarioLugar {
+  return {
     manana: turnoVacio(),
     tarde: turnoVacio(),
     noche: turnoVacio(),
     guardia24: false,
-  });
-  return { v: 1, semana: grupo(), finde: grupo() };
+  };
+}
+
+function claveFranja() {
+  return `franja-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+export function franjaHorarioVacia(dias: string[] = ["lun", "mar", "mie", "jue", "vie"]): FranjaHorarioLugar {
+  return {
+    key: claveFranja(),
+    dias,
+    cerrado: false,
+    ...grupoHorarioVacio(),
+  };
+}
+
+export function horarioLugarVacio(): HorarioLugarData {
+  return { v: 2, franjas: [franjaHorarioVacia()] };
 }
 
 export function normalizarHora(valor: string): string {
@@ -81,8 +112,17 @@ function textoTurnos(grupo: GrupoHorarioLugar) {
   return partes.join(", ");
 }
 
-function textoGrupo(titulo: string, grupo: GrupoHorarioLugar) {
-  const detalle = textoTurnos(grupo);
+function ordenarDias(dias: string[]) {
+  const orden = DIAS.map((dia) => dia.id);
+  return orden.filter((id) => dias.includes(id));
+}
+
+function textoFranja(franja: FranjaHorarioLugar) {
+  if (franja.dias.length === 0) return "";
+  const titulo = textoDias(ordenarDias(franja.dias));
+  if (!titulo) return "";
+  if (franja.cerrado) return `${titulo}: cerrado.`;
+  const detalle = textoTurnos(franja);
   if (!detalle) return "";
   return `${titulo}: ${detalle}.`;
 }
@@ -90,46 +130,116 @@ function textoGrupo(titulo: string, grupo: GrupoHorarioLugar) {
 export function lineasHorarioLugar(note: string): string[] {
   const datos = parsearScheduleNote(note);
   if (!datos) return note.trim() ? [note.trim()] : [];
-  const lineas: string[] = [];
-  const semana = textoGrupo("Lunes a viernes", datos.semana);
-  if (semana) lineas.push(semana);
-  const finde = textoGrupo("Sábado y domingo", datos.finde);
-  if (finde) lineas.push(finde);
-  return lineas;
+  return datos.franjas.map(textoFranja).filter(Boolean);
 }
 
 export function textoHorarioLugarPublico(note: string) {
-  const lineas = lineasHorarioLugar(note);
-  return lineas.join(" ");
+  return lineasHorarioLugar(note).join(" ");
+}
+
+export function diasEnConflicto(data: HorarioLugarData) {
+  const vistos = new Set<string>();
+  const repetidos = new Set<string>();
+  for (const franja of data.franjas) {
+    for (const dia of franja.dias) {
+      if (vistos.has(dia)) repetidos.add(dia);
+      else vistos.add(dia);
+    }
+  }
+  return ordenarDias([...repetidos]);
+}
+
+export function diasSinFranja(data: HorarioLugarData) {
+  const cubiertos = new Set(data.franjas.flatMap((franja) => franja.dias));
+  return DIAS.map((dia) => dia.id).filter((id) => !cubiertos.has(id));
+}
+
+export function etiquetasDias(ids: string[]) {
+  return ordenarDias(ids)
+    .map((id) => DIAS.find((dia) => dia.id === id)?.label ?? id)
+    .join(", ");
+}
+
+function grupoConDatos(grupo: GrupoHorarioLugar) {
+  if (grupo.guardia24) return true;
+  return [grupo.manana, grupo.tarde, grupo.noche].some((turno) => turno.activo);
+}
+
+function franjaConDatos(franja: FranjaHorarioLugar) {
+  if (franja.dias.length === 0) return false;
+  return franja.cerrado || grupoConDatos(franja);
+}
+
+export function horarioLugarConDatos(data: HorarioLugarData) {
+  return data.franjas.some(franjaConDatos);
+}
+
+export function validarHorarioLugar(data: HorarioLugarData): string | null {
+  const conflictos = diasEnConflicto(data);
+  if (conflictos.length) {
+    return `Cada día debe estar en una sola franja. Revisá: ${etiquetasDias(conflictos)}.`;
+  }
+  for (const franja of data.franjas) {
+    if (franja.dias.length === 0) continue;
+    if (!franja.cerrado && !grupoConDatos(franja)) {
+      return `En ${etiquetasDias(franja.dias)} marcá turnos, guardia 24 h o “cerrado”.`;
+    }
+  }
+  return null;
 }
 
 export function serializarHorarioLugar(data: HorarioLugarData) {
-  const saneado = sanitizarHorarioLugar(data);
-  return SCHEDULE_MAGIC + JSON.stringify(saneado);
+  return SCHEDULE_MAGIC + JSON.stringify(sanitizarHorarioLugar(data));
 }
 
-function sanitizarHorarioLugar(data: HorarioLugarData): HorarioLugarData {
-  const limpiarGrupo = (grupo: GrupoHorarioLugar): GrupoHorarioLugar => {
-    const limpiarTurno = (turno: TurnoHorarioLugar): TurnoHorarioLugar => {
-      if (!turno.activo) return { activo: false, desde: "", hasta: "" };
-      return {
-        activo: true,
-        desde: normalizarHora(turno.desde),
-        hasta: normalizarHora(turno.hasta),
-      };
-    };
+export function notaHorarioParaGuardar(data: HorarioLugarData, legacy: string | null) {
+  if (horarioLugarConDatos(data)) return serializarHorarioLugar(data);
+  return (legacy ?? "").trim();
+}
+
+function limpiarGrupo(grupo: GrupoHorarioLugar): GrupoHorarioLugar {
+  const limpiarTurno = (turno: TurnoHorarioLugar): TurnoHorarioLugar => {
+    if (!turno.activo) return { activo: false, desde: "", hasta: "" };
     return {
-      manana: limpiarTurno(grupo.manana),
-      tarde: limpiarTurno(grupo.tarde),
-      noche: limpiarTurno(grupo.noche),
-      guardia24: grupo.guardia24,
+      activo: true,
+      desde: normalizarHora(turno.desde),
+      hasta: normalizarHora(turno.hasta),
     };
   };
   return {
-    v: 1,
-    semana: limpiarGrupo(data.semana),
-    finde: limpiarGrupo(data.finde),
+    manana: limpiarTurno(grupo.manana),
+    tarde: limpiarTurno(grupo.tarde),
+    noche: limpiarTurno(grupo.noche),
+    guardia24: grupo.guardia24,
   };
+}
+
+function limpiarFranja(franja: FranjaHorarioLugar): FranjaHorarioLugar {
+  const grupo = limpiarGrupo(franja);
+  return {
+    ...grupo,
+    key: franja.key || claveFranja(),
+    dias: ordenarDias(franja.dias),
+    cerrado: franja.cerrado,
+  };
+}
+
+function sanitizarHorarioLugar(data: HorarioLugarData): HorarioLugarData {
+  return {
+    v: 2,
+    franjas: data.franjas.map(limpiarFranja).filter((franja) => franja.dias.length > 0 || franjaConDatos(franja)),
+  };
+}
+
+function migrarV1(crudo: HorarioLugarDataV1): HorarioLugarData {
+  const franjas: FranjaHorarioLugar[] = [];
+  if (grupoConDatos(crudo.semana)) {
+    franjas.push({ ...franjaHorarioVacia(["lun", "mar", "mie", "jue", "vie"]), ...limpiarGrupo(crudo.semana) });
+  }
+  if (grupoConDatos(crudo.finde)) {
+    franjas.push({ ...franjaHorarioVacia(["sab", "dom"]), ...limpiarGrupo(crudo.finde) });
+  }
+  return franjas.length ? { v: 2, franjas } : horarioLugarVacio();
 }
 
 function esTurno(valor: unknown): valor is TurnoHorarioLugar {
@@ -144,12 +254,28 @@ function esGrupo(valor: unknown): valor is GrupoHorarioLugar {
   return esTurno(grupo.manana) && esTurno(grupo.tarde) && esTurno(grupo.noche) && typeof grupo.guardia24 === "boolean";
 }
 
+function esFranja(valor: unknown): valor is FranjaHorarioLugar {
+  if (!valor || typeof valor !== "object") return false;
+  const franja = valor as FranjaHorarioLugar;
+  return (
+    typeof franja.key === "string" &&
+    Array.isArray(franja.dias) &&
+    typeof franja.cerrado === "boolean" &&
+    esGrupo(franja)
+  );
+}
+
 export function parsearScheduleNote(note: string): HorarioLugarData | null {
   if (!note.startsWith(SCHEDULE_MAGIC)) return null;
   try {
-    const crudo = JSON.parse(note.slice(SCHEDULE_MAGIC.length)) as HorarioLugarData;
-    if (crudo.v !== 1 || !esGrupo(crudo.semana) || !esGrupo(crudo.finde)) return null;
-    return sanitizarHorarioLugar(crudo);
+    const crudo = JSON.parse(note.slice(SCHEDULE_MAGIC.length)) as HorarioLugarData | HorarioLugarDataV1;
+    if (crudo.v === 1 && esGrupo(crudo.semana) && esGrupo(crudo.finde)) {
+      return sanitizarHorarioLugar(migrarV1(crudo));
+    }
+    if (crudo.v === 2 && Array.isArray((crudo as HorarioLugarData).franjas) && (crudo as HorarioLugarData).franjas.every(esFranja)) {
+      return sanitizarHorarioLugar(crudo as HorarioLugarData);
+    }
+    return null;
   } catch {
     return null;
   }
@@ -159,18 +285,4 @@ export function leerHorarioLugarDesdeNota(note: string): { data: HorarioLugarDat
   const datos = parsearScheduleNote(note);
   if (datos) return { data: datos, legacy: null };
   return { data: horarioLugarVacio(), legacy: note.trim() || null };
-}
-
-function grupoConDatos(grupo: GrupoHorarioLugar) {
-  if (grupo.guardia24) return true;
-  return [grupo.manana, grupo.tarde, grupo.noche].some((turno) => turno.activo);
-}
-
-export function horarioLugarConDatos(data: HorarioLugarData) {
-  return grupoConDatos(data.semana) || grupoConDatos(data.finde);
-}
-
-export function notaHorarioParaGuardar(data: HorarioLugarData, legacy: string | null) {
-  if (horarioLugarConDatos(data)) return serializarHorarioLugar(data);
-  return (legacy ?? "").trim();
 }

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { esAdmin, usuarioActual } from "@/lib/auth";
 import { LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
-import { notaHorarioParaGuardar } from "@/lib/placeSchedule";
+import { notaHorarioParaGuardar, validarHorarioLugar } from "@/lib/placeSchedule";
 import type { BorradorLugar } from "@/lib/draft";
 
 export type GuardadoLugar =
@@ -62,6 +62,9 @@ export async function guardarLugar(placeId: string, borrador: BorradorLugar): Pr
   if (!LOCALIDADES.includes(borrador.locality as (typeof LOCALIDADES)[number])) {
     return { ok: false, error: "Elegí una localidad del corredor." };
   }
+
+  const errorHorario = validarHorarioLugar(borrador.schedule);
+  if (errorHorario) return { ok: false, error: errorHorario };
 
   const lugar = await prisma.place.findUnique({ where: { id: placeId } });
   if (!lugar) return { ok: false, error: "Ese lugar ya no está." };
