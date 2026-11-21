@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CampoContrasena } from "@/components/CampoContrasena";
 import { useActionState, useEffect } from "react";
 import { crearCuenta, type Resultado } from "@/actions/auth";
 
@@ -28,10 +29,7 @@ export function FormularioCuenta() {
         WhatsApp
         <input name="whatsapp" type="tel" className="campo" autoComplete="tel" placeholder="Ej. 3754421234" required />
       </label>
-      <label className="grid gap-1">
-        Contraseña
-        <input name="password" type="password" className="campo" autoComplete="new-password" minLength={8} required />
-      </label>
+      <CampoContrasena autoComplete="new-password" label="Contraseña" minLength={8} />
       <label className="grid gap-1">
         Matrícula
         <input name="license" className="campo" minLength={3} required />

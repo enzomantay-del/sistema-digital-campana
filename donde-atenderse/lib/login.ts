@@ -37,7 +37,10 @@ export async function procesarEntrada(formData: FormData): Promise<ResultadoLogi
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
     await registrarFalloAuth(`login:${email}`, LIMITE_LOGIN);
     await registrarFalloAuth(`login-ip:${ip}`, { max: 30, windowMs: 15 * 60 * 1000 });
-    return { ok: false, error: "El correo o la contraseña no coinciden." };
+    return {
+      ok: false,
+      error: "El correo o la contraseña no coinciden. Revisá los datos o recuperá el acceso si la olvidaste.",
+    };
   }
   await limpiarFallosAuth(`login:${email}`);
 

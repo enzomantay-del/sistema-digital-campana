@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FormularioEntrarWeb } from "@/components/FormularioEntrarWeb";
 import { esAdmin, usuarioActual } from "@/lib/auth";
 
 export default async function Entrar({
@@ -26,20 +27,7 @@ export default async function Entrar({
       <p className="max-w-xl text-muted">
         Desde acá cargás tu ficha. El paciente no necesita una cuenta para buscar.
       </p>
-      <form method="POST" action="/api/login" className="grid max-w-xl gap-4">
-        <label className="grid gap-1">
-          Correo
-          <input name="email" type="email" className="campo" autoComplete="email" required />
-        </label>
-        <label className="grid gap-1">
-          Contraseña
-          <input name="password" type="password" className="campo" autoComplete="current-password" required />
-        </label>
-        {error ? <p className="text-warn">{error}</p> : null}
-        <button className="boton w-fit" type="submit">
-          Entrar
-        </button>
-      </form>
+      <FormularioEntrarWeb error={error} />
       <p className="flex flex-wrap gap-x-4 gap-y-2">
         <Link href="/crear-cuenta" className="font-semibold text-link">
           Crear una cuenta
