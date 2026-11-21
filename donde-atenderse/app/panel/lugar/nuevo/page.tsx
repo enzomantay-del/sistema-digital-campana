@@ -18,6 +18,8 @@ export default async function NuevoLugar({
       ? "Escribí el nombre del lugar."
       : error === "localidad"
         ? "Elegí una localidad del corredor."
+        : error === "servidor"
+          ? "No pudimos guardar el lugar en la base (suele pasar si el hosting no actualizó las tablas). Volvé a publicar la app en Cursor y probá otra vez; si sigue, avisanos."
         : error
           ? "Revisá los datos del lugar."
           : "";

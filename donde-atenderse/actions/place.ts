@@ -46,10 +46,15 @@ export async function crearLugar(formData: FormData) {
   if (!TIPOS_LUGAR.some((tipo) => tipo.id === kind)) redirect("/panel/lugar/nuevo?error=tipo");
   if (!LOCALIDADES.includes(locality as (typeof LOCALIDADES)[number])) redirect("/panel/lugar/nuevo?error=localidad");
 
-  const place = await prisma.place.create({
-    data: { name, kind, locality, address, published: true, obrasMode: obrasModoDefault(kind) },
-  });
-  redirect(`/panel/lugar/${place.id}`);
+  try {
+    const place = await prisma.place.create({
+      data: { name, kind, locality, address, published: true, obrasMode: obrasModoDefault(kind) },
+    });
+    redirect(`/panel/lugar/${place.id}`);
+  } catch (error) {
+    console.error("crearLugar:", error);
+    redirect("/panel/lugar/nuevo?error=servidor");
+  }
 }
 
 export async function guardarLugar(placeId: string, borrador: BorradorLugar): Promise<GuardadoLugar> {
