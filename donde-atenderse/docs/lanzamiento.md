@@ -35,7 +35,7 @@ No uses `npm run db:seed` en producción (carga el corredor de ejemplo).
 - [ ] Lugares reales creados y **publicados** desde Administración.
 - [ ] Profesionales registrados → revisión de matrícula/WhatsApp → **publicar ficha**.
 - [ ] Horarios v2 cargados por lugar y por profesional.
-- [ ] Fotos: hoy se guardan en el servidor; en hosting sin disco, planear storage externo (S3, etc.).
+- [ ] Fotos: configurar **S3/R2** en Secrets (`CERCALUD_S3_*`). Ver [almacenamiento-imagenes.md](./almacenamiento-imagenes.md).
 
 ## 3. Farmacia de turno
 

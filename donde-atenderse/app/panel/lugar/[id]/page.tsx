@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { asignarEditor, bajarLugar, eliminarLugar, publicarLugar, quitarEditor } from "@/actions/admin";
 import { AccionesAdmin } from "@/components/AccionesAdmin";
+import { AvisoFotosHosting } from "@/components/AvisoFotosHosting";
 import { EditorLugar } from "@/components/EditorLugar";
 import { esAdmin, usuarioActual } from "@/lib/auth";
 import { fechaInput } from "@/lib/format";
@@ -41,6 +42,7 @@ export default async function PaginaEditorLugar({
 
   return (
     <div className="grid gap-8">
+      <AvisoFotosHosting />
       {admin ? (
         <section className="panel-admin grid max-w-3xl gap-3 rounded-2xl border border-line bg-white p-4">
           <div className="flex flex-wrap items-center gap-3">

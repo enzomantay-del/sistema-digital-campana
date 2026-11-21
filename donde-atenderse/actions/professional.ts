@@ -1,7 +1,6 @@
 "use server";
 
-import { mkdir, readdir, unlink, writeFile } from "fs/promises";
-import path from "path";
+import { guardarImagenEntidad, quitarImagenesEntidad } from "@/lib/almacenamientoImagen";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { esAdmin, usuarioActual } from "@/lib/auth";
@@ -245,20 +244,6 @@ async function puedeEditarProfesional(
   return user.professional?.id === professionalId;
 }
 
-async function borrarArchivosFoto(professionalId: string) {
-  const dir = path.join(process.cwd(), "public", "uploads", "profesionales");
-  try {
-    const archivos = await readdir(dir);
-    for (const nombre of archivos) {
-      if (nombre.startsWith(`${professionalId}.`)) {
-        await unlink(path.join(dir, nombre));
-      }
-    }
-  } catch {
-    /* carpeta vacía */
-  }
-}
-
 export async function subirFotoProfesional(
   professionalId: string,
   formData: FormData,
@@ -281,12 +266,18 @@ export async function subirFotoProfesional(
   const extension = extensionFoto(archivo.type);
   if (!extension) return { ok: false, error: "Formato de imagen no admitido." };
 
-  const dir = path.join(process.cwd(), "public", "uploads", "profesionales");
-  await mkdir(dir, { recursive: true });
-  await borrarArchivosFoto(professionalId);
-  const nombre = `${professionalId}.${extension}`;
-  await writeFile(path.join(dir, nombre), Buffer.from(await archivo.arrayBuffer()));
-  const photoUrl = `/uploads/profesionales/${nombre}?v=${Date.now()}`;
+  let photoUrl: string;
+  try {
+    photoUrl = await guardarImagenEntidad(
+      "profesionales",
+      professionalId,
+      Buffer.from(await archivo.arrayBuffer()),
+      archivo.type,
+      extension,
+    );
+  } catch {
+    return { ok: false, error: "No se pudo guardar la imagen. Revisá el almacenamiento en la nube." };
+  }
   await prisma.professional.update({ where: { id: professionalId }, data: { photoUrl } });
   revalidatePath("/panel/profesional");
   revalidatePath(`/profesional/${professionalId}`);
@@ -301,7 +292,7 @@ export async function quitarFotoProfesional(
   if (!(await puedeEditarProfesional(user, professionalId))) {
     return { ok: false, error: "Esta ficha no está en tu cuenta." };
   }
-  await borrarArchivosFoto(professionalId);
+  await quitarImagenesEntidad("profesionales", professionalId);
   await prisma.professional.update({ where: { id: professionalId }, data: { photoUrl: "" } });
   revalidatePath("/panel/profesional");
   revalidatePath(`/profesional/${professionalId}`);

@@ -1,7 +1,6 @@
 "use server";
 
-import { mkdir, readdir, unlink, writeFile } from "fs/promises";
-import path from "path";
+import { guardarImagenEntidad, quitarImagenesEntidad } from "@/lib/almacenamientoImagen";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { esAdmin, usuarioActual } from "@/lib/auth";
@@ -159,20 +158,6 @@ function extensionLogo(tipo: string) {
   return null;
 }
 
-async function borrarArchivosLogo(placeId: string) {
-  const dir = path.join(process.cwd(), "public", "uploads", "logos");
-  try {
-    const archivos = await readdir(dir);
-    for (const nombre of archivos) {
-      if (nombre.startsWith(`${placeId}.`)) {
-        await unlink(path.join(dir, nombre));
-      }
-    }
-  } catch {
-    /* carpeta vacía */
-  }
-}
-
 export async function subirLogoLugar(
   placeId: string,
   formData: FormData,
@@ -195,12 +180,18 @@ export async function subirLogoLugar(
   const extension = extensionLogo(archivo.type);
   if (!extension) return { ok: false, error: "Formato de imagen no admitido." };
 
-  const dir = path.join(process.cwd(), "public", "uploads", "logos");
-  await mkdir(dir, { recursive: true });
-  await borrarArchivosLogo(placeId);
-  const nombre = `${placeId}.${extension}`;
-  await writeFile(path.join(dir, nombre), Buffer.from(await archivo.arrayBuffer()));
-  const logoUrl = `/uploads/logos/${nombre}?v=${Date.now()}`;
+  let logoUrl: string;
+  try {
+    logoUrl = await guardarImagenEntidad(
+      "logos",
+      placeId,
+      Buffer.from(await archivo.arrayBuffer()),
+      archivo.type,
+      extension,
+    );
+  } catch {
+    return { ok: false, error: "No se pudo guardar la imagen. Revisá el almacenamiento en la nube." };
+  }
   await prisma.place.update({ where: { id: placeId }, data: { logoUrl } });
   return { ok: true, logoUrl };
 }
@@ -211,7 +202,7 @@ export async function quitarLogoLugar(placeId: string): Promise<{ ok: true } | {
   if (!(await puedeEditarLugar(user, placeId))) {
     return { ok: false, error: "Esta ficha no está en tu cuenta." };
   }
-  await borrarArchivosLogo(placeId);
+  await quitarImagenesEntidad("logos", placeId);
   await prisma.place.update({ where: { id: placeId }, data: { logoUrl: "" } });
   return { ok: true };
 }

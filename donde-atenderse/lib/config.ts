@@ -37,6 +37,9 @@ export function correoReservadoParaAdmin(email: string) {
 
 /** En hosting con Postgres el disco de fotos puede no persistir entre despliegues. */
 export function avisoFotosHosting() {
+  if (process.env.CERCALUD_S3_BUCKET?.trim() && process.env.CERCALUD_S3_ACCESS_KEY_ID?.trim()) {
+    return false;
+  }
   return process.env.NODE_ENV === "production" && (process.env.DATABASE_URL?.startsWith("postgres") ?? false);
 }
 

@@ -4,8 +4,8 @@ export function AvisoFotosHosting() {
   if (!avisoFotosHosting()) return null;
   return (
     <p className="rounded-xl border border-line bg-paper px-4 py-3 text-sm text-muted">
-      Las fotos se guardan en el servidor del hosting. Si republicamos la app, pueden perderse hasta que activemos
-      almacenamiento permanente. Guardá una copia en tu equipo.
+      Las fotos están en el disco del hosting y pueden perderse al republicar. Configurá almacenamiento S3/R2 en los
+      Secrets de la app (ver documentación en el repo) o guardá una copia en tu equipo.
     </p>
   );
 }
