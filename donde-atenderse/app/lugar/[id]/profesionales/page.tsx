@@ -62,10 +62,10 @@ export default async function ProfesionalesDelLugar({
         {lista.length === 0 ? (
           <p>Todavía no hay profesionales publicados con esos datos.</p>
         ) : (
-          <ul className="grid gap-2">
+          <ul className="lista-profesionales-lugar">
             {lista.map((persona) => (
               <li key={persona.id}>
-                <FichaProfesionalEnLugar persona={persona} />
+                <FichaProfesionalEnLugar persona={persona} enLista />
               </li>
             ))}
           </ul>

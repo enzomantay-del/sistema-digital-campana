@@ -40,10 +40,10 @@ export default async function EspecialidadesDelLugar({ params }: { params: Promi
                     {profesionales.length === 1 ? "Ver 1 profesional" : `Ver los ${profesionales.length} profesionales`}
                   </Link>
                 </div>
-                <ul className="grid gap-2">
+                <ul className="lista-profesionales-lugar">
                   {profesionales.map((persona) => (
                     <li key={persona.id}>
-                      <FichaProfesionalEnLugar persona={persona} />
+                      <FichaProfesionalEnLugar persona={persona} enLista />
                     </li>
                   ))}
                 </ul>

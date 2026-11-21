@@ -16,12 +16,19 @@ function iniciales(nombre: string) {
 }
 
 /** Fila densa para listados (muchos profesionales en un mismo lugar). */
-export function FichaProfesionalEnLugar({ persona }: { persona: ProfesionalEnLugar }) {
+export function FichaProfesionalEnLugar({
+  persona,
+  enLista = false,
+}: {
+  persona: ProfesionalEnLugar;
+  /** Dentro de `lista-profesionales-lugar`: sin borde propio, separador horizontal del contenedor. */
+  enLista?: boolean;
+}) {
   const horarioLineas =
     persona.horarioLineas.length > 0 ? persona.horarioLineas : ["Sin horario cargado en este lugar."];
 
   return (
-    <article className="fila-profesional flex gap-3">
+    <article className={enLista ? "fila-profesional-lista" : "fila-profesional flex gap-3"}>
       {persona.photoUrl ? (
         <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-line bg-white">
           <Image src={persona.photoUrl} alt="" fill className="object-cover" sizes="48px" unoptimized />
@@ -50,19 +57,24 @@ export function FichaProfesionalEnLugar({ persona }: { persona: ProfesionalEnLug
         <div className="mt-1">
           <ListaHorarioTexto lineas={horarioLineas} compacto />
         </div>
-        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs font-semibold">
+        <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs font-semibold">
           <Link href={`/profesional/${persona.id}`} className="text-link hover:underline">
             Ver ficha
           </Link>
           {persona.whatsapp ? (
-            <a
-              className="text-link hover:underline"
-              href={enlaceWhatsApp(persona.whatsapp, MENSAJE_WHATSAPP)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              WhatsApp
-            </a>
+            <>
+              <span className="select-none text-muted" aria-hidden>
+                ·
+              </span>
+              <a
+                className="text-link hover:underline"
+                href={enlaceWhatsApp(persona.whatsapp, MENSAJE_WHATSAPP)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                WhatsApp
+              </a>
+            </>
           ) : null}
         </div>
       </div>
