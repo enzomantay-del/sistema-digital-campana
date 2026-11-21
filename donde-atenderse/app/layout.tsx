@@ -21,8 +21,15 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const ejemplo =
-    mostrarDatosEjemplo() && (await prisma.professional.count({ where: { example: true, published: true } })) > 0;
+  let ejemplo = false;
+  if (mostrarDatosEjemplo()) {
+    try {
+      ejemplo =
+        (await prisma.professional.count({ where: { example: true, published: true } })) > 0;
+    } catch {
+      ejemplo = false;
+    }
+  }
   return (
     <html lang="es">
       <body className={`${nunito.variable} font-sans antialiased`}>

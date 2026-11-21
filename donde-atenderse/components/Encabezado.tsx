@@ -13,7 +13,12 @@ const ENLACES = [
 ] as const;
 
 export async function Encabezado({ ejemplo }: { ejemplo: boolean }) {
-  const usuario = await usuarioActual();
+  let usuario = null;
+  try {
+    usuario = await usuarioActual();
+  } catch {
+    usuario = null;
+  }
   const admin = esAdmin(usuario);
   const demo = mostrarDatosEjemplo();
   return (

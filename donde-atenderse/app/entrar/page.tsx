@@ -1,8 +1,12 @@
 import Link from "next/link";
-import { FormularioEntrar } from "@/components/FormularioEntrar";
 import { esAdmin, usuarioActual } from "@/lib/auth";
 
-export default async function Entrar() {
+export default async function Entrar({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
   const usuario = await usuarioActual();
   if (usuario) {
     const destino = esAdmin(usuario) ? "/panel/admin" : "/panel";
@@ -22,7 +26,20 @@ export default async function Entrar() {
       <p className="max-w-xl text-muted">
         Desde acá cargás tu ficha. El paciente no necesita una cuenta para buscar.
       </p>
-      <FormularioEntrar />
+      <form method="POST" action="/api/login" className="grid max-w-xl gap-4">
+        <label className="grid gap-1">
+          Correo
+          <input name="email" type="email" className="campo" autoComplete="email" required />
+        </label>
+        <label className="grid gap-1">
+          Contraseña
+          <input name="password" type="password" className="campo" autoComplete="current-password" required />
+        </label>
+        {error ? <p className="text-warn">{error}</p> : null}
+        <button className="boton w-fit" type="submit">
+          Entrar
+        </button>
+      </form>
       <p className="flex flex-wrap gap-x-4 gap-y-2">
         <Link href="/crear-cuenta" className="font-semibold text-link">
           Crear una cuenta

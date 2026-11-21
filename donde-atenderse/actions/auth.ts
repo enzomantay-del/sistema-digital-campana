@@ -3,15 +3,14 @@
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { cerrarSesion, crearSesion, cuentasDisponibles, esAdmin } from "@/lib/auth";
+import { cerrarSesion, crearSesion, cuentasDisponibles } from "@/lib/auth";
 import { ipCliente } from "@/lib/cliente";
-import { bootstrapAdminDesdeSecrets } from "@/lib/adminBootstrap";
 import { correoReservadoParaAdmin } from "@/lib/config";
-import { bloqueoAuthActivo, limpiarFallosAuth, registrarFalloAuth } from "@/lib/rateLimit";
+import { procesarEntrada } from "@/lib/login";
+import { bloqueoAuthActivo, registrarFalloAuth } from "@/lib/rateLimit";
 
 export type Resultado = { ok: true; irA?: string } | { ok: false; error: string };
 
-const LIMITE_LOGIN = { max: 8, windowMs: 15 * 60 * 1000 };
 const LIMITE_REGISTRO_IP = { max: 5, windowMs: 60 * 60 * 1000 };
 
 function correo(valor: FormDataEntryValue | null) {
@@ -24,44 +23,11 @@ function soloDigitos(valor: string) {
 
 export async function entrar(_estado: Resultado | null, formData: FormData): Promise<Resultado> {
   try {
-    return await entrarInterno(formData);
+    return await procesarEntrada(formData);
   } catch (error) {
     console.error("entrar:", error);
     return { ok: false, error: "No pudimos completar el ingreso. Si acaba de publicarse el sitio, esperá un minuto y volvé a probar." };
   }
-}
-
-async function entrarInterno(formData: FormData): Promise<Resultado> {
-  if (!cuentasDisponibles()) {
-    return { ok: false, error: "En este momento no se pueden usar las cuentas." };
-  }
-  const email = correo(formData.get("email"));
-  const password = String(formData.get("password") ?? "");
-
-  await bootstrapAdminDesdeSecrets();
-
-  const bloqueoCorreo = await bloqueoAuthActivo(`login:${email}`, LIMITE_LOGIN);
-  const ip = await ipCliente();
-  const bloqueoIp = await bloqueoAuthActivo(`login-ip:${ip}`, { max: 30, windowMs: 15 * 60 * 1000 });
-  const minutos = bloqueoCorreo ?? bloqueoIp;
-  if (minutos) {
-    return {
-      ok: false,
-      error: `Demasiados intentos. Probá de nuevo en ${minutos} minuto${minutos === 1 ? "" : "s"}.`,
-    };
-  }
-
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-    await registrarFalloAuth(`login:${email}`, LIMITE_LOGIN);
-    await registrarFalloAuth(`login-ip:${ip}`, { max: 30, windowMs: 15 * 60 * 1000 });
-    return { ok: false, error: "El correo o la contraseña no coinciden." };
-  }
-  await limpiarFallosAuth(`login:${email}`);
-
-  const sesion = await crearSesion(user.id);
-  if (!sesion) return { ok: false, error: "En este momento no se pueden usar las cuentas." };
-  return { ok: true, irA: esAdmin(user) ? "/panel/admin" : "/panel" };
 }
 
 export async function crearCuenta(_estado: Resultado | null, formData: FormData): Promise<Resultado> {
