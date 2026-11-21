@@ -26,10 +26,11 @@ type Props = SVGProps<SVGSVGElement> & {
   size?: number;
 };
 
-const T = 1.65;
+/** Trazo un poco más marcado para que se lean bien en pantalla. */
+const T = 2;
 
 function SvgBase({
-  size = 22,
+  size = 24,
   children,
   className,
   ...rest
@@ -98,7 +99,7 @@ const ICONOS: Record<NombreIconoCercalud, (props: { size?: number; className?: s
       <Trazo d="M6 5.5h6.25l5.75 3.25v10H6z" />
       <Trazo d="M12.25 5.5v3.25" />
       <Trazo d="M8.5 12h7M8.5 15h4.5" className="opacity-75" />
-      <circle cx="15.25" cy="8.35" r="1" fill="currentColor" className="text-menta" />
+      <circle cx="15.25" cy="8.35" r="1.15" fill="currentColor" className="text-menta" />
     </SvgBase>
   ),
   buscar: (p) => (
@@ -200,7 +201,7 @@ const ICONOS: Record<NombreIconoCercalud, (props: { size?: number; className?: s
   ),
 };
 
-export function IconoCercalud({ nombre, size = 22, className }: Props) {
+export function IconoCercalud({ nombre, size = 24, className }: Props) {
   const Dibujo = ICONOS[nombre];
   return <Dibujo size={size} className={className} />;
 }

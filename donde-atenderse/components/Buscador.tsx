@@ -149,7 +149,7 @@ export function Buscador({
         <div ref={caja} className="campo-buscar-con-icono relative min-w-0 flex-1">
           <IconoCercalud
             nombre="buscar"
-            size={20}
+            size={22}
             className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-link"
           />
           <label className="sr-only" htmlFor="q">
@@ -255,7 +255,7 @@ export function Buscador({
           ) : null}
         </div>
         <button className="boton shrink-0 gap-2" type="submit">
-          <IconoCercalud nombre="buscar" size={18} className="text-white/95" />
+          <IconoCercalud nombre="buscar" size={20} className="text-white/95" />
           Buscar
         </button>
       </div>

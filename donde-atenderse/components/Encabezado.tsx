@@ -21,7 +21,7 @@ export async function Encabezado({ ejemplo }: { ejemplo: boolean }) {
         <nav className="ml-4 hidden items-center gap-5 text-[15px] font-medium lg:flex">
           {ENLACES.map((enlace) => (
             <Link key={enlace.href} href={enlace.href} className="enlace-icono text-ink hover:text-link">
-              <IconoCercalud nombre={ICONO_NAV[enlace.href]} size={18} className="text-menta" />
+              <IconoCercalud nombre={ICONO_NAV[enlace.href]} size={22} className="shrink-0 text-menta" />
               {enlace.label}
             </Link>
           ))}
@@ -33,7 +33,7 @@ export async function Encabezado({ ejemplo }: { ejemplo: boolean }) {
               className="inline-flex items-center gap-2 rounded-full border border-line bg-paper px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] hover:border-menta"
               title="Ver la ficha de profesional de ejemplo (foto, horarios y contacto)."
             >
-              <IconoCercalud nombre="ficha" size={14} className="text-menta" />
+              <IconoCercalud nombre="ficha" size={16} className="shrink-0 text-menta" />
               Ver ficha de ejemplo
             </Link>
           ) : null}
@@ -48,7 +48,7 @@ export async function Encabezado({ ejemplo }: { ejemplo: boolean }) {
       <nav className="mx-auto flex max-w-page gap-4 overflow-x-auto px-4 pb-3 text-sm font-medium lg:hidden">
         {ENLACES.map((enlace) => (
           <Link key={enlace.href} href={enlace.href} className="enlace-icono shrink-0 text-ink">
-            <IconoCercalud nombre={ICONO_NAV[enlace.href]} size={16} className="text-menta" />
+            <IconoCercalud nombre={ICONO_NAV[enlace.href]} size={20} className="shrink-0 text-menta" />
             {enlace.label}
           </Link>
         ))}

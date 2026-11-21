@@ -55,12 +55,12 @@ export default async function Inicio() {
           <div className="flex flex-wrap justify-center gap-2">
             {AREAS.map((area) => (
               <Link key={area.id} href={`/buscar?area=${area.id}`} className="pastilla enlace-icono gap-2">
-                <IconoCercalud nombre={iconoArea(area.id)} size={18} className="text-menta" />
+                <IconoCercalud nombre={iconoArea(area.id)} size={20} className="shrink-0 text-menta" />
                 {area.label}
               </Link>
             ))}
             <Link href="/farmacia" className="pastilla enlace-icono gap-2">
-              <IconoCercalud nombre="farmacia" size={18} className="text-menta" />
+              <IconoCercalud nombre="farmacia" size={20} className="shrink-0 text-menta" />
               Farmacia de turno
             </Link>
           </div>
@@ -74,7 +74,7 @@ export default async function Inicio() {
             {BENEFICIOS.map((item) => (
               <article key={item.titulo} className="flex gap-3 border-t border-line pt-4">
                 <div className="icono-beneficio">
-                  <IconoCercalud nombre={item.icono} size={24} />
+                  <IconoCercalud nombre={item.icono} size={30} className="shrink-0" />
                 </div>
                 <div className="grid min-w-0 gap-1">
                   <h3 className="text-xl font-bold">{item.titulo}</h3>
@@ -92,7 +92,7 @@ export default async function Inicio() {
           {PREGUNTAS.map(([pregunta, respuesta]) => (
             <details key={pregunta} className="border-t border-line py-3">
               <summary className="flex cursor-pointer list-none items-start gap-2 text-lg font-semibold [&::-webkit-details-marker]:hidden">
-                <IconoCercalud nombre="guia" size={20} className="mt-0.5 shrink-0 text-menta" />
+                <IconoCercalud nombre="guia" size={22} className="mt-0.5 shrink-0 text-menta" />
                 <span>{pregunta}</span>
               </summary>
               <p className="pt-2 pl-7 text-muted">{respuesta}</p>
