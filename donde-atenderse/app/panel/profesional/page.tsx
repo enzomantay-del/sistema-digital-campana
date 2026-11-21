@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { AvisoFotosHosting } from "@/components/AvisoFotosHosting";
 import { EditorProfesional } from "@/components/EditorProfesional";
 import { usuarioActual } from "@/lib/auth";
 import { horarioProfesional } from "@/lib/map";
@@ -36,7 +37,9 @@ export default async function PaginaEditorProfesional() {
   const propios = new Set(usuario.places.map((item) => item.placeId));
 
   return (
-    <EditorProfesional
+    <div className="grid gap-4">
+      <AvisoFotosHosting />
+      <EditorProfesional
       professionalId={completo.id}
       obras={obras}
       lugares={lugares}
@@ -56,6 +59,7 @@ export default async function PaginaEditorProfesional() {
         otraObra: "",
         horarios: completo.attendances.map((item) => horarioProfesional(item, propios.has(item.placeId))),
       }}
-    />
+      />
+    </div>
   );
 }

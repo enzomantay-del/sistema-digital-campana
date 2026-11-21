@@ -10,6 +10,9 @@ export type UsuarioSesion = NonNullable<Awaited<ReturnType<typeof usuarioActual>
 function claveSesion() {
   const valor = process.env.AUTH_SECRET?.trim() ?? "";
   if (valor.length < 32) return null;
+  if (process.env.NODE_ENV === "production" && valor === "cambia-esta-frase-por-una-larga-y-minima-de-32-caracteres") {
+    return null;
+  }
   return new TextEncoder().encode(valor);
 }
 

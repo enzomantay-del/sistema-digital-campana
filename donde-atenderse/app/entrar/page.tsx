@@ -12,9 +12,12 @@ export default async function Entrar() {
         Desde acá cargás tu ficha. El paciente no necesita una cuenta para buscar.
       </p>
       <FormularioEntrar />
-      <p>
+      <p className="flex flex-wrap gap-x-4 gap-y-2">
         <Link href="/crear-cuenta" className="font-semibold text-link">
           Crear una cuenta
+        </Link>
+        <Link href="/entrar/recuperar" className="font-semibold text-link">
+          Olvidé mi contraseña
         </Link>
       </p>
     </div>

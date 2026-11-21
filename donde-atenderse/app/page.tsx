@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Buscador } from "@/components/Buscador";
 import { IconoCercalud, iconoArea, type NombreIconoCercalud } from "@/components/iconos/IconoCercalud";
+import { mostrarDatosEjemplo } from "@/lib/config";
 import { AREAS } from "@/lib/constants";
 import { catalogoObras } from "@/lib/search";
 
@@ -32,13 +33,26 @@ const PREGUNTAS = [
   ["¿Por qué pide mi ubicación?", "Para mostrar primero lo que tenés más cerca. Si no la activás, elegís el pueblo. No se guarda."],
   [
     "¿Los datos que veo son reales?",
-    "Si aparece “Datos de ejemplo”, son para probar la web. Podés ver la ficha modelo en la ruta /ejemplo/profesional (también desde el cartel del encabezado).",
+    "Solo publicamos fichas revisadas. Cada profesional verifica su información; el sello azul indica una actualización en los últimos 30 días.",
   ],
   ["¿Dónde miro la farmacia de turno?", "En su página, con la fecha que cargaron. Si esa fecha ya pasó, no es el turno de hoy."],
 ];
 
+function faqVisibles(demo: boolean) {
+  return PREGUNTAS.map(([pregunta, respuesta]) => {
+    if (demo && pregunta === "¿Los datos que veo son reales?") {
+      return [
+        pregunta,
+        'Si aparece "Datos de ejemplo", son para probar la web. Podés ver la ficha modelo en /ejemplo/profesional.',
+      ] as const;
+    }
+    return [pregunta, respuesta] as const;
+  });
+}
+
 export default async function Inicio() {
   const obras = await catalogoObras();
+  const demo = mostrarDatosEjemplo();
   return (
     <div className="inicio-bandas relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 -my-8">
       <section className="bg-white">
@@ -89,7 +103,7 @@ export default async function Inicio() {
       <section className="bg-[#eef1f4]">
         <div className="mx-auto grid max-w-3xl gap-2 px-4 py-14 sm:py-16">
           <h2 className="text-3xl font-bold tracking-tight">Preguntas frecuentes</h2>
-          {PREGUNTAS.map(([pregunta, respuesta]) => (
+          {faqVisibles(demo).map(([pregunta, respuesta]) => (
             <details key={pregunta} className="border-t border-line py-3">
               <summary className="flex cursor-pointer list-none items-start gap-2 text-lg font-semibold [&::-webkit-details-marker]:hidden">
                 <IconoCercalud nombre="guia" size={22} className="mt-0.5 shrink-0 text-menta" />

@@ -58,7 +58,7 @@ No uses `npm run db:seed` en producción (carga el corredor de ejemplo).
 
 - [ ] Analítica (opcional).
 - [ ] Correo cuando una ficha queda pendiente de revisión (hoy no está implementado).
-- [ ] Recuperación de contraseña (hoy no está implementado).
+- [x] Recuperación de contraseña: página `/entrar/recuperar` (contacto manual; sin correo automático todavía).
 
 ## Desarrollo local con ejemplos
 

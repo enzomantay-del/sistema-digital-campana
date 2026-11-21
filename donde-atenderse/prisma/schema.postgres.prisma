@@ -136,3 +136,9 @@ model PharmacyDuty {
   updatedAt DateTime @updatedAt
   place     Place    @relation(fields: [placeId], references: [id], onDelete: Cascade)
 }
+
+model AuthRateLimit {
+  key       String   @id
+  attempts  Int      @default(0)
+  resetAt   DateTime
+}
