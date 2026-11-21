@@ -4,6 +4,7 @@ import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { TarjetaListadoLugar } from "@/components/TarjetaListadoLugar";
 import { TarjetaListadoProfesional } from "@/components/TarjetaListadoProfesional";
 import { filaHorario } from "@/lib/map";
+import { asistenciasEnLugaresPublicados } from "@/lib/publico";
 import { catalogoObras, buscar } from "@/lib/search";
 import { armarVistaProfesional } from "@/lib/view";
 
@@ -60,7 +61,7 @@ export default async function PaginaBuscar({
             phone: persona.phone,
             obras: persona.obras.map((item) => item.obra.name),
             updatedAt: persona.updatedAt,
-            filas: persona.attendances.map(filaHorario),
+            filas: asistenciasEnLugaresPublicados(persona.attendances).map(filaHorario),
           });
           return <TarjetaListadoProfesional key={persona.id} id={persona.id} vista={vista} ejemplo={persona.example} />;
         })}

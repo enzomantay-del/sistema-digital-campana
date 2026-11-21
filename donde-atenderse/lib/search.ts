@@ -3,7 +3,7 @@ import { lugarAtiendeObra, obrasModoEfectivo } from "./placeObras";
 import { incluye } from "./format";
 import { distanciaALocalidad } from "./geo";
 import { prisma } from "./prisma";
-import { filtroLugarPublico, filtroProfesionalPublico } from "./publico";
+import { asistenciasEnLugaresPublicados, filtroLugarPublico, filtroProfesionalPublico } from "./publico";
 
 const profesionalConRelaciones = {
   obras: { include: { obra: true } },
@@ -59,7 +59,7 @@ export async function buscar(filtros: {
 
   const personas = professionals.filter((persona) => {
     const obras = persona.obras.map((item) => item.obra.name);
-    const lugares = persona.attendances.map((item) => item.place);
+    const lugares = asistenciasEnLugaresPublicados(persona.attendances).map((item) => item.place);
     const texto = [persona.fullName, persona.specialty, ...lugares.map((lugar) => lugar.name)].join(" ");
     if (q && !incluye(texto, q)) return false;
     if (area && persona.area !== area) return false;
@@ -115,7 +115,7 @@ export async function buscar(filtros: {
 
   return {
     personas: porCercania(personasVisibles, (persona) => {
-      const distancias = persona.attendances.map((item) => km(item.place.locality));
+      const distancias = asistenciasEnLugaresPublicados(persona.attendances).map((item) => km(item.place.locality));
       return distancias.length > 0 ? Math.min(...distancias) : Number.POSITIVE_INFINITY;
     }),
     centros: porCercania(centros, (lugar) => km(lugar.locality)),
