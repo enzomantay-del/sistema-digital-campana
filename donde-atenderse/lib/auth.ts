@@ -57,14 +57,15 @@ export async function usuarioActual() {
   try {
     const { payload } = await jwtVerify(token, clave);
     if (!payload.sub) return null;
-    return prisma.user.findUnique({
+    return await prisma.user.findUnique({
       where: { id: payload.sub },
       include: {
         professional: true,
         places: { include: { place: true }, orderBy: { place: { name: "asc" } } },
       },
     });
-  } catch {
+  } catch (error) {
+    console.error("usuarioActual:", error);
     return null;
   }
 }

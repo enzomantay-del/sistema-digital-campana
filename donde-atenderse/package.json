@@ -13,7 +13,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:produccion": "tsx prisma/seed-produccion.ts",
     "test:schedule": "tsx lib/schedule.test.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "node scripts/prisma-generate.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1175.0",

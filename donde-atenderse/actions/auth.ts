@@ -22,6 +22,15 @@ function soloDigitos(valor: string) {
 }
 
 export async function entrar(_estado: Resultado | null, formData: FormData): Promise<Resultado> {
+  try {
+    return await entrarInterno(formData);
+  } catch (error) {
+    console.error("entrar:", error);
+    return { ok: false, error: "No pudimos completar el ingreso. Si acaba de publicarse el sitio, esperá un minuto y volvé a probar." };
+  }
+}
+
+async function entrarInterno(formData: FormData): Promise<Resultado> {
   if (!cuentasDisponibles()) {
     return { ok: false, error: "En este momento no se pueden usar las cuentas." };
   }
