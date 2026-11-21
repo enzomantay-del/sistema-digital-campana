@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { cerrarSesion, crearSesion, cuentasDisponibles, esAdmin } from "@/lib/auth";
 import { ipCliente } from "@/lib/cliente";
+import { bootstrapAdminDesdeSecrets } from "@/lib/adminBootstrap";
 import { correoReservadoParaAdmin } from "@/lib/config";
 import { bloqueoAuthActivo, limpiarFallosAuth, registrarFalloAuth } from "@/lib/rateLimit";
 
@@ -36,6 +37,8 @@ async function entrarInterno(formData: FormData): Promise<Resultado> {
   }
   const email = correo(formData.get("email"));
   const password = String(formData.get("password") ?? "");
+
+  await bootstrapAdminDesdeSecrets();
 
   const bloqueoCorreo = await bloqueoAuthActivo(`login:${email}`, LIMITE_LOGIN);
   const ip = await ipCliente();

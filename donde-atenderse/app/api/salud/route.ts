@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server";
+import { bootstrapAdminDesdeSecrets } from "@/lib/adminBootstrap";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
     await prisma.$queryRaw`SELECT 1`;
-    const usuarios = await prisma.user.count();
+    await bootstrapAdminDesdeSecrets();
     const admins = await prisma.user.count({ where: { role: "admin" } });
-    return NextResponse.json({ ok: true, usuarios, admins });
-  } catch (error) {
-    const mensaje = error instanceof Error ? error.message : String(error);
-    return NextResponse.json({ ok: false, error: mensaje }, { status: 500 });
+    return NextResponse.json({
+      ok: true,
+      base: "conectada",
+      adminListo: admins > 0,
+    });
+  } catch {
+    return NextResponse.json({ ok: false, base: "error" }, { status: 500 });
   }
 }
