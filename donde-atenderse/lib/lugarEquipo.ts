@@ -1,6 +1,5 @@
-import { detalleHorario } from "./format";
 import { prisma } from "./prisma";
-import { lineasHorarioLugar } from "./placeSchedule";
+import { lineasHorarioAtencion } from "./horarioTexto";
 import { datosActualizadosRecientes, fechaMasReciente } from "./verificacion";
 
 export type ProfesionalEnLugar = {
@@ -21,12 +20,12 @@ function horarioEnLugar(fila: {
   professionalTime: string;
   professionalShift: string;
 }) {
-  const lineas = lineasHorarioLugar(fila.professionalScheduleNote);
-  if (lineas.length) return lineas;
-  const legacy = detalleHorario(fila.professionalDays, fila.professionalTime);
-  if (legacy) return [legacy];
-  if (fila.professionalShift === "guardia") return ["Guardia las 24 h"];
-  return [];
+  return lineasHorarioAtencion({
+    scheduleNote: fila.professionalScheduleNote,
+    days: fila.professionalDays,
+    time: fila.professionalTime,
+    shift: fila.professionalShift,
+  });
 }
 
 export function filaAProfesionalEnLugar(

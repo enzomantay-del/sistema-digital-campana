@@ -1,4 +1,5 @@
-import { etiquetaArea, etiquetaTurno, detalleHorario, fecha, textoPrecio } from "./format";
+import { etiquetaArea, etiquetaTurno, fecha, textoPrecio } from "./format";
+import { lineasHorarioLegacy, textoHorarioUnido } from "./horarioTexto";
 import { datosActualizadosRecientes, fechaMasReciente } from "./verificacion";
 import { ObrasModoLugar, obrasModoEfectivo, presentacionObrasLugar } from "./placeObras";
 import { lineasHorarioLugar, textoHorarioLugarPublico } from "./placeSchedule";
@@ -62,7 +63,9 @@ function frase(fechaValor: Date | null, quien: string) {
 function conflictoTexto(linea: LineaHorario) {
   if (!linea.conflict) return "";
   const cuando = linea.conflict.updatedAt ? ` el ${fecha(linea.conflict.updatedAt)}` : "";
-  const detalle = detalleHorario(linea.conflict.days, linea.conflict.time);
+  const detalle = textoHorarioUnido(
+    lineasHorarioLegacy(linea.conflict.days, linea.conflict.time, linea.conflict.shift),
+  );
   const turno = etiquetaTurno(linea.conflict.shift);
   const dato = [turno, detalle].filter(Boolean).join(", ");
   return `${linea.placeName} cargó otra cosa${cuando}${dato ? `: ${dato}` : ""}.`;
@@ -70,12 +73,14 @@ function conflictoTexto(linea: LineaHorario) {
 
 function decorar(linea: LineaHorario, nombreProfesional: string, rotulo: string, personaId?: string): VistaLinea {
   const quien = linea.source === "lugar" ? linea.placeName : nombreProfesional;
-  const detalle =
+  const lineas =
     linea.horarioLineas.length > 0
-      ? linea.horarioLineas.join(" · ")
-      : detalleHorario(linea.days, linea.time);
+      ? linea.horarioLineas
+      : lineasHorarioLegacy(linea.days, linea.time, linea.shift);
+  const detalle = textoHorarioUnido(lineas);
   return {
     ...linea,
+    horarioLineas: lineas,
     detalle,
     actualizacion: frase(linea.updatedAt, quien),
     conflictoTexto: conflictoTexto(linea),

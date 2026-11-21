@@ -52,8 +52,22 @@ export function etiquetaTurno(id: string) {
   return TURNOS.find((turno) => turno.id === id)?.label ?? "";
 }
 
-export function detalleHorario(days: string, time: string) {
-  return [textoDias(diasDesdeTexto(days)), time.trim()].filter(Boolean).join(" · ");
+/** @deprecated Preferí `lineasHorarioLegacy` / `detalleHorarioPublico` en `lib/horarioTexto`. */
+export function detalleHorario(days: string, time: string, shift = "") {
+  const titulo = textoDias(diasDesdeTexto(days));
+  const turno = etiquetaTurno(shift).toLowerCase();
+  const t = time.trim();
+  if (shift === "guardia" || /24\s*h/i.test(t)) {
+    return titulo ? `${titulo}: guardia las 24 h.` : "guardia las 24 h.";
+  }
+  if (!titulo && !t && !turno) return "";
+  const rango = t;
+  let detalle = "";
+  if (turno && rango) detalle = `${turno} ${rango}`;
+  else if (turno) detalle = turno;
+  else detalle = rango;
+  if (!titulo) return detalle ? `${detalle}.` : "";
+  return detalle ? `${titulo}: ${detalle}.` : titulo;
 }
 
 export function textoPrecio(price: string) {

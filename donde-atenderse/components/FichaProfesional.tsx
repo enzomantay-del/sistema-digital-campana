@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
+import { ListaHorarioTexto } from "@/components/ListaHorarioTexto";
 import { MENSAJE_WHATSAPP } from "@/lib/constants";
 import { enlaceTelefono, enlaceWhatsApp } from "@/lib/format";
 import type { VistaProfesional } from "@/lib/view";
@@ -65,14 +66,12 @@ export function FichaProfesional({
                     <p className="text-xl font-semibold">{linea.rotulo}</p>
                   )}
                   <p className="text-muted">{linea.locality}</p>
-                  {linea.horarioLineas.length > 0 ? (
-                    <div className="mt-1 grid gap-0.5">
-                      {linea.horarioLineas.map((texto) => (
-                        <p key={texto}>{texto}</p>
-                      ))}
+                  {linea.horarioLineas.length > 0 || linea.detalle ? (
+                    <div className="mt-1">
+                      <ListaHorarioTexto
+                        lineas={linea.horarioLineas.length > 0 ? linea.horarioLineas : [linea.detalle]}
+                      />
                     </div>
-                  ) : linea.detalle ? (
-                    <p className="mt-1">{linea.detalle}</p>
                   ) : null}
                   <p className="mt-2 text-xs text-muted">{linea.actualizacion}</p>
                   {linea.conflictoTexto ? <p className="mt-1 text-base text-warn">{linea.conflictoTexto}</p> : null}

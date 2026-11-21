@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
+import { ListaHorarioTexto } from "@/components/ListaHorarioTexto";
 import { MENSAJE_WHATSAPP } from "@/lib/constants";
 import { enlaceWhatsApp, etiquetaArea } from "@/lib/format";
 import type { ProfesionalEnLugar } from "@/lib/lugarEquipo";
@@ -16,10 +17,8 @@ function iniciales(nombre: string) {
 
 /** Fila densa para listados (muchos profesionales en un mismo lugar). */
 export function FichaProfesionalEnLugar({ persona }: { persona: ProfesionalEnLugar }) {
-  const horario =
-    persona.horarioLineas.length > 0
-      ? persona.horarioLineas.join(" · ")
-      : "Sin horario cargado en este lugar";
+  const horarioLineas =
+    persona.horarioLineas.length > 0 ? persona.horarioLineas : ["Sin horario cargado en este lugar."];
 
   return (
     <article className="fila-profesional flex gap-3">
@@ -48,9 +47,9 @@ export function FichaProfesionalEnLugar({ persona }: { persona: ProfesionalEnLug
           </div>
           <InsigniaVerificacion activa={persona.datosVerificados} compacta />
         </div>
-        <p className="mt-1 line-clamp-2 text-xs leading-snug text-muted" title={horario}>
-          {horario}
-        </p>
+        <div className="mt-1">
+          <ListaHorarioTexto lineas={horarioLineas} compacto />
+        </div>
         <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs font-semibold">
           <Link href={`/profesional/${persona.id}`} className="text-link hover:underline">
             Ver ficha

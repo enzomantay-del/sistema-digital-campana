@@ -64,12 +64,15 @@ export default async function PaginaBuscar({
                 {vista.especialidad} · {vista.area}
                 {persona.example ? " · Dato de ejemplo" : ""}
               </p>
-              <ul className="mt-2 grid gap-1">
+              <ul className="mt-2 grid gap-2 text-sm">
                 {vista.bloques.flatMap((bloque) =>
                   bloque.lineas.map((linea) => (
                     <li key={linea.id}>
-                      {bloque.titulo} · {linea.rotulo}
-                      {linea.locality ? ` · ${linea.locality}` : ""}
+                      <span className="font-semibold text-ink">
+                        {linea.rotulo}
+                        {linea.locality ? ` · ${linea.locality}` : ""}
+                      </span>
+                      {linea.detalle ? <p className="mt-0.5 text-muted">{linea.detalle}</p> : null}
                     </li>
                   )),
                 )}

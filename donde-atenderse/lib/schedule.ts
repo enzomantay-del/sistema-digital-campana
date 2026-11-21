@@ -33,15 +33,10 @@ export type LineaHorario = {
   };
 };
 
-import { lineasHorarioLugar } from "./placeSchedule";
+import { lineasHorarioAtencion, lineasHorarioLegacy } from "./horarioTexto";
 
 function tieneDatos(days: string, time: string, shift: string) {
   return Boolean(days.trim() || time.trim() || shift.trim());
-}
-
-function lineasProfesional(nota?: string) {
-  if (!nota?.trim()) return [];
-  return lineasHorarioLugar(nota);
 }
 
 function masReciente(a: Date | null, b: Date | null) {
@@ -51,8 +46,13 @@ function masReciente(a: Date | null, b: Date | null) {
 }
 
 export function lineaHorario(fila: FilaHorario): LineaHorario | null {
-  const horarioLineas = lineasProfesional(fila.professionalScheduleNote);
-  const profesional = horarioLineas.length > 0 || tieneDatos(fila.professionalDays, fila.professionalTime, fila.professionalShift);
+  const horarioPro = lineasHorarioAtencion({
+    scheduleNote: fila.professionalScheduleNote,
+    days: fila.professionalDays,
+    time: fila.professionalTime,
+    shift: fila.professionalShift,
+  });
+  const profesional = horarioPro.length > 0 || tieneDatos(fila.professionalDays, fila.professionalTime, fila.professionalShift);
   const lugar = tieneDatos(fila.placeDays, fila.placeTime, fila.placeShift);
   if (!profesional && !lugar) return null;
 
@@ -76,7 +76,7 @@ export function lineaHorario(fila: FilaHorario): LineaHorario | null {
       shift: fila.professionalShift || fila.placeShift,
       days: fila.professionalDays || fila.placeDays,
       time: fila.professionalTime || fila.placeTime,
-      horarioLineas: horarioLineas.length > 0 && (profesional || iguales) ? horarioLineas : [],
+      horarioLineas: horarioPro.length > 0 && (profesional || iguales) ? horarioPro : [],
       updatedAt: iguales
         ? masReciente(fila.professionalUpdatedAt, fila.placeUpdatedAt)
         : fila.professionalUpdatedAt,
@@ -86,6 +86,7 @@ export function lineaHorario(fila: FilaHorario): LineaHorario | null {
   }
 
   if (!profesional) {
+    const horarioLugar = lineasHorarioLegacy(fila.placeDays, fila.placeTime, fila.placeShift);
     return {
       id: fila.id,
       placeId: fila.placeId,
@@ -94,7 +95,7 @@ export function lineaHorario(fila: FilaHorario): LineaHorario | null {
       shift: fila.placeShift,
       days: fila.placeDays,
       time: fila.placeTime,
-      horarioLineas: [],
+      horarioLineas: horarioLugar,
       updatedAt: fila.placeUpdatedAt,
       source: "lugar",
       conflict: null,
@@ -109,7 +110,7 @@ export function lineaHorario(fila: FilaHorario): LineaHorario | null {
     shift: fila.professionalShift,
     days: fila.professionalDays,
     time: fila.professionalTime,
-    horarioLineas,
+    horarioLineas: horarioPro,
     updatedAt: fila.professionalUpdatedAt,
     source: "profesional",
     conflict: {

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HorarioLugarPublico } from "@/components/HorarioLugarPublico";
+import { ListaHorarioTexto } from "@/components/ListaHorarioTexto";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
 import { MENSAJE_WHATSAPP } from "@/lib/constants";
 import { enlaceMaps, enlaceTelefono, enlaceWhatsApp, etiquetaLugar } from "@/lib/format";
@@ -99,7 +100,13 @@ export function FichaLugar({
                   ) : (
                     <p className="text-xl font-semibold">{linea.rotulo}</p>
                   )}
-                  {linea.detalle ? <p className="mt-1">{linea.detalle}</p> : null}
+                  {linea.horarioLineas.length > 0 || linea.detalle ? (
+                    <div className="mt-1">
+                      <ListaHorarioTexto
+                        lineas={linea.horarioLineas.length > 0 ? linea.horarioLineas : [linea.detalle]}
+                      />
+                    </div>
+                  ) : null}
                   <p className="mt-2 text-xs text-muted">{linea.actualizacion}</p>
                 </div>
               ))}

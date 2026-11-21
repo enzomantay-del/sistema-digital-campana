@@ -4,7 +4,7 @@ import { TarjetaPublicidad } from "@/components/TarjetaPublicidad";
 import { PROFESIONAL_PUBLICIDAD_ORTIZ } from "@/lib/ejemplo";
 import { enlaceWhatsApp, etiquetaArea } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
-import { lineasHorarioLugar } from "@/lib/placeSchedule";
+import { lineasHorarioAtencion } from "@/lib/horarioTexto";
 
 export async function PublicidadProfesionalOrtiz() {
   const persona = await prisma.professional.findFirst({
@@ -15,10 +15,15 @@ export async function PublicidadProfesionalOrtiz() {
 
   const foto = persona.photoUrl?.trim() || "/ejemplos/dr-ivan-ortiz.png";
   const primerLugar = persona.attendances[0];
-  const horario =
+  const horarioLineas =
     primerLugar &&
-    (lineasHorarioLugar(primerLugar.professionalScheduleNote)[0] ||
-      `${primerLugar.professionalTime || "Consultar horario"}`);
+    lineasHorarioAtencion({
+      scheduleNote: primerLugar.professionalScheduleNote,
+      days: primerLugar.professionalDays,
+      time: primerLugar.professionalTime,
+      shift: primerLugar.professionalShift,
+    });
+  const horario = horarioLineas?.[0] ?? null;
   const lugar = primerLugar ? `${primerLugar.place.name} · ${primerLugar.place.locality}` : etiquetaArea(persona.area);
 
   return (
