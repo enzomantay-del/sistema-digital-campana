@@ -4,8 +4,18 @@ Orden sugerido. Vos podés avanzar hosting en paralelo; el resto es operación +
 
 ## 1. Hosting y entorno
 
-- [ ] Servidor con Node 20+ y proceso persistente (`npm run build` + `npm run start`) o plataforma compatible con Next.js 15.
-- [ ] `DATABASE_URL` apuntando a una base **persistente** (recomendado: Postgres; SQLite solo en VPS con disco fijo).
+### Opción A — Publicación en Cursor (recomendada si usás este flujo)
+
+1. Confirmá la publicación de la app **cercalud** desde el botón **Publish** en el chat del agente.
+2. Elegí visibilidad **pública** (o team si preferís solo equipo).
+3. En Secrets, cargá: `AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (y opcional `CERCALUD_CONTACTO_EMAIL`).
+4. El hosting asigna **Postgres** (`cursor-app.json`); en el primer `start` se crean tablas y el admin con `seed-produccion` si la base está vacía.
+5. Cuando tengas dominio, en el panel de la app publicada configurá el **dominio personalizado** (o el CNAME que te indiquen) apuntando a Cursor.
+
+### Opción B — Servidor propio
+
+- [ ] Node 20+ y `npm run build` + `npm run start`.
+- [ ] `DATABASE_URL` con Postgres en producción (SQLite solo para desarrollo local).
 - [ ] `AUTH_SECRET` con al menos 32 caracteres aleatorios.
 - [ ] `ADMIN_EMAIL` y `ADMIN_PASSWORD` distintos del ejemplo.
 - [ ] En producción: **no** definir `CERCALUD_MOSTRAR_EJEMPLOS=1` (oculta datos `example` y publicidades demo).
