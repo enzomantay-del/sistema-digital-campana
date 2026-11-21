@@ -1,16 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { crearCuenta, type Resultado } from "@/actions/auth";
 
 export function FormularioCuenta() {
-  const router = useRouter();
   const [estado, accion, pendiente] = useActionState<Resultado | null, FormData>(crearCuenta, null);
   useEffect(() => {
-    if (estado?.ok && estado.irA) router.replace(estado.irA);
-  }, [estado, router]);
+    if (estado?.ok && estado.irA) window.location.assign(estado.irA);
+  }, [estado]);
 
   return (
     <form action={accion} className="grid max-w-xl gap-4">

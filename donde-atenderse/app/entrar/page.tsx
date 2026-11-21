@@ -1,10 +1,21 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { FormularioEntrar } from "@/components/FormularioEntrar";
-import { usuarioActual } from "@/lib/auth";
+import { esAdmin, usuarioActual } from "@/lib/auth";
 
 export default async function Entrar() {
-  if (await usuarioActual()) redirect("/panel");
+  const usuario = await usuarioActual();
+  if (usuario) {
+    const destino = esAdmin(usuario) ? "/panel/admin" : "/panel";
+    return (
+      <div className="grid max-w-xl gap-4">
+        <h1 className="text-4xl font-bold tracking-tight">Ya entraste</h1>
+        <p className="text-muted">Sesión abierta como {usuario.name}.</p>
+        <Link href={destino} className="boton w-fit">
+          Ir al panel
+        </Link>
+      </div>
+    );
+  }
   return (
     <div className="grid gap-6">
       <h1 className="text-4xl font-bold tracking-tight">Entrar</h1>
