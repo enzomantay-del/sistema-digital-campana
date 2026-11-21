@@ -142,3 +142,14 @@ model AuthRateLimit {
   attempts  Int      @default(0)
   resetAt   DateTime
 }
+
+model ImagenAlmacenada {
+  id        String   @id @default(cuid())
+  carpeta   String
+  entidadId String
+  tipoMime  String
+  datos     Bytes
+  updatedAt DateTime @updatedAt
+
+  @@unique([carpeta, entidadId])
+}

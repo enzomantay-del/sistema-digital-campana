@@ -1,5 +1,6 @@
 import { mkdir, readdir, unlink, writeFile } from "fs/promises";
 import path from "path";
+import { prisma } from "./prisma";
 
 export type CarpetaImagen = "logos" | "profesionales";
 
@@ -15,6 +16,16 @@ function credencialesS3() {
 
 export function almacenamientoPersistenteEnNube() {
   return bucketConfigurado() && credencialesS3();
+}
+
+/** En el hosting de Cercalud las fotos van a la base Postgres (sin configurar nada extra). */
+export function almacenamientoEnBaseDatos() {
+  if (almacenamientoPersistenteEnNube()) return false;
+  return process.env.NODE_ENV === "production" && (process.env.DATABASE_URL?.startsWith("postgres") ?? false);
+}
+
+export function fotosPersistenEnProduccion() {
+  return almacenamientoPersistenteEnNube() || almacenamientoEnBaseDatos();
 }
 
 function configS3() {
@@ -48,6 +59,14 @@ function rutaLocal(carpeta: CarpetaImagen) {
   return path.join(process.cwd(), "public", "uploads", carpeta);
 }
 
+function urlPublicaImagen(carpeta: CarpetaImagen, entidadId: string) {
+  return `/api/imagen/${carpeta}/${entidadId}?v=${Date.now()}`;
+}
+
+async function quitarEnBaseDatos(carpeta: CarpetaImagen, entidadId: string) {
+  await prisma.imagenAlmacenada.deleteMany({ where: { carpeta, entidadId } });
+}
+
 export async function quitarImagenesEntidad(carpeta: CarpetaImagen, entidadId: string) {
   if (almacenamientoPersistenteEnNube()) {
     const { ListObjectsV2Command, DeleteObjectCommand } = await import("@aws-sdk/client-s3");
@@ -66,6 +85,11 @@ export async function quitarImagenesEntidad(carpeta: CarpetaImagen, entidadId: s
       }
       token = listado.IsTruncated ? listado.NextContinuationToken : undefined;
     } while (token);
+    return;
+  }
+
+  if (almacenamientoEnBaseDatos()) {
+    await quitarEnBaseDatos(carpeta, entidadId);
     return;
   }
 
@@ -109,6 +133,15 @@ export async function guardarImagenEntidad(
       }),
     );
     return `${cfg.publicBase}/${key}?v=${Date.now()}`;
+  }
+
+  if (almacenamientoEnBaseDatos()) {
+    await prisma.imagenAlmacenada.upsert({
+      where: { carpeta_entidadId: { carpeta, entidadId } },
+      create: { carpeta, entidadId, tipoMime, datos: contenido },
+      update: { tipoMime, datos: contenido },
+    });
+    return urlPublicaImagen(carpeta, entidadId);
   }
 
   const dir = rutaLocal(carpeta);

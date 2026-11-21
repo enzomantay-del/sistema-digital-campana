@@ -1,3 +1,5 @@
+import { fotosPersistenEnProduccion } from "./almacenamientoImagen";
+
 /**
  * Configuración de entorno para demo vs producción.
  * En producción, sin `CERCALUD_MOSTRAR_EJEMPLOS=1`, no se muestran datos `example` ni avisos demo.
@@ -35,12 +37,10 @@ export function correoReservadoParaAdmin(email: string) {
   return admin.length > 0 && email.trim().toLowerCase() === admin;
 }
 
-/** En hosting con Postgres el disco de fotos puede no persistir entre despliegues. */
+/** Solo avisar si en producción las fotos quedarían en disco efímero (raro). */
 export function avisoFotosHosting() {
-  if (process.env.CERCALUD_S3_BUCKET?.trim() && process.env.CERCALUD_S3_ACCESS_KEY_ID?.trim()) {
-    return false;
-  }
-  return process.env.NODE_ENV === "production" && (process.env.DATABASE_URL?.startsWith("postgres") ?? false);
+  if (fotosPersistenEnProduccion()) return false;
+  return process.env.NODE_ENV === "production";
 }
 
 export function urlSitioPublico() {
