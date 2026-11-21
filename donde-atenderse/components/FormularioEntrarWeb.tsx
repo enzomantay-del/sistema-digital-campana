@@ -1,9 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { CampoContrasena } from "@/components/CampoContrasena";
-
-export function FormularioEntrarWeb({ error }: { error?: string }) {
+export function FormularioEntrarWeb({
+  error,
+  recuperacionHref,
+}: {
+  error?: string;
+  recuperacionHref: string;
+}) {
   const falloCredenciales = Boolean(error?.toLowerCase().includes("no coinciden"));
 
   return (
@@ -22,9 +26,14 @@ export function FormularioEntrarWeb({ error }: { error?: string }) {
               elegiste al crear la cuenta).
             </p>
           ) : null}
-          <Link href="/entrar/recuperar" className="text-sm font-semibold text-link hover:underline">
-            ¿Olvidaste la contraseña? Recuperar acceso
-          </Link>
+          <a
+            href={recuperacionHref}
+            className="text-sm font-semibold text-link hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ¿Olvidaste el correo o la contraseña? Escribinos por WhatsApp
+          </a>
         </div>
       ) : null}
       <button className="boton w-fit" type="submit">

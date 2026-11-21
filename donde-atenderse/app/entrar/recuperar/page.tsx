@@ -1,35 +1,38 @@
 import Link from "next/link";
 import { IconoCercalud } from "@/components/iconos/IconoCercalud";
-import { contactoEmail, contactoWhatsApp } from "@/lib/config";
-import { enlaceWhatsApp } from "@/lib/format";
+import {
+  MENSAJE_RECUPERACION_INGRESO,
+  enlaceRecuperacionIngreso,
+  numeroWhatsAppRecuperacion,
+} from "@/lib/recuperacion";
 
 export default function RecuperarContrasena() {
-  const mail = contactoEmail();
-  const wa = contactoWhatsApp();
+  const whatsapp = enlaceRecuperacionIngreso();
+  const telefono = numeroWhatsAppRecuperacion();
   return (
     <div className="mx-auto grid max-w-xl gap-6">
       <h1 className="enlace-icono text-4xl font-bold tracking-tight">
         <IconoCercalud nombre="mensaje" size={32} className="text-menta" />
-        Recuperar contraseña
+        Recuperar ingreso
       </h1>
       <p className="text-muted">
-        Todavía no hay recuperación automática por correo. Si olvidaste la contraseña, escribinos con el correo de tu
-        cuenta y te ayudamos a restablecerla de forma manual.
+        Si olvidaste el correo o la contraseña, escribinos por WhatsApp. Te respondemos para restablecer el acceso.
       </p>
-      <section className="tarjeta grid gap-3">
-        <a href={`mailto:${mail}?subject=Recuperar%20contraseña%20Cercalud`} className="font-semibold text-link hover:underline">
-          {mail}
+      <section className="tarjeta grid gap-4">
+        <a
+          href={whatsapp}
+          className="boton w-fit enlace-icono gap-2"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <IconoCercalud nombre="contacto-directo" size={22} className="text-white" />
+          Abrir WhatsApp
         </a>
-        {wa ? (
-          <a
-            href={enlaceWhatsApp(wa, "Hola, necesito recuperar mi contraseña de Cercalud.")}
-            className="font-semibold text-link hover:underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            WhatsApp institucional
-          </a>
-        ) : null}
+        <p className="text-sm text-muted">
+          Se abre un chat con el mensaje: «{MENSAJE_RECUPERACION_INGRESO}» al número{" "}
+          <span className="font-semibold text-ink">{telefono}</span>. Podés agregar tu nombre y el correo que creías
+          usar.
+        </p>
       </section>
       <p>
         <Link href="/entrar" className="font-semibold text-link">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FormularioEntrarWeb } from "@/components/FormularioEntrarWeb";
 import { esAdmin, usuarioActual } from "@/lib/auth";
+import { enlaceRecuperacionIngreso } from "@/lib/recuperacion";
 
 export default async function Entrar({
   searchParams,
@@ -27,14 +28,19 @@ export default async function Entrar({
       <p className="max-w-xl text-muted">
         Desde acá cargás tu ficha. El paciente no necesita una cuenta para buscar.
       </p>
-      <FormularioEntrarWeb error={error} />
+      <FormularioEntrarWeb error={error} recuperacionHref={enlaceRecuperacionIngreso()} />
       <p className="flex flex-wrap gap-x-4 gap-y-2">
         <Link href="/crear-cuenta" className="font-semibold text-link">
           Crear una cuenta
         </Link>
-        <Link href="/entrar/recuperar" className="font-semibold text-link">
-          Olvidé mi contraseña
-        </Link>
+        <a
+          href={enlaceRecuperacionIngreso()}
+          className="font-semibold text-link"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Olvidé mis datos — WhatsApp
+        </a>
       </p>
     </div>
   );
