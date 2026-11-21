@@ -2,6 +2,7 @@ import Link from "next/link";
 import { IconoCercalud, ICONO_NAV } from "@/components/iconos/IconoCercalud";
 import { Marca } from "@/components/Marca";
 import { esAdmin, usuarioActual } from "@/lib/auth";
+import { mostrarDatosEjemplo } from "@/lib/config";
 import { RUTA_PROFESIONAL_EJEMPLO } from "@/lib/ejemplo";
 
 const ENLACES = [
@@ -14,6 +15,7 @@ const ENLACES = [
 export async function Encabezado({ ejemplo }: { ejemplo: boolean }) {
   const usuario = await usuarioActual();
   const admin = esAdmin(usuario);
+  const demo = mostrarDatosEjemplo();
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-page items-center gap-4 px-4 py-3">
@@ -27,7 +29,7 @@ export async function Encabezado({ ejemplo }: { ejemplo: boolean }) {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-3">
-          {ejemplo ? (
+          {demo && ejemplo ? (
             <Link
               href={RUTA_PROFESIONAL_EJEMPLO}
               className="inline-flex items-center gap-2 rounded-full border border-line bg-paper px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] hover:border-menta"

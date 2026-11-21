@@ -112,7 +112,7 @@ const ICONOS: Record<NombreIconoCercalud, (props: { size?: number; className?: s
     <SvgBase {...p}>
       <Trazo d="M5.75 6.5h12.5A1.75 1.75 0 0 1 20 8.25v6.75a1.75 1.75 0 0 1-1.75 1.75H10l-4.25 2.75V8.25A1.75 1.75 0 0 1 7.5 6.5Z" />
       <Trazo d="M8.5 11h7M8.5 13.75h4.25" className="opacity-70" />
-      <circle cx="17.25" cy="7.25" r="1.35" fill="currentColor" className="text-menta" />
+      <circle cx="17.25" cy="7.25" r="1.5" fill="currentColor" className="text-menta" />
     </SvgBase>
   ),
   telefono: (p) => (
@@ -140,8 +140,8 @@ const ICONOS: Record<NombreIconoCercalud, (props: { size?: number; className?: s
       <Trazo d="M5.25 16.25c2.2-3.65 4.65-5.5 6.75-5.5s4.55 1.85 6.75 5.5" className="opacity-55" />
       <Trazo d="M6.25 9.5c0-1.65 1.35-3 3-3s3 1.35 3 3-1.35 3-3 3-3-1.35-3-3Z" />
       <Trazo d="M15.25 13.25c0-1.65 1.35-3 3-3s3 1.35 3 3-1.35 3-3 3-3-1.35-3-3Z" />
-      <circle cx="9.25" cy="9.5" r=".9" fill="currentColor" className="text-menta" />
-      <circle cx="18.25" cy="13.25" r=".9" fill="currentColor" className="text-menta" />
+      <circle cx="9.25" cy="9.5" r="1.15" fill="currentColor" className="text-menta" />
+      <circle cx="18.25" cy="13.25" r="1.15" fill="currentColor" className="text-menta" />
     </SvgBase>
   ),
   sello: (p) => (

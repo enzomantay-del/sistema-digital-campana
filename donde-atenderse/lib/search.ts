@@ -3,6 +3,7 @@ import { lugarAtiendeObra, obrasModoEfectivo } from "./placeObras";
 import { incluye } from "./format";
 import { distanciaALocalidad } from "./geo";
 import { prisma } from "./prisma";
+import { filtroLugarPublico, filtroProfesionalPublico } from "./publico";
 
 const profesionalConRelaciones = {
   obras: { include: { obra: true } },
@@ -45,12 +46,12 @@ export async function buscar(filtros: {
 
   const [professionals, places] = await Promise.all([
     prisma.professional.findMany({
-      where: { published: true },
+      where: filtroProfesionalPublico(),
       include: profesionalConRelaciones,
       orderBy: { fullName: "asc" },
     }),
     prisma.place.findMany({
-      where: { published: true, kind: { not: "farmacia" } },
+      where: filtroLugarPublico({ kind: { not: "farmacia" } }),
       include: lugarConRelaciones,
       orderBy: { name: "asc" },
     }),
@@ -129,7 +130,7 @@ export async function buscar(filtros: {
 
 export async function farmaciasDeTurno(ahora = new Date()) {
   const farmacias = await prisma.place.findMany({
-    where: { published: true, kind: "farmacia" },
+    where: filtroLugarPublico({ kind: "farmacia" }),
     include: { duties: { orderBy: { endsOn: "desc" } } },
     orderBy: { locality: "asc" },
   });

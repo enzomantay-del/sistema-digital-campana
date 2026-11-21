@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { filtroProfesionalPublico } from "./publico";
 import { lineasHorarioAtencion } from "./horarioTexto";
 import { datosActualizadosRecientes, fechaMasReciente } from "./verificacion";
 
@@ -74,7 +75,7 @@ export function agruparPorEspecialidad(lista: ProfesionalEnLugar[]) {
 
 export async function equipoPublicadoEnLugar(placeId: string) {
   const filas = await prisma.attendance.findMany({
-    where: { placeId, professional: { published: true } },
+    where: { placeId, professional: filtroProfesionalPublico() },
     include: { professional: true },
     orderBy: [{ professional: { specialty: "asc" } }, { professional: { fullName: "asc" } }],
   });

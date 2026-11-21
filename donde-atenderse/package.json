@@ -11,6 +11,7 @@
     "lint": "next lint",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:produccion": "tsx prisma/seed-produccion.ts",
     "test:schedule": "tsx lib/schedule.test.ts",
     "postinstall": "prisma generate"
   },

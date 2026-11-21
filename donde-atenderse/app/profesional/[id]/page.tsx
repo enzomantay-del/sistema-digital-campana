@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { mostrarDatosEjemplo } from "@/lib/config";
 import { FichaProfesional } from "@/components/FichaProfesional";
 import { LayoutFichaPublica } from "@/components/LayoutFichaPublica";
 import { filaHorario } from "@/lib/map";
@@ -11,7 +12,7 @@ export default async function PaginaProfesional({ params }: { params: Promise<{ 
     where: { id },
     include: { obras: { include: { obra: true } }, attendances: { include: { place: true } } },
   });
-  if (!persona || !persona.published) notFound();
+  if (!persona || !persona.published || (!mostrarDatosEjemplo() && persona.example)) notFound();
   const vista = armarVistaProfesional({
     fullName: persona.fullName,
     specialty: persona.specialty,

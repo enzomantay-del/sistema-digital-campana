@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { mostrarDatosEjemplo } from "@/lib/config";
 import { FichaLugar } from "@/components/FichaLugar";
 import { LayoutFichaPublica } from "@/components/LayoutFichaPublica";
 import { filaHorario } from "@/lib/map";
@@ -17,7 +18,7 @@ export default async function PaginaLugar({ params }: { params: Promise<{ id: st
       attendances: { include: { place: true, professional: true } },
     },
   });
-  if (!lugar || !lugar.published || lugar.kind === "farmacia") notFound();
+  if (!lugar || !lugar.published || lugar.kind === "farmacia" || (!mostrarDatosEjemplo() && lugar.example)) notFound();
   const equipo = await equipoPublicadoEnLugar(id);
   const vista = armarVistaLugar({
     placeId: lugar.id,

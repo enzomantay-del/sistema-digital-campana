@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import { Encabezado } from "@/components/Encabezado";
 import { Pie } from "@/components/Pie";
+import { mostrarDatosEjemplo } from "@/lib/config";
 import { prisma } from "@/lib/prisma";
 import "./globals.css";
 
@@ -20,8 +21,8 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const ejemplos = await prisma.professional.count({ where: { example: true } });
-  const ejemplo = ejemplos > 0;
+  const ejemplo =
+    mostrarDatosEjemplo() && (await prisma.professional.count({ where: { example: true, published: true } })) > 0;
   return (
     <html lang="es">
       <body className={`${nunito.variable} font-sans antialiased`}>

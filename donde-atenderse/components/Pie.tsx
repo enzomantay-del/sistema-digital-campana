@@ -27,6 +27,9 @@ export function Pie({ ejemplo }: { ejemplo: boolean }) {
           <Link href="/buscar">Profesionales</Link>
           <Link href="/buscar?estudios=1">Estudios</Link>
           <Link href="/farmacia">Farmacia de turno</Link>
+          <Link href="/contacto">Contacto</Link>
+          <Link href="/privacidad">Privacidad</Link>
+          <Link href="/terminos">Términos</Link>
           <Link href="/entrar">Soy profesional</Link>
         </nav>
       </div>

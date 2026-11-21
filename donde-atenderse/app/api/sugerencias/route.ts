@@ -1,5 +1,6 @@
 import { etiquetaLugar, normalizar } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
+import { filtroLugarPublico, filtroProfesionalPublico } from "@/lib/publico";
 import { lugarVerificadoEnListado, profesionalVerificadoEnListado } from "@/lib/verificacion";
 
 const MINIMO = 3;
@@ -10,7 +11,7 @@ export async function GET(request: Request) {
   const consulta = normalizar(q);
   const [personas, lugares] = await Promise.all([
     prisma.professional.findMany({
-      where: { published: true },
+      where: filtroProfesionalPublico(),
       select: {
         id: true,
         fullName: true,
@@ -22,7 +23,7 @@ export async function GET(request: Request) {
       orderBy: { fullName: "asc" },
     }),
     prisma.place.findMany({
-      where: { published: true, kind: { not: "farmacia" } },
+      where: filtroLugarPublico({ kind: { not: "farmacia" } }),
       select: {
         id: true,
         name: true,

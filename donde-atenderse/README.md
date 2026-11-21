@@ -35,3 +35,10 @@ npm run preview
 Para crear una cuenta, definí `AUTH_SECRET` en el entorno con una frase larga. No la subas al repositorio.
 
 Los profesionales y lugares que aparecen al entrar son datos de ejemplo. No tienen usuario ni contraseña.
+
+## Producción (cuando tengas hosting)
+
+1. Variables: `DATABASE_URL`, `AUTH_SECRET` (32+ caracteres), `ADMIN_EMAIL`, `ADMIN_PASSWORD` nuevos.
+2. Primera base: `npx prisma db push` y **`npm run db:seed:produccion`** (no uses `db:seed`: carga el corredor de demo).
+3. Sin `CERCALUD_MOSTRAR_EJEMPLOS=1` el sitio oculta fichas `example` y muestra espacio comercial en lugar de avisos de muestra.
+4. Checklist completo: [docs/lanzamiento.md](docs/lanzamiento.md).
