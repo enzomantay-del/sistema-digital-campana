@@ -28,9 +28,9 @@ export default async function EspecialidadesDelLugar({ params }: { params: Promi
         {grupos.length === 0 ? (
           <p>Todavía no hay especialidades cargadas.</p>
         ) : (
-          <div className="grid gap-8">
+          <div className="grid gap-5">
             {grupos.map(([especialidad, profesionales]) => (
-              <section key={especialidad} className="grid gap-4">
+              <section key={especialidad} className="grid gap-2">
                 <div className="flex flex-wrap items-end justify-between gap-2 border-b border-line pb-2">
                   <h2 className="text-2xl font-bold">{especialidad}</h2>
                   <Link
@@ -40,10 +40,10 @@ export default async function EspecialidadesDelLugar({ params }: { params: Promi
                     {profesionales.length === 1 ? "Ver 1 profesional" : `Ver los ${profesionales.length} profesionales`}
                   </Link>
                 </div>
-                <ul className="grid gap-3">
+                <ul className="grid gap-2">
                   {profesionales.map((persona) => (
                     <li key={persona.id}>
-                      <FichaProfesionalEnLugar persona={persona} compacto />
+                      <FichaProfesionalEnLugar persona={persona} />
                     </li>
                   ))}
                 </ul>

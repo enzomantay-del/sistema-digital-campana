@@ -14,42 +14,50 @@ function iniciales(nombre: string) {
     .join("");
 }
 
-export function FichaProfesionalEnLugar({
-  persona,
-  compacto = false,
-}: {
-  persona: ProfesionalEnLugar;
-  compacto?: boolean;
-}) {
+/** Fila densa para listados (muchos profesionales en un mismo lugar). */
+export function FichaProfesionalEnLugar({ persona }: { persona: ProfesionalEnLugar }) {
+  const horario =
+    persona.horarioLineas.length > 0
+      ? persona.horarioLineas.join(" · ")
+      : "Sin horario cargado en este lugar";
+
   return (
-    <article className={`tarjeta grid gap-4 ${compacto ? "" : "sm:grid-cols-[5.5rem_1fr] sm:items-start"}`}>
-      <div className={`flex gap-3 ${compacto ? "items-center" : "sm:flex-col sm:items-center"}`}>
-        {persona.photoUrl ? (
-          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border border-line bg-white shadow-sm">
-            <Image src={persona.photoUrl} alt="" fill className="object-cover" sizes="80px" unoptimized />
-          </div>
-        ) : (
-          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border border-line bg-[#eef4f8] text-xl font-bold text-link">
-            {iniciales(persona.fullName) || "?"}
-          </div>
-        )}
-        {compacto ? (
+    <article className="fila-profesional flex gap-3">
+      {persona.photoUrl ? (
+        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-line bg-white">
+          <Image src={persona.photoUrl} alt="" fill className="object-cover" sizes="48px" unoptimized />
+        </div>
+      ) : (
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-line bg-[#eef4f8] text-sm font-bold text-link">
+          {iniciales(persona.fullName) || "?"}
+        </div>
+      )}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start gap-2">
           <div className="min-w-0 flex-1">
-            <Cabecera persona={persona} />
+            <Link
+              href={`/profesional/${persona.id}`}
+              className="text-base font-bold leading-tight text-link hover:underline"
+            >
+              {persona.fullName}
+            </Link>
+            <p className="mt-0.5 text-xs text-menta">
+              {persona.specialty} · {etiquetaArea(persona.area)}
+              {persona.license ? ` · Mat. ${persona.license}` : ""}
+            </p>
           </div>
-        ) : null}
-      </div>
-      <div className="grid min-w-0 gap-3">
-        {!compacto ? <Cabecera persona={persona} /> : null}
-        {persona.license ? <p className="text-sm text-muted">Matrícula {persona.license}</p> : null}
-        <HorarioBloque lineas={persona.horarioLineas} />
-        <div className="flex flex-wrap gap-2 pt-1">
-          <Link href={`/profesional/${persona.id}`} className="boton-suave text-sm">
-            Ver ficha completa
+          <InsigniaVerificacion activa={persona.datosVerificados} compacta />
+        </div>
+        <p className="mt-1 line-clamp-2 text-xs leading-snug text-muted" title={horario}>
+          {horario}
+        </p>
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs font-semibold">
+          <Link href={`/profesional/${persona.id}`} className="text-link hover:underline">
+            Ver ficha
           </Link>
           {persona.whatsapp ? (
             <a
-              className="boton text-sm"
+              className="text-link hover:underline"
               href={enlaceWhatsApp(persona.whatsapp, MENSAJE_WHATSAPP)}
               target="_blank"
               rel="noopener noreferrer"
@@ -60,39 +68,5 @@ export function FichaProfesionalEnLugar({
         </div>
       </div>
     </article>
-  );
-}
-
-function Cabecera({ persona }: { persona: ProfesionalEnLugar }) {
-  return (
-    <div className="grid gap-1">
-      <div className="flex items-start justify-between gap-2">
-        <Link href={`/profesional/${persona.id}`} className="text-xl font-bold leading-tight text-link hover:underline">
-          {persona.fullName}
-        </Link>
-        <InsigniaVerificacion activa={persona.datosVerificados} />
-      </div>
-      <p className="text-sm text-menta">
-        {persona.specialty} · {etiquetaArea(persona.area)}
-      </p>
-    </div>
-  );
-}
-
-function HorarioBloque({ lineas }: { lineas: string[] }) {
-  if (lineas.length === 0) {
-    return <p className="text-sm text-muted">Todavía no cargó horario en este lugar.</p>;
-  }
-  return (
-    <div className="rounded-xl border border-line bg-[#f8fafc] px-3 py-2.5">
-      <p className="text-xs font-bold uppercase tracking-wide text-muted">Horario en este lugar</p>
-      <ul className="mt-1.5 grid gap-0.5">
-        {lineas.map((linea) => (
-          <li key={linea} className="text-sm font-medium">
-            {linea}
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }

@@ -67,6 +67,10 @@ button {
   @apply rounded-3xl border border-line bg-white p-6 shadow-[0_10px_30px_rgba(16,36,62,0.06)];
 }
 
+.fila-profesional {
+  @apply rounded-2xl border border-line bg-white px-3 py-2.5 shadow-[0_4px_14px_rgba(16,36,62,0.04)] transition hover:border-link/40;
+}
+
 .pastilla {
   @apply inline-flex cursor-pointer items-center rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-ink;
 }

@@ -12,17 +12,17 @@ function contornoSello(picos = 12) {
   return `M ${coords.join(" L ")} Z`;
 }
 
-export function InsigniaVerificacion({ activa }: { activa: boolean }) {
+export function InsigniaVerificacion({
+  activa,
+  compacta = false,
+}: {
+  activa: boolean;
+  compacta?: boolean;
+}) {
   if (!activa) return null;
+  const clase = compacta ? "h-7 w-7 shrink-0" : "h-14 w-14 shrink-0";
   return (
-    <svg
-      width="56"
-      height="56"
-      viewBox="0 0 56 56"
-      className="h-14 w-14 shrink-0"
-      role="img"
-      aria-hidden
-    >
+    <svg width={compacta ? 28 : 56} height={compacta ? 28 : 56} viewBox="0 0 56 56" className={clase} role="img" aria-hidden>
       <title>Ficha actualizada en los últimos 30 días</title>
       <path fill="#1d9bf0" d={contornoSello()} />
       <path
