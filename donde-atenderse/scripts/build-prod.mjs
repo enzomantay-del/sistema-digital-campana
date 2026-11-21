@@ -6,4 +6,5 @@ execSync(`npx prisma generate --schema=${schema}`, { stdio: "inherit" });
 if (usaPostgres()) {
   execSync(`npx prisma db push --schema=${schema}`, { stdio: "inherit" });
 }
-execSync("NEXT_BUILD_DIR=prod next build", { stdio: "inherit", env: { ...process.env, NEXT_BUILD_DIR: "prod" } });
+// Hosting (Cursor/Vercel) exige salida en `.next`; `.next-prod` es solo para `npm run preview` en local.
+execSync("next build", { stdio: "inherit" });
