@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { TarjetaPublicidad } from "@/components/TarjetaPublicidad";
 import { PROFESIONAL_PUBLICIDAD_ORTIZ } from "@/lib/ejemplo";
 import { enlaceWhatsApp, etiquetaArea } from "@/lib/format";
@@ -55,15 +56,17 @@ export async function PublicidadProfesionalOrtiz() {
       <div className="grid gap-2">
         {persona.whatsapp ? (
           <a
-            className="boton w-full text-center text-base font-bold"
+            className="boton w-full gap-2 text-center text-base font-bold"
             href={enlaceWhatsApp(persona.whatsapp, "Hola Dr., quiero pedir un turno. Vi su aviso en Cercalud.")}
             target="_blank"
             rel="noopener noreferrer"
           >
+            <IconoCercalud nombre="mensaje" size={18} className="text-white/95" />
             Sacar turno por WhatsApp
           </a>
         ) : null}
-        <Link href={`/profesional/${persona.id}`} className="boton-suave w-full text-center text-sm font-semibold">
+        <Link href={`/profesional/${persona.id}`} className="boton-suave w-full gap-2 text-center text-sm font-semibold">
+          <IconoCercalud nombre="ficha" size={17} className="text-link" />
           Ver ficha completa
         </Link>
       </div>

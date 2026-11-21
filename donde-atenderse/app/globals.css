@@ -51,6 +51,10 @@ button {
   @apply w-full rounded-full border-2 border-[#1478c0]/70 bg-white px-5 py-3.5 text-ink outline-none placeholder:text-muted;
 }
 
+.campo-buscar-con-icono .campo-buscar {
+  @apply pl-12;
+}
+
 .boton {
   @apply inline-flex items-center justify-center rounded-2xl bg-accent px-5 py-3 font-semibold text-white hover:bg-accent-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-60;
 }
@@ -61,6 +65,14 @@ button {
 
 .boton-suave:hover {
   border-color: #45c0a8;
+}
+
+.enlace-icono {
+  @apply inline-flex items-center gap-1.5;
+}
+
+.icono-beneficio {
+  @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-line bg-white text-accent shadow-sm;
 }
 
 .tarjeta {

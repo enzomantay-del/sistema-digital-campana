@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { FichaProfesionalEnLugar } from "@/components/FichaProfesionalEnLugar";
 import { LayoutFichaPublica } from "@/components/LayoutFichaPublica";
 import { incluye } from "@/lib/format";
@@ -26,7 +27,8 @@ export default async function ProfesionalesDelLugar({
     <LayoutFichaPublica>
       <div className="grid gap-6">
         <header className="grid gap-2">
-          <Link href={`/lugar/${lugar.id}`} className="text-sm font-semibold text-link">
+          <Link href={`/lugar/${lugar.id}`} className="enlace-icono text-sm font-semibold text-link">
+            <IconoCercalud nombre="flecha-izq" size={16} className="text-menta" />
             Volver a {lugar.name}
           </Link>
           <h1 className="text-4xl font-bold tracking-tight">Profesionales en {lugar.name}</h1>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Buscador } from "@/components/Buscador";
+import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { TarjetaListadoLugar } from "@/components/TarjetaListadoLugar";
 import { TarjetaListadoProfesional } from "@/components/TarjetaListadoProfesional";
 import { filaHorario } from "@/lib/map";
@@ -21,7 +22,10 @@ export default async function PaginaBuscar({
   return (
     <div className="grid gap-8">
       <header className="grid max-w-3xl gap-2">
-        <h1 className="text-4xl font-bold tracking-tight">{estudios ? "Estudios" : "Profesionales"}</h1>
+        <h1 className="enlace-icono text-4xl font-bold tracking-tight">
+          <IconoCercalud nombre={estudios ? "estudios" : "profesional"} size={34} className="text-menta" />
+          {estudios ? "Estudios" : "Profesionales"}
+        </h1>
         <p className="text-muted">
           {estudios
             ? "Centros de imágenes, laboratorios y lugares que cargaron un estudio."

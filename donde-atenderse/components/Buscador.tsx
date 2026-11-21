@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AvatarProfesionalListado, LogoLugarListado } from "@/components/MediaListado";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
+import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { AREAS, LOCALIDADES } from "@/lib/constants";
 import { puebloMasCercano } from "@/lib/geo";
 
@@ -145,7 +146,12 @@ export function Buscador({
         </>
       ) : null}
       <div className="flex flex-col gap-3 sm:flex-row">
-        <div ref={caja} className="relative min-w-0 flex-1">
+        <div ref={caja} className="campo-buscar-con-icono relative min-w-0 flex-1">
+          <IconoCercalud
+            nombre="buscar"
+            size={20}
+            className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-link"
+          />
           <label className="sr-only" htmlFor="q">
             Profesional, especialidad o centro de salud
           </label>
@@ -248,7 +254,8 @@ export function Buscador({
             </ul>
           ) : null}
         </div>
-        <button className="boton shrink-0" type="submit">
+        <button className="boton shrink-0 gap-2" type="submit">
+          <IconoCercalud nombre="buscar" size={18} className="text-white/95" />
           Buscar
         </button>
       </div>

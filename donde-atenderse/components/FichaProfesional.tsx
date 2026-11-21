@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
 import { ListaHorarioTexto } from "@/components/ListaHorarioTexto";
 import { MENSAJE_WHATSAPP } from "@/lib/constants";
@@ -111,11 +112,12 @@ export function FichaProfesional({
                 <span className="boton w-fit cursor-default opacity-80">WhatsApp</span>
               ) : (
                 <a
-                  className="boton w-fit"
+                  className="boton w-fit gap-2"
                   href={enlaceWhatsApp(vista.whatsapp, MENSAJE_WHATSAPP)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
+                  <IconoCercalud nombre="mensaje" size={18} className="text-white/95" />
                   WhatsApp
                 </a>
               )
@@ -124,7 +126,8 @@ export function FichaProfesional({
               ejemplo ? (
                 <span className="boton-suave w-fit cursor-default opacity-80">Teléfono fijo</span>
               ) : (
-                <a className="boton-suave w-fit" href={enlaceTelefono(vista.telefono)}>
+                <a className="boton-suave w-fit gap-2" href={enlaceTelefono(vista.telefono)}>
+                  <IconoCercalud nombre="telefono" size={18} className="text-link" />
                   Teléfono fijo
                 </a>
               )

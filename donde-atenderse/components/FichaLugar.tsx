@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { HorarioLugarPublico } from "@/components/HorarioLugarPublico";
 import { ListaHorarioTexto } from "@/components/ListaHorarioTexto";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
@@ -53,8 +54,9 @@ export function FichaLugar({
               href={enlaceMaps(vista.direccion, vista.localidad, vista.nombre)}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-fit font-medium text-link underline-offset-2 hover:underline"
+              className="enlace-icono w-fit font-medium text-link underline-offset-2 hover:underline"
             >
+              <IconoCercalud nombre="ubicacion" size={18} className="text-menta" />
               {vista.direccion}
             </a>
           )
@@ -73,11 +75,13 @@ export function FichaLugar({
           <h2 className="text-2xl font-semibold">Quién atiende</h2>
           <p className="text-muted">Consultá el listado completo de profesionales y especialidades en este lugar.</p>
           <div className="flex flex-wrap gap-3">
-            <Link href={`/lugar/${vista.placeId}/profesionales`} className="boton-suave">
+            <Link href={`/lugar/${vista.placeId}/profesionales`} className="boton-suave gap-2">
+              <IconoCercalud nombre="profesional" size={18} className="text-link" />
               Ver profesionales ({vista.cantidadProfesionales})
             </Link>
             {vista.especialidades.length > 0 ? (
-              <Link href={`/lugar/${vista.placeId}/especialidades`} className="boton-suave">
+              <Link href={`/lugar/${vista.placeId}/especialidades`} className="boton-suave gap-2">
+                <IconoCercalud nombre="areas" size={18} className="text-link" />
                 Ver especialidades ({vista.especialidades.length})
               </Link>
             ) : null}
@@ -145,11 +149,12 @@ export function FichaLugar({
                 <span className="boton w-fit cursor-default opacity-80">WhatsApp</span>
               ) : (
                 <a
-                  className="boton w-fit"
+                  className="boton w-fit gap-2"
                   href={enlaceWhatsApp(vista.whatsapp, MENSAJE_WHATSAPP)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
+                  <IconoCercalud nombre="mensaje" size={18} className="text-white/95" />
                   WhatsApp
                 </a>
               )
@@ -158,7 +163,8 @@ export function FichaLugar({
               ejemplo ? (
                 <span className="boton-suave w-fit cursor-default opacity-80">Teléfono fijo</span>
               ) : (
-                <a className="boton-suave w-fit" href={enlaceTelefono(vista.telefono)}>
+                <a className="boton-suave w-fit gap-2" href={enlaceTelefono(vista.telefono)}>
+                  <IconoCercalud nombre="telefono" size={18} className="text-link" />
                   Teléfono fijo
                 </a>
               )

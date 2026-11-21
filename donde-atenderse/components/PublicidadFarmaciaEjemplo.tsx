@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { TarjetaPublicidad } from "@/components/TarjetaPublicidad";
 import { enlaceWhatsApp } from "@/lib/format";
 
@@ -35,15 +36,17 @@ export function PublicidadFarmaciaEjemplo() {
         3x2 en agua mineral presentando este aviso. Válido hasta el domingo.
       </p>
       <div className="grid gap-2">
-        <Link href="/farmacia" className="boton w-full text-center text-base font-bold">
+        <Link href="/farmacia" className="boton w-full gap-2 text-center text-base font-bold">
+          <IconoCercalud nombre="farmacia" size={18} className="text-white/95" />
           Ver farmacia de turno hoy
         </Link>
         <a
-          className="boton-suave w-full text-center text-sm font-semibold"
+          className="boton-suave w-full gap-2 text-center text-sm font-semibold"
           href={enlaceWhatsApp(whatsapp, "Hola, quiero consultar la promo que vi en Cercalud.")}
           target="_blank"
           rel="noopener noreferrer"
         >
+          <IconoCercalud nombre="mensaje" size={17} className="text-link" />
           Pedir por WhatsApp
         </a>
       </div>

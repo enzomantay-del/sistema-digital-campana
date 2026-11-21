@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { AvatarProfesionalListado } from "@/components/MediaListado";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
 import { ListaHorarioTexto } from "@/components/ListaHorarioTexto";
@@ -41,23 +42,20 @@ export function FichaProfesionalEnLugar({
           <ListaHorarioTexto lineas={horarioLineas} compacto />
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs font-semibold">
-          <Link href={`/profesional/${persona.id}`} className="text-link hover:underline">
+          <Link href={`/profesional/${persona.id}`} className="enlace-icono text-link hover:underline">
+            <IconoCercalud nombre="ficha" size={15} className="text-menta" />
             Ver ficha
           </Link>
           {persona.whatsapp ? (
-            <>
-              <span className="select-none text-muted" aria-hidden>
-                ·
-              </span>
-              <a
-                className="text-link hover:underline"
-                href={enlaceWhatsApp(persona.whatsapp, MENSAJE_WHATSAPP)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                WhatsApp
-              </a>
-            </>
+            <a
+              className="enlace-icono text-link hover:underline"
+              href={enlaceWhatsApp(persona.whatsapp, MENSAJE_WHATSAPP)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <IconoCercalud nombre="mensaje" size={15} className="text-menta" />
+              WhatsApp
+            </a>
           ) : null}
         </div>
       </div>

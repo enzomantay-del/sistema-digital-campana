@@ -1,16 +1,18 @@
 import Link from "next/link";
 import { Buscador } from "@/components/Buscador";
+import { IconoCercalud, iconoArea, type NombreIconoCercalud } from "@/components/iconos/IconoCercalud";
 import { AREAS } from "@/lib/constants";
 import { catalogoObras } from "@/lib/search";
 
-const BENEFICIOS = [
-  ["El corredor entero", "Si en tu pueblo no está esa atención, ves el pueblo de al lado."],
-  [
-    "Sello azul",
-    "El icono al lado del nombre indica que el lugar o el profesional actualizó su ficha en los últimos 30 días.",
-  ],
-  ["Tres áreas juntas", "Salud del cuerpo, salud mental y odontología, en la misma búsqueda."],
-  ["Sin turno desde acá", "Escribís directo al profesional o al lugar. Cercalud no reserva."],
+const BENEFICIOS: { titulo: string; texto: string; icono: NombreIconoCercalud }[] = [
+  { titulo: "El corredor entero", texto: "Si en tu pueblo no está esa atención, ves el pueblo de al lado.", icono: "corredor" },
+  {
+    titulo: "Sello azul",
+    texto: "El icono al lado del nombre indica que el lugar o el profesional actualizó su ficha en los últimos 30 días.",
+    icono: "sello",
+  },
+  { titulo: "Tres áreas juntas", texto: "Salud del cuerpo, salud mental y odontología, en la misma búsqueda.", icono: "areas" },
+  { titulo: "Sin turno desde acá", texto: "Escribís directo al profesional o al lugar. Cercalud no reserva.", icono: "contacto-directo" },
 ];
 
 const PREGUNTAS = [
@@ -52,11 +54,13 @@ export default async function Inicio() {
           <Buscador obras={obras} />
           <div className="flex flex-wrap justify-center gap-2">
             {AREAS.map((area) => (
-              <Link key={area.id} href={`/buscar?area=${area.id}`} className="pastilla">
+              <Link key={area.id} href={`/buscar?area=${area.id}`} className="pastilla enlace-icono gap-2">
+                <IconoCercalud nombre={iconoArea(area.id)} size={18} className="text-menta" />
                 {area.label}
               </Link>
             ))}
-            <Link href="/farmacia" className="pastilla">
+            <Link href="/farmacia" className="pastilla enlace-icono gap-2">
+              <IconoCercalud nombre="farmacia" size={18} className="text-menta" />
               Farmacia de turno
             </Link>
           </div>
@@ -67,10 +71,15 @@ export default async function Inicio() {
         <div className="mx-auto grid max-w-page gap-5 px-4 py-14 sm:py-16">
           <h2 className="text-3xl font-bold tracking-tight">Por qué buscar en Cercalud</h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            {BENEFICIOS.map(([titulo, texto]) => (
-              <article key={titulo} className="grid gap-1 border-t border-line pt-4">
-                <h3 className="text-xl font-bold">{titulo}</h3>
-                <p className="text-muted">{texto}</p>
+            {BENEFICIOS.map((item) => (
+              <article key={item.titulo} className="flex gap-3 border-t border-line pt-4">
+                <div className="icono-beneficio">
+                  <IconoCercalud nombre={item.icono} size={24} />
+                </div>
+                <div className="grid min-w-0 gap-1">
+                  <h3 className="text-xl font-bold">{item.titulo}</h3>
+                  <p className="text-muted">{item.texto}</p>
+                </div>
               </article>
             ))}
           </div>
@@ -82,8 +91,11 @@ export default async function Inicio() {
           <h2 className="text-3xl font-bold tracking-tight">Preguntas frecuentes</h2>
           {PREGUNTAS.map(([pregunta, respuesta]) => (
             <details key={pregunta} className="border-t border-line py-3">
-              <summary className="cursor-pointer text-lg font-semibold">{pregunta}</summary>
-              <p className="pt-2 text-muted">{respuesta}</p>
+              <summary className="flex cursor-pointer list-none items-start gap-2 text-lg font-semibold [&::-webkit-details-marker]:hidden">
+                <IconoCercalud nombre="guia" size={20} className="mt-0.5 shrink-0 text-menta" />
+                <span>{pregunta}</span>
+              </summary>
+              <p className="pt-2 pl-7 text-muted">{respuesta}</p>
             </details>
           ))}
         </div>
