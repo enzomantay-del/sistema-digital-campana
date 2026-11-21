@@ -5,5 +5,8 @@ export function usaPostgres() {
 }
 
 export function schemaPrisma() {
-  return usaPostgres() ? "prisma/schema.postgres.prisma" : "prisma/schema.prisma";
+  if (usaPostgres()) return "prisma/schema.postgres.prisma";
+  // En el build del hosting, Postgres se conecta solo al iniciar; el cliente debe ser el de Postgres.
+  if (process.env.NODE_ENV === "production") return "prisma/schema.postgres.prisma";
+  return "prisma/schema.prisma";
 }

@@ -8,7 +8,7 @@ import { ipCliente } from "@/lib/cliente";
 import { correoReservadoParaAdmin } from "@/lib/config";
 import { bloqueoAuthActivo, limpiarFallosAuth, registrarFalloAuth } from "@/lib/rateLimit";
 
-export type Resultado = { ok: true } | { ok: false; error: string };
+export type Resultado = { ok: true; irA?: string } | { ok: false; error: string };
 
 const LIMITE_LOGIN = { max: 8, windowMs: 15 * 60 * 1000 };
 const LIMITE_REGISTRO_IP = { max: 5, windowMs: 60 * 60 * 1000 };
@@ -49,7 +49,7 @@ export async function entrar(_estado: Resultado | null, formData: FormData): Pro
 
   const sesion = await crearSesion(user.id);
   if (!sesion) return { ok: false, error: "En este momento no se pueden usar las cuentas." };
-  redirect(esAdmin(user) ? "/panel/admin" : "/panel");
+  return { ok: true, irA: esAdmin(user) ? "/panel/admin" : "/panel" };
 }
 
 export async function crearCuenta(_estado: Resultado | null, formData: FormData): Promise<Resultado> {
@@ -106,7 +106,7 @@ export async function crearCuenta(_estado: Resultado | null, formData: FormData)
 
   const sesion = await crearSesion(user.id);
   if (!sesion) return { ok: false, error: "En este momento no se pueden usar las cuentas." };
-  redirect("/panel");
+  return { ok: true, irA: "/panel" };
 }
 
 export async function salir() {

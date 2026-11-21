@@ -1,10 +1,15 @@
 "use client";
 
-import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
 import { entrar, type Resultado } from "@/actions/auth";
 
 export function FormularioEntrar() {
+  const router = useRouter();
   const [estado, accion, pendiente] = useActionState<Resultado | null, FormData>(entrar, null);
+  useEffect(() => {
+    if (estado?.ok && estado.irA) router.replace(estado.irA);
+  }, [estado, router]);
   return (
     <form action={accion} className="grid max-w-xl gap-4">
       <label className="grid gap-1">
