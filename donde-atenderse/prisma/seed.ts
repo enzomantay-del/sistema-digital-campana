@@ -23,7 +23,10 @@ function dia(iso: string) {
 
 async function asegurarAdmin() {
   const email = (process.env.ADMIN_EMAIL ?? "admin@cercalud.local").trim().toLowerCase();
-  const password = process.env.ADMIN_PASSWORD ?? "cercalud-admin";
+  const password = process.env.ADMIN_PASSWORD?.trim();
+  if (!password) {
+    throw new Error("Definí ADMIN_PASSWORD en .env antes de ejecutar npm run db:seed (solo desarrollo local).");
+  }
   const passwordHash = await bcrypt.hash(password, 10);
   await prisma.user.upsert({
     where: { email },
