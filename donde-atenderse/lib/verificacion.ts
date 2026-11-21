@@ -6,6 +6,24 @@ export function datosActualizadosRecientes(valor: Date | null | undefined, ahora
   return ahora.getTime() - valor.getTime() <= limite;
 }
 
+export function profesionalVerificadoEnListado(input: {
+  updatedAt: Date;
+  attendances: { professionalUpdatedAt: Date | null }[];
+}) {
+  return datosActualizadosRecientes(
+    fechaMasReciente(input.updatedAt, ...input.attendances.map((fila) => fila.professionalUpdatedAt)),
+  );
+}
+
+export function lugarVerificadoEnListado(input: {
+  updatedAt: Date;
+  attendances?: { placeUpdatedAt: Date | null }[];
+}) {
+  return datosActualizadosRecientes(
+    fechaMasReciente(input.updatedAt, ...(input.attendances?.map((fila) => fila.placeUpdatedAt) ?? [])),
+  );
+}
+
 export function fechaMasReciente(...valores: (Date | null | undefined)[]) {
   let mejor: Date | null = null;
   for (const valor of valores) {

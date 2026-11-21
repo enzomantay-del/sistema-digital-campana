@@ -2,13 +2,28 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { AvatarProfesionalListado, LogoLugarListado } from "@/components/MediaListado";
+import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
 import { AREAS, LOCALIDADES } from "@/lib/constants";
 import { puebloMasCercano } from "@/lib/geo";
 
 const MINIMO_BUSQUEDA = 3;
 
-type SugerenciaPersona = { id: string; nombre: string; especialidad: string };
-type SugerenciaLugar = { id: string; nombre: string; tipo: string; localidad: string };
+type SugerenciaPersona = {
+  id: string;
+  nombre: string;
+  especialidad: string;
+  photoUrl: string;
+  verificado: boolean;
+};
+type SugerenciaLugar = {
+  id: string;
+  nombre: string;
+  tipo: string;
+  localidad: string;
+  logoUrl: string;
+  verificado: boolean;
+};
 
 export function Buscador({
   q = "",
@@ -169,17 +184,23 @@ export function Buscador({
                 <li key={lugar.id}>
                   <button
                     type="button"
-                    className="block w-full px-4 py-2 text-left hover:bg-paper"
+                    className="flex w-full gap-2.5 px-4 py-2 text-left hover:bg-paper"
                     onMouseDown={(evento) => evento.preventDefault()}
                     onClick={() => {
                       setAbierto(false);
                       router.push(`/lugar/${lugar.id}`);
                     }}
                   >
-                    <span className="block text-xs font-bold uppercase tracking-[0.06em] text-menta">Centro de salud</span>
-                    <span className="block font-semibold">{lugar.nombre}</span>
-                    <span className="text-sm text-muted">
-                      {lugar.tipo} · {lugar.localidad}
+                    <LogoLugarListado nombre={lugar.nombre} logoUrl={lugar.logoUrl} tamano="chico" />
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-start justify-between gap-1">
+                        <span className="block text-xs font-bold uppercase tracking-[0.06em] text-menta">Centro de salud</span>
+                        <InsigniaVerificacion activa={lugar.verificado} compacta />
+                      </span>
+                      <span className="block font-semibold">{lugar.nombre}</span>
+                      <span className="text-sm text-muted">
+                        {lugar.tipo} · {lugar.localidad}
+                      </span>
                     </span>
                   </button>
                 </li>
@@ -205,16 +226,22 @@ export function Buscador({
                 <li key={persona.id}>
                   <button
                     type="button"
-                    className="block w-full px-4 py-2 text-left hover:bg-paper"
+                    className="flex w-full gap-2.5 px-4 py-2 text-left hover:bg-paper"
                     onMouseDown={(evento) => evento.preventDefault()}
                     onClick={() => {
                       setAbierto(false);
                       router.push(`/profesional/${persona.id}`);
                     }}
                   >
-                    <span className="block text-xs font-bold uppercase tracking-[0.06em] text-menta">Profesional</span>
-                    <span className="block font-semibold">{persona.nombre}</span>
-                    <span className="text-sm text-muted">{persona.especialidad}</span>
+                    <AvatarProfesionalListado nombre={persona.nombre} photoUrl={persona.photoUrl} tamano="chico" />
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-start justify-between gap-1">
+                        <span className="block text-xs font-bold uppercase tracking-[0.06em] text-menta">Profesional</span>
+                        <InsigniaVerificacion activa={persona.verificado} compacta />
+                      </span>
+                      <span className="block font-semibold">{persona.nombre}</span>
+                      <span className="text-sm text-muted">{persona.especialidad}</span>
+                    </span>
                   </button>
                 </li>
               ))}

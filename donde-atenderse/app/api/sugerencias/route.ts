@@ -1,5 +1,6 @@
 import { etiquetaLugar, normalizar } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
+import { lugarVerificadoEnListado, profesionalVerificadoEnListado } from "@/lib/verificacion";
 
 const MINIMO = 3;
 
@@ -10,12 +11,27 @@ export async function GET(request: Request) {
   const [personas, lugares] = await Promise.all([
     prisma.professional.findMany({
       where: { published: true },
-      select: { id: true, fullName: true, specialty: true },
+      select: {
+        id: true,
+        fullName: true,
+        specialty: true,
+        photoUrl: true,
+        updatedAt: true,
+        attendances: { select: { professionalUpdatedAt: true } },
+      },
       orderBy: { fullName: "asc" },
     }),
     prisma.place.findMany({
       where: { published: true, kind: { not: "farmacia" } },
-      select: { id: true, name: true, kind: true, locality: true },
+      select: {
+        id: true,
+        name: true,
+        kind: true,
+        locality: true,
+        logoUrl: true,
+        updatedAt: true,
+        attendances: { select: { placeUpdatedAt: true } },
+      },
       orderBy: { name: "asc" },
     }),
   ]);
@@ -25,7 +41,13 @@ export async function GET(request: Request) {
         normalizar(persona.fullName).includes(consulta) || normalizar(persona.specialty).includes(consulta),
     )
     .slice(0, 6)
-    .map((persona) => ({ id: persona.id, nombre: persona.fullName, especialidad: persona.specialty }));
+    .map((persona) => ({
+      id: persona.id,
+      nombre: persona.fullName,
+      especialidad: persona.specialty,
+      photoUrl: persona.photoUrl,
+      verificado: profesionalVerificadoEnListado(persona),
+    }));
   const especialidades = [...new Set(personas.map((persona) => persona.specialty.trim()).filter(Boolean))]
     .filter((especialidad) => normalizar(especialidad).includes(consulta))
     .sort((a, b) => a.localeCompare(b, "es"))
@@ -43,6 +65,8 @@ export async function GET(request: Request) {
       nombre: lugar.name,
       tipo: etiquetaLugar(lugar.kind),
       localidad: lugar.locality,
+      logoUrl: lugar.logoUrl,
+      verificado: lugarVerificadoEnListado(lugar),
     }));
   return Response.json({ personas: porNombre, especialidades, lugares: lugaresCoincidentes });
 }

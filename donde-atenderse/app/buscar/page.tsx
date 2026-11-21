@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Buscador } from "@/components/Buscador";
-import { etiquetaLugar } from "@/lib/format";
+import { TarjetaListadoLugar } from "@/components/TarjetaListadoLugar";
+import { TarjetaListadoProfesional } from "@/components/TarjetaListadoProfesional";
 import { filaHorario } from "@/lib/map";
 import { catalogoObras, buscar } from "@/lib/search";
 import { armarVistaProfesional } from "@/lib/view";
@@ -57,42 +58,25 @@ export default async function PaginaBuscar({
             updatedAt: persona.updatedAt,
             filas: persona.attendances.map(filaHorario),
           });
-          return (
-            <Link key={persona.id} href={`/profesional/${persona.id}`} className="tarjeta block transition hover:border-link">
-              <h2 className="text-2xl font-bold tracking-tight text-ink">{vista.nombre}</h2>
-              <p className="text-muted">
-                {vista.especialidad} · {vista.area}
-                {persona.example ? " · Dato de ejemplo" : ""}
-              </p>
-              <ul className="mt-2 grid gap-2 text-sm">
-                {vista.bloques.flatMap((bloque) =>
-                  bloque.lineas.map((linea) => (
-                    <li key={linea.id}>
-                      <span className="font-semibold text-ink">
-                        {linea.rotulo}
-                        {linea.locality ? ` · ${linea.locality}` : ""}
-                      </span>
-                      {linea.detalle ? <p className="mt-0.5 text-muted">{linea.detalle}</p> : null}
-                    </li>
-                  )),
-                )}
-              </ul>
-            </Link>
-          );
+          return <TarjetaListadoProfesional key={persona.id} id={persona.id} vista={vista} ejemplo={persona.example} />;
         })}
       </section>
       <section className={`grid gap-3 ${estudios ? "order-1" : ""}`}>
         {centros.map((lugar) => (
-          <Link key={lugar.id} href={`/lugar/${lugar.id}`} className="tarjeta block transition hover:border-link">
-            <h2 className="text-2xl font-bold tracking-tight">{lugar.name}</h2>
-            <p className="text-muted">
-              {etiquetaLugar(lugar.kind)} · {lugar.locality}
-              {lugar.example ? " · Dato de ejemplo" : ""}
-            </p>
-            {lugar.studies.length > 0 ? (
-              <p className="mt-1">{lugar.studies.map((estudio) => estudio.name).join(" · ")}</p>
-            ) : null}
-          </Link>
+          <TarjetaListadoLugar
+            key={lugar.id}
+            lugar={{
+              id: lugar.id,
+              name: lugar.name,
+              kind: lugar.kind,
+              locality: lugar.locality,
+              logoUrl: lugar.logoUrl,
+              example: lugar.example,
+              updatedAt: lugar.updatedAt,
+              attendances: lugar.attendances,
+              studies: lugar.studies,
+            }}
+          />
         ))}
       </section>
     </div>

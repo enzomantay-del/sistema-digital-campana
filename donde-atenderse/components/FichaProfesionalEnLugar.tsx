@@ -1,19 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
+import { AvatarProfesionalListado } from "@/components/MediaListado";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
 import { ListaHorarioTexto } from "@/components/ListaHorarioTexto";
 import { MENSAJE_WHATSAPP } from "@/lib/constants";
 import { enlaceWhatsApp, etiquetaArea } from "@/lib/format";
 import type { ProfesionalEnLugar } from "@/lib/lugarEquipo";
-
-function iniciales(nombre: string) {
-  return nombre
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((parte) => parte[0]?.toUpperCase() ?? "")
-    .join("");
-}
 
 /** Fila densa para listados (muchos profesionales en un mismo lugar). */
 export function FichaProfesionalEnLugar({
@@ -29,15 +20,7 @@ export function FichaProfesionalEnLugar({
 
   return (
     <article className={enLista ? "fila-profesional-lista" : "fila-profesional flex gap-3"}>
-      {persona.photoUrl ? (
-        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-line bg-white">
-          <Image src={persona.photoUrl} alt="" fill className="object-cover" sizes="48px" unoptimized />
-        </div>
-      ) : (
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-line bg-[#eef4f8] text-sm font-bold text-link">
-          {iniciales(persona.fullName) || "?"}
-        </div>
-      )}
+      <AvatarProfesionalListado nombre={persona.fullName} photoUrl={persona.photoUrl} tamano="lista" />
       <div className="min-w-0 flex-1">
         <div className="flex items-start gap-2">
           <div className="min-w-0 flex-1">
