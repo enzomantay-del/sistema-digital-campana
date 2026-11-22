@@ -13,6 +13,9 @@ export const AREAS = [
   { id: "odontologia", label: "Odontológica" },
 ] as const;
 
+/** Hospitales, sanatorios y consultorios (sin farmacia ni laboratorio/imágenes). */
+export const TIPOS_CENTRO_SALUD = ["hospital", "sanatorio", "consultorio", "policonsultorio"] as const;
+
 export const TIPOS_LUGAR = [
   { id: "hospital", label: "Hospital" },
   { id: "sanatorio", label: "Sanatorio" },

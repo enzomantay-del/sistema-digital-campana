@@ -1,4 +1,4 @@
-import { OBRAS_MISIONES } from "./constants";
+import { OBRAS_MISIONES, TIPOS_CENTRO_SALUD } from "./constants";
 import { lugarAtiendeObra, obrasModoEfectivo } from "./placeObras";
 import { incluye } from "./format";
 import { distanciaALocalidad } from "./geo";
@@ -32,6 +32,7 @@ export async function buscar(filtros: {
   area?: string;
   obra?: string;
   estudios?: string;
+  centros?: string;
   lat?: string;
   lng?: string;
 }) {
@@ -40,6 +41,8 @@ export async function buscar(filtros: {
   const area = filtros.area?.trim() ?? "";
   const obra = filtros.obra?.trim() ?? "";
   const estudios = filtros.estudios === "1";
+  const centrosSalud = filtros.centros === "1";
+  const soloLugares = (estudios || centrosSalud) && !q;
   const lat = Number(filtros.lat);
   const lng = Number(filtros.lng);
   const conUbicacion = Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
@@ -103,10 +106,15 @@ export async function buscar(filtros: {
       if (!coincide && !estudio) return false;
     }
     if (estudios && lugar.kind !== "imagenes" && lugar.kind !== "laboratorio" && lugar.studies.length === 0) return false;
+    if (
+      centrosSalud &&
+      !TIPOS_CENTRO_SALUD.includes(lugar.kind as (typeof TIPOS_CENTRO_SALUD)[number])
+    )
+      return false;
     return true;
   });
 
-  const personasVisibles = estudios && !q ? [] : personas;
+  const personasVisibles = soloLugares ? [] : personas;
   const km = (localidadItem: string) => (conUbicacion ? distanciaALocalidad(localidadItem, lat, lng) : 0);
   const porCercania = <T,>(items: T[], distanciaDe: (item: T) => number) => {
     if (!conUbicacion || localidad) return items;
@@ -124,6 +132,7 @@ export async function buscar(filtros: {
     area,
     obra,
     estudios,
+    centrosSalud,
     conUbicacion,
   };
 }

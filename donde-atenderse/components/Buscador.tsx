@@ -33,6 +33,7 @@ export function Buscador({
   obra = "",
   obras = [],
   estudios = false,
+  centrosSalud = false,
   mostrarArea = false,
   placeholder = "Nombre del profesional, especialidad o centro de salud",
 }: {
@@ -42,6 +43,7 @@ export function Buscador({
   obra?: string;
   obras?: string[];
   estudios?: boolean;
+  centrosSalud?: boolean;
   mostrarArea?: boolean;
   placeholder?: string;
 }) {
@@ -129,6 +131,8 @@ export function Buscador({
   function irABuscar(consulta: string) {
     const params = new URLSearchParams({ q: consulta });
     if (obra) params.set("obra", obra);
+    if (estudios) params.set("estudios", "1");
+    if (centrosSalud) params.set("centros", "1");
     if (coords && ubicacion === "cerca") {
       params.set("lat", String(coords.lat));
       params.set("lng", String(coords.lng));
@@ -139,6 +143,7 @@ export function Buscador({
   return (
     <form action="/buscar" className="grid gap-3 text-left">
       {estudios ? <input type="hidden" name="estudios" value="1" /> : null}
+      {centrosSalud ? <input type="hidden" name="centros" value="1" /> : null}
       {ubicacion === "cerca" && coords ? (
         <>
           <input type="hidden" name="lat" value={coords.lat} />

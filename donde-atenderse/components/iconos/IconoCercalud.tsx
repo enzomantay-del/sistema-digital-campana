@@ -2,6 +2,7 @@ import type { ReactElement, SVGProps } from "react";
 
 export type NombreIconoCercalud =
   | "profesional"
+  | "centro-salud"
   | "estudios"
   | "farmacia"
   | "guia"
@@ -77,6 +78,14 @@ const ICONOS: Record<NombreIconoCercalud, (props: { size?: number; className?: s
         className="text-menta"
       />
       <Trazo d="M17.25 12.25c.6 1 .95 2.15.95 3.35" className="opacity-70" />
+    </SvgBase>
+  ),
+  "centro-salud": (p) => (
+    <SvgBase {...p}>
+      <Trazo d="M5 11.5h14v7.5H5z" />
+      <Trazo d="M8.25 11.5V9a1.75 1.75 0 0 1 1.75-1.75h4.5A1.75 1.75 0 0 1 16 9v2.5" />
+      <path d="M12 14v4M10 16h4" stroke="currentColor" strokeWidth={T} strokeLinecap="round" className="text-menta" />
+      <Trazo d="M5 18.25h14" className="opacity-55" />
     </SvgBase>
   ),
   estudios: (p) => (
@@ -218,6 +227,7 @@ export function iconoArea(id: string): NombreIconoCercalud {
 
 export const ICONO_NAV: Record<string, NombreIconoCercalud> = {
   "/buscar": "profesional",
+  "/buscar?centros=1": "centro-salud",
   "/buscar?estudios=1": "estudios",
   "/farmacia": "farmacia",
   "/#como-funciona": "guia",
