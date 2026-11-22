@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { asignarEditor, bajarLugar, eliminarLugar, publicarLugar, quitarEditor } from "@/actions/admin";
 import { AccionesAdmin } from "@/components/AccionesAdmin";
 import { AvisoFotosHosting } from "@/components/AvisoFotosHosting";
 import { EditorLugar } from "@/components/EditorLugar";
@@ -16,10 +15,10 @@ export default async function PaginaEditorLugar({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; ok?: string }>;
 }) {
   const { id } = await params;
-  const { error } = await searchParams;
+  const { error, ok } = await searchParams;
   const usuario = await usuarioActual();
   if (!usuario) redirect("/entrar");
   const admin = esAdmin(usuario);
@@ -57,18 +56,34 @@ export default async function PaginaEditorLugar({
           <AccionesAdmin
             compacto
             acciones={[
-              { label: "Publicar", action: publicarLugar, id: lugar.id, tono: "boton" },
-              { label: "Bajar", action: bajarLugar, id: lugar.id, tono: "suave" },
+              {
+                label: "Publicar",
+                href: `/api/lugar/${lugar.id}/admin`,
+                accionCampo: "publicar",
+                id: lugar.id,
+                tono: "boton",
+              },
+              {
+                label: "Bajar",
+                href: `/api/lugar/${lugar.id}/admin`,
+                accionCampo: "bajar",
+                id: lugar.id,
+                tono: "suave",
+              },
               {
                 label: "Eliminar",
-                action: eliminarLugar,
+                href: `/api/lugar/${lugar.id}/admin`,
+                accionCampo: "eliminar",
                 id: lugar.id,
                 tono: "peligro",
                 confirmar: `¿Eliminar ${lugar.name}? No se puede deshacer.`,
               },
             ]}
           />
-          <form action={asignarEditor} className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+          {ok === "publicar" ? <p className="text-sm text-menta">Lugar publicado.</p> : null}
+          {ok === "bajar" ? <p className="text-sm text-muted">Lugar sin publicar en la web.</p> : null}
+          {error === "accion" ? <p className="text-sm text-warn">No se pudo completar la acción. Probá de nuevo.</p> : null}
+          <form action={`/api/lugar/${lugar.id}/editor`} method="post" className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
             <label className="grid gap-1">
               Asignar editor por correo
               <input name="email" type="email" className="campo" placeholder="secretaria@ejemplo.com" required />
@@ -86,8 +101,8 @@ export default async function PaginaEditorLugar({
                   <span>
                     {editor.user.name} · {editor.user.email}
                   </span>
-                  <form action={quitarEditor}>
-                    <input type="hidden" name="placeId" value={lugar.id} />
+                  <form action={`/api/lugar/${lugar.id}/editor`} method="post">
+                    <input type="hidden" name="modo" value="quitar" />
                     <input type="hidden" name="userId" value={editor.userId} />
                     <button className="font-semibold text-link" type="submit">
                       Quitar

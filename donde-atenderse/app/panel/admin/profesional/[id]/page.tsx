@@ -2,15 +2,21 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EditorProfesional } from "@/components/EditorProfesional";
 import { AccionesAdmin } from "@/components/AccionesAdmin";
-import { bajarProfesional, eliminarProfesional, publicarProfesional } from "@/actions/admin";
 import { requiereAdmin } from "@/lib/auth";
 import { horarioProfesional } from "@/lib/map";
 import { prisma } from "@/lib/prisma";
 import { catalogoObras } from "@/lib/search";
 
-export default async function EditarProfesionalAdmin({ params }: { params: Promise<{ id: string }> }) {
+export default async function EditarProfesionalAdmin({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string; ok?: string }>;
+}) {
   await requiereAdmin();
   const { id } = await params;
+  const { error, ok } = await searchParams;
   const persona = await prisma.professional.findUnique({
     where: { id },
     include: {
@@ -46,17 +52,33 @@ export default async function EditarProfesionalAdmin({ params }: { params: Promi
         <AccionesAdmin
           compacto
           acciones={[
-            { label: "Publicar", action: publicarProfesional, id: persona.id, tono: "boton" },
-            { label: "Bajar", action: bajarProfesional, id: persona.id, tono: "suave" },
+            {
+              label: "Publicar",
+              href: `/api/profesional/${persona.id}/admin`,
+              accionCampo: "publicar",
+              id: persona.id,
+              tono: "boton",
+            },
+            {
+              label: "Bajar",
+              href: `/api/profesional/${persona.id}/admin`,
+              accionCampo: "bajar",
+              id: persona.id,
+              tono: "suave",
+            },
             {
               label: "Eliminar",
-              action: eliminarProfesional,
+              href: `/api/profesional/${persona.id}/admin`,
+              accionCampo: "eliminar",
               id: persona.id,
               tono: "peligro",
               confirmar: `¿Eliminar ${persona.fullName}? No se puede deshacer.`,
             },
           ]}
         />
+        {ok === "publicar" ? <p className="text-sm text-menta">Ficha publicada.</p> : null}
+        {ok === "bajar" ? <p className="text-sm text-muted">Ficha sin publicar en la web.</p> : null}
+        {error === "accion" ? <p className="text-sm text-warn">No se pudo completar la acción. Probá de nuevo.</p> : null}
         {persona.example ? (
           <p className="text-sm text-muted">
             Podés editar esta ficha de ejemplo como administrador. Sigue marcada como dato de ejemplo hasta que la

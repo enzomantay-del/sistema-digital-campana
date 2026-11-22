@@ -18,12 +18,14 @@ const accionesProfesional = {
   publicar: publicarProfesional,
   bajar: bajarProfesional,
   eliminar: eliminarProfesional,
+  hrefLote: "/api/admin/profesionales",
 };
 
 const accionesLugar = {
   publicar: publicarLugar,
   bajar: bajarLugar,
   eliminar: eliminarLugar,
+  hrefLote: "/api/admin/lugares",
 };
 
 function filaProfesional(

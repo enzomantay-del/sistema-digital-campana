@@ -24,6 +24,8 @@ type AccionesLote = {
   publicar: (formData: FormData) => void | Promise<void>;
   bajar: (formData: FormData) => void | Promise<void>;
   eliminar: (formData: FormData) => void | Promise<void>;
+  /** Si está definido, los formularios de lote usan POST clásico en vez de server actions. */
+  hrefLote?: string;
 };
 
 function claseLote(variante: "publicar" | "bajar" | "eliminar") {
@@ -35,12 +37,16 @@ function claseLote(variante: "publicar" | "bajar" | "eliminar") {
 function FormularioLote({
   ids,
   accion,
+  href,
+  accionCampo,
   etiqueta,
   variante,
   confirmar,
 }: {
   ids: string[];
   accion: (formData: FormData) => void | Promise<void>;
+  href?: string;
+  accionCampo?: string;
   etiqueta: string;
   variante: "publicar" | "bajar" | "eliminar";
   confirmar?: string;
@@ -48,7 +54,8 @@ function FormularioLote({
   const deshabilitado = ids.length === 0;
   return (
     <form
-      action={accion}
+      action={href ?? accion}
+      method={href ? "post" : undefined}
       onSubmit={(event) => {
         if (deshabilitado) {
           event.preventDefault();
@@ -59,6 +66,7 @@ function FormularioLote({
         }
       }}
     >
+      {href && accionCampo ? <input type="hidden" name="accion" value={accionCampo} /> : null}
       {ids.map((id) => (
         <input key={id} type="hidden" name="ids" value={id} />
       ))}
@@ -212,11 +220,27 @@ export function GestionAdminLista({
           <input className="size-3.5 accent-accent" type="checkbox" checked={todosVisibles} onChange={alternarVisibles} />
           Seleccionar visibles ({visibles.length})
         </label>
-        <FormularioLote ids={idsSeleccionados} accion={acciones.publicar} etiqueta="Publicar" variante="publicar" />
-        <FormularioLote ids={idsSeleccionados} accion={acciones.bajar} etiqueta="Bajar" variante="bajar" />
+        <FormularioLote
+          ids={idsSeleccionados}
+          accion={acciones.publicar}
+          href={acciones.hrefLote}
+          accionCampo="publicar"
+          etiqueta="Publicar"
+          variante="publicar"
+        />
+        <FormularioLote
+          ids={idsSeleccionados}
+          accion={acciones.bajar}
+          href={acciones.hrefLote}
+          accionCampo="bajar"
+          etiqueta="Bajar"
+          variante="bajar"
+        />
         <FormularioLote
           ids={idsSeleccionados}
           accion={acciones.eliminar}
+          href={acciones.hrefLote}
+          accionCampo="eliminar"
           etiqueta="Eliminar"
           variante="eliminar"
           confirmar={
@@ -271,17 +295,24 @@ export function GestionAdminLista({
                 acciones={[
                   {
                     label: "Publicar",
-                    action: acciones.publicar,
+                    action: acciones.hrefLote ? undefined : acciones.publicar,
+                    href: acciones.hrefLote,
+                    accionCampo: "publicar",
                     id: fila.id,
                   },
                   {
                     label: "Bajar",
-                    action: acciones.bajar,
+                    action: acciones.hrefLote ? undefined : acciones.bajar,
+                    href: acciones.hrefLote,
+                    accionCampo: "bajar",
                     id: fila.id,
+                    tono: "suave",
                   },
                   {
                     label: "Eliminar",
-                    action: acciones.eliminar,
+                    action: acciones.hrefLote ? undefined : acciones.eliminar,
+                    href: acciones.hrefLote,
+                    accionCampo: "eliminar",
                     id: fila.id,
                     tono: "peligro",
                     confirmar: `¿Eliminar ${fila.titulo}? No se puede deshacer.`,

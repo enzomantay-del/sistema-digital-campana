@@ -4,7 +4,12 @@ import type { ReactNode } from "react";
 
 type Accion = {
   label: string;
-  action: (formData: FormData) => void | Promise<void>;
+  /** Server action (legacy). Preferir `href` + `accionCampo`. */
+  action?: (formData: FormData) => void | Promise<void>;
+  /** POST clásico (recomendado en hosting). */
+  href?: string;
+  /** Valor del campo oculto `accion` cuando se usa `href`. */
+  accionCampo?: string;
   id: string;
   tono?: "link" | "boton" | "suave" | "peligro";
   confirmar?: string;
@@ -36,13 +41,17 @@ export function AccionesAdmin({
       {acciones.map((accion) => (
         <form
           key={`${accion.label}-${accion.id}`}
-          action={accion.action}
+          action={accion.href ?? accion.action}
+          method={accion.href ? "post" : undefined}
           onSubmit={(event) => {
             if (accion.confirmar && !window.confirm(accion.confirmar)) {
               event.preventDefault();
             }
           }}
         >
+          {accion.href && accion.accionCampo ? (
+            <input type="hidden" name="accion" value={accion.accionCampo} />
+          ) : null}
           <input type="hidden" name="id" value={accion.id} />
           <button className={clase(accion.tono)} type="submit">
             {accion.label}
