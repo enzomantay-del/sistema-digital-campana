@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Buscador } from "@/components/Buscador";
+import { PublicidadPruebaInicio } from "@/components/PublicidadPruebaInicio";
 import { IconoCercalud, iconoArea, type NombreIconoCercalud } from "@/components/iconos/IconoCercalud";
 import { mostrarDatosEjemplo } from "@/lib/config";
 import { AREAS } from "@/lib/constants";
@@ -66,6 +67,7 @@ export default async function Inicio() {
             </p>
           </div>
           <Buscador obras={obras} />
+          <PublicidadPruebaInicio />
           <div className="flex flex-wrap justify-center gap-2">
             {AREAS.map((area) => (
               <Link key={area.id} href={`/buscar?area=${area.id}`} className="pastilla enlace-icono gap-2">
