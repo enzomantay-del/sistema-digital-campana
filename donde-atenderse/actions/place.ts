@@ -33,29 +33,22 @@ async function puedeEditarLugar(user: NonNullable<Awaited<ReturnType<typeof usua
   return user.places.some((item) => item.placeId === placeId);
 }
 
+/** @deprecated Usar POST /api/lugar/crear (formulario en /panel/lugar/nuevo). */
 export async function crearLugar(formData: FormData) {
-  const user = await usuarioActual();
-  if (!user) redirect("/entrar");
-  if (!esAdmin(user)) redirect("/panel");
-
-  const name = String(formData.get("name") ?? "").trim();
-  const kind = String(formData.get("kind") ?? "");
-  const locality = String(formData.get("locality") ?? "");
-  const address = String(formData.get("address") ?? "").trim();
-  if (name.length < 2) redirect("/panel/lugar/nuevo?error=nombre");
-  if (!TIPOS_LUGAR.some((tipo) => tipo.id === kind)) redirect("/panel/lugar/nuevo?error=tipo");
-  if (!LOCALIDADES.includes(locality as (typeof LOCALIDADES)[number])) redirect("/panel/lugar/nuevo?error=localidad");
-
-  let place;
-  try {
-    place = await prisma.place.create({
-      data: { name, kind, locality, address, published: true, obrasMode: obrasModoDefault(kind) },
-    });
-  } catch (error) {
-    console.error("crearLugar:", error);
-    redirect("/panel/lugar/nuevo?error=servidor");
+  const { procesarNuevoLugar } = await import("@/lib/nuevoLugar");
+  const resultado = await procesarNuevoLugar(formData);
+  if (!resultado.ok) {
+    const errores: Record<string, string> = {
+      sesion: "/entrar",
+      permiso: "/panel",
+      nombre: "/panel/lugar/nuevo?error=nombre",
+      tipo: "/panel/lugar/nuevo?error=tipo",
+      localidad: "/panel/lugar/nuevo?error=localidad",
+      servidor: "/panel/lugar/nuevo?error=servidor",
+    };
+    redirect(errores[resultado.codigo] ?? "/panel/lugar/nuevo?error=servidor");
   }
-  redirect(`/panel/lugar/${place.id}`);
+  redirect(`/panel/lugar/${resultado.placeId}`);
 }
 
 export async function guardarLugar(placeId: string, borrador: BorradorLugar): Promise<GuardadoLugar> {

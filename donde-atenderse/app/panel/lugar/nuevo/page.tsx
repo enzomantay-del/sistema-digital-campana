@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { crearLugar } from "@/actions/place";
 import { esAdmin, usuarioActual } from "@/lib/auth";
 import { LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
 
@@ -25,7 +24,7 @@ export default async function NuevoLugar({
           : "";
 
   return (
-    <form action={crearLugar} className="grid max-w-xl gap-4">
+    <form action="/api/lugar/crear" method="post" className="grid max-w-xl gap-4">
       <h1 className="text-4xl font-semibold tracking-tight">Cargar un lugar</h1>
       <p className="text-muted">Hospitales, sanatorios, consultorios, estudios y farmacias del corredor.</p>
       <label className="grid gap-1">
@@ -46,7 +45,9 @@ export default async function NuevoLugar({
         Localidad
         <select name="locality" className="campo" defaultValue="Jardín América">
           {LOCALIDADES.map((localidad) => (
-            <option key={localidad}>{localidad}</option>
+            <option key={localidad} value={localidad}>
+              {localidad}
+            </option>
           ))}
         </select>
       </label>
