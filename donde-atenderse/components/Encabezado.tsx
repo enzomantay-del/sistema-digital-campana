@@ -7,7 +7,7 @@ import { RUTA_PROFESIONAL_EJEMPLO } from "@/lib/ejemplo";
 
 const ENLACES = [
   { href: "/buscar", label: "Profesionales" },
-  { href: "/buscar?estudios=1", label: "Estudios" },
+  { href: "/buscar?estudios=1", label: "Laboratorios e imágenes" },
   { href: "/farmacia", label: "Farmacia de turno" },
   { href: "/#como-funciona", label: "Cómo funciona" },
 ] as const;

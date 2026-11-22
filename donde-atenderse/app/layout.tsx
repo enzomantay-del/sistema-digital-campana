@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   title: "Cercalud",
   applicationName: "Cercalud",
   description:
-    "Profesionales, consultorios, hospitales, sanatorios, estudios y farmacia de turno en el corredor de Jardín América.",
+    "Profesionales, consultorios, hospitales, sanatorios, laboratorios e imágenes y farmacia de turno en el corredor de Jardín América.",
 };
 
 export const dynamic = "force-dynamic";

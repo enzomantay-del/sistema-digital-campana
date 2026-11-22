@@ -25,11 +25,11 @@ export default async function PaginaBuscar({
       <header className="grid max-w-3xl gap-2">
         <h1 className="enlace-icono text-4xl font-bold tracking-tight">
           <IconoCercalud nombre={estudios ? "estudios" : "profesional"} size={34} className="text-menta" />
-          {estudios ? "Estudios" : "Profesionales"}
+          {estudios ? "Laboratorios e imágenes" : "Profesionales"}
         </h1>
         <p className="text-muted">
           {estudios
-            ? "Centros de imágenes, laboratorios y lugares que cargaron un estudio."
+            ? "Laboratorios, centros de diagnóstico por imágenes y lugares que publican qué prácticas realizan."
             : "Buscá por el nombre, la especialidad o el lugar."}
         </p>
       </header>

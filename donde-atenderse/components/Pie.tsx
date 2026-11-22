@@ -25,7 +25,7 @@ export function Pie({ ejemplo }: { ejemplo: boolean }) {
         <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-link">
           <Link href="/">Inicio</Link>
           <Link href="/buscar">Profesionales</Link>
-          <Link href="/buscar?estudios=1">Estudios</Link>
+          <Link href="/buscar?estudios=1">Laboratorios e imágenes</Link>
           <Link href="/farmacia">Farmacia de turno</Link>
           <Link href="/contacto">Contacto</Link>
           <Link href="/privacidad">Privacidad</Link>

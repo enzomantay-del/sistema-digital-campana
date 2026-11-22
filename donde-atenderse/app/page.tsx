@@ -25,7 +25,7 @@ const BENEFICIOS: { titulo: string; texto: string; icono: NombreIconoCercalud }[
 const PREGUNTAS = [
   [
     "¿Qué puedo buscar en Cercalud?",
-    "Profesionales y lugares de salud del cuerpo, salud mental y odontología: consultorios, hospitales, sanatorios y estudios. También la farmacia de turno, en Santo Pipó, Hipólito Yrigoyen, Jardín América, Ruiz de Montoya, Capioví y Puerto Rico.",
+    "Profesionales y lugares de salud del cuerpo, salud mental y odontología: consultorios, hospitales, sanatorios, laboratorios e imágenes. También la farmacia de turno, en Santo Pipó, Hipólito Yrigoyen, Jardín América, Ruiz de Montoya, Capioví y Puerto Rico.",
   ],
   [
     "¿Puedo buscar por obra social?",
