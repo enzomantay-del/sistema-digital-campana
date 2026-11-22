@@ -20,6 +20,7 @@ Orden sugerido. Vos podés avanzar hosting en paralelo; el resto es operación +
 - [ ] `ADMIN_EMAIL` y `ADMIN_PASSWORD` distintos del ejemplo.
 - [ ] En producción: **no** definir `CERCALUD_MOSTRAR_EJEMPLOS=1` (oculta datos `example` y publicidades demo).
 - [ ] Opcional: `CERCALUD_CONTACTO_EMAIL`, `CERCALUD_CONTACTO_WHATSAPP` para la página de contacto.
+- [ ] Correo público `contacto@cercalud.com.ar` sin costo: ver [correo-cercalud.md](./correo-cercalud.md) (NIC + Cloudflare Email Routing + Gmail solo de Cercalud).
 
 Primera carga de base en producción:
 
