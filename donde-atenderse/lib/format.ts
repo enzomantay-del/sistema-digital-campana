@@ -25,6 +25,27 @@ export function fecha(date: Date | string | null | undefined) {
   }).format(value);
 }
 
+const ZONA_CORREDOR = "America/Argentina/Buenos_Aires";
+
+export function fechaHora(date: Date | string | null | undefined) {
+  if (!date) return "";
+  const value = typeof date === "string" ? new Date(date) : date;
+  if (Number.isNaN(value.getTime())) return "";
+  return new Intl.DateTimeFormat("es-AR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: ZONA_CORREDOR,
+  }).format(value);
+}
+
+export function textoVigenciaTurnoFarmacia(desde: Date, hasta: Date) {
+  return `Desde el ${fechaHora(desde)} hasta el ${fechaHora(hasta)} (hora de Misiones).`;
+}
+
 export function textoDias(ids: string[]) {
   const orden = DIAS.map((dia) => dia.id);
   const elegidos = orden.filter((id) => ids.includes(id));

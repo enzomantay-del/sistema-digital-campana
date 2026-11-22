@@ -9,6 +9,7 @@ import {
   publicarProfesional,
 } from "@/actions/admin";
 import { GestionAdminLista, type FilaAdmin } from "@/components/GestionAdminLista";
+import { ImportarTurneroFarmacia } from "@/components/ImportarTurneroFarmacia";
 import { requiereAdmin } from "@/lib/auth";
 import { etiquetaArea, etiquetaLugar, fecha } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
@@ -200,6 +201,10 @@ export default async function PanelAdmin() {
           acciones={accionesProfesional}
           filtros="profesional"
         />
+      </section>
+
+      <section className="flex justify-center">
+        <ImportarTurneroFarmacia />
       </section>
 
       <section className="grid gap-2">

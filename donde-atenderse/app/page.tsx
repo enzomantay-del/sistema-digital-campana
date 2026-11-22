@@ -14,6 +14,11 @@ const BENEFICIOS: { titulo: string; texto: string; icono: NombreIconoCercalud }[
     icono: "sello",
   },
   { titulo: "Tres áreas juntas", texto: "Salud del cuerpo, salud mental y odontología, en la misma búsqueda.", icono: "areas" },
+  {
+    titulo: "Cuadro completo",
+    texto: "Horarios, contacto y obras en un solo lugar: la guía más amplia del corredor, pensada para mantenerla actualizada.",
+    icono: "ficha",
+  },
   { titulo: "Sin turno desde acá", texto: "Escribís directo al profesional o al lugar. Cercalud no reserva.", icono: "contacto-directo" },
 ];
 
@@ -29,14 +34,17 @@ const PREGUNTAS = [
   ["¿Cercalud saca turnos?", "No. Muestra los datos para que le escribas al profesional o al lugar."],
   [
     "¿Quién carga los datos?",
-    "Los lugares los carga Cercalud. Cada profesional carga su ficha y los días en que atiende. La primera vez revisamos nombre, matrícula y WhatsApp.",
+    "Los lugares y farmacias los carga Cercalud. Cada profesional carga su ficha y los días en que atiende; los turnos de farmacia salen del turnero oficial. La primera vez revisamos nombre, matrícula y WhatsApp.",
   ],
   ["¿Por qué pide mi ubicación?", "Para mostrar primero lo que tenés más cerca. Si no la activás, elegís el pueblo. No se guarda."],
   [
     "¿Los datos que veo son reales?",
     "Solo publicamos fichas revisadas. Cada profesional verifica su información; el sello azul indica una actualización en los últimos 30 días.",
   ],
-  ["¿Dónde miro la farmacia de turno?", "En su página, con la fecha que cargaron. Si esa fecha ya pasó, no es el turno de hoy."],
+  [
+    "¿Dónde miro la farmacia de turno?",
+    "En Farmacia de turno, con día y hora de inicio y fin. Solo figura la farmacia mientras dura su turno según el turnero.",
+  ],
 ];
 
 function faqVisibles(demo: boolean) {
@@ -67,7 +75,6 @@ export default async function Inicio() {
             </p>
           </div>
           <Buscador obras={obras} />
-          <PublicidadPruebaInicio />
           <div className="flex flex-wrap justify-center gap-2">
             {AREAS.map((area) => (
               <Link key={area.id} href={`/buscar?area=${area.id}`} className="pastilla enlace-icono gap-2">
@@ -80,6 +87,12 @@ export default async function Inicio() {
               Farmacia de turno
             </Link>
           </div>
+        </div>
+      </section>
+
+      <section aria-label="Publicidad" className="border-y border-line bg-white px-4 py-6 sm:py-10">
+        <div className="mx-auto w-full max-w-page">
+          <PublicidadPruebaInicio />
         </div>
       </section>
 

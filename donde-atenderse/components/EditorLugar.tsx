@@ -249,20 +249,12 @@ export function EditorLugar({
         </section>
 
         {borrador.kind === "farmacia" ? (
-          <section className="grid gap-4">
-            <h2 className="text-2xl font-semibold">Turno</h2>
-            <label className="grid gap-1">
-              Desde
-              <input className="campo" type="date" value={borrador.dutyStart} onChange={(event) => cambiar({ dutyStart: event.target.value })} />
-            </label>
-            <label className="grid gap-1">
-              Hasta
-              <input className="campo" type="date" value={borrador.dutyEnd} onChange={(event) => cambiar({ dutyEnd: event.target.value })} />
-            </label>
-            <label className="grid gap-1">
-              Fuente
-              <input className="campo" value={borrador.dutySource} onChange={(event) => cambiar({ dutySource: event.target.value })} />
-            </label>
+          <section className="grid gap-3 rounded-xl border border-line bg-paper px-4 py-3">
+            <h2 className="text-xl font-semibold">Turno de farmacia</h2>
+            <p className="text-sm text-muted">
+              Los turnos no se cargan en esta ficha. Cercalud los importa desde el turnero oficial (día y hora exactos) en
+              Administración.
+            </p>
           </section>
         ) : (
           <section className="grid gap-4">
@@ -296,8 +288,8 @@ export function EditorLugar({
         <h2 className="text-2xl font-semibold">Así lo ve el paciente</h2>
         {borrador.kind === "farmacia" ? (
           <p>
-            {borrador.name || "Farmacia"} · {borrador.locality}. El turno se publica en Farmacia de turno
-            {borrador.dutyStart && borrador.dutyEnd ? `, del ${borrador.dutyStart} al ${borrador.dutyEnd}` : ""}.
+            {borrador.name || "Farmacia"} · {borrador.locality}. En la web pública el turno se muestra cuando corresponda
+            según el turnero.
           </p>
         ) : (
           <FichaLugar vista={vista} enlazar={false} mostrarProfesionalesEnFicha />

@@ -1,6 +1,6 @@
 import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { LOCALIDADES } from "@/lib/constants";
-import { fecha } from "@/lib/format";
+import { fecha, textoVigenciaTurnoFarmacia } from "@/lib/format";
 import { farmaciasDeTurno } from "@/lib/search";
 
 export default async function PaginaFarmacia() {
@@ -13,8 +13,8 @@ export default async function PaginaFarmacia() {
           Farmacia de turno
         </h1>
         <p className="text-muted">
-          El turno se muestra con la fecha cargada. Si esa fecha ya pasó, no lo tomes como el
-          turno de hoy.
+          Mostramos el turno con día y hora de inicio y fin, según el turnero oficial del corredor. Fuera de ese rango, esa
+          farmacia no figura como de turno.
         </p>
       </header>
       {LOCALIDADES.map((localidad) => {
@@ -28,9 +28,7 @@ export default async function PaginaFarmacia() {
               <div className="grid gap-1">
                 <p className="text-xl">{vigente.name}</p>
                 {vigente.address ? <p>{vigente.address}</p> : null}
-                <p className="text-muted">
-                  Del {fecha(vigente.vigente.startsOn)} al {fecha(vigente.vigente.endsOn)}.
-                </p>
+                <p className="text-muted">{textoVigenciaTurnoFarmacia(vigente.vigente.startsOn, vigente.vigente.endsOn)}</p>
                 {vigente.vigente.source ? <p className="text-base text-muted">{vigente.vigente.source}</p> : null}
                 {vigente.example ? <p className="text-base text-warn">Dato de ejemplo.</p> : null}
               </div>

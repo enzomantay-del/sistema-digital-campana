@@ -40,7 +40,7 @@ No uses `npm run db:seed` en producción (carga el corredor de ejemplo).
 ## 3. Farmacia de turno
 
 - [ ] Cada farmacia como lugar `kind: farmacia`, publicada.
-- [ ] Turno vigente en el panel del lugar (fechas inicio/fin y fuente).
+- [ ] Turnos importados desde el turnero en **Administración** (no en la ficha del lugar).
 
 ## 4. Quitar modo demo
 

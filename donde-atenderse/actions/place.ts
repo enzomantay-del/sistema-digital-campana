@@ -124,25 +124,6 @@ export async function guardarLugar(placeId: string, borrador: BorradorLugar): Pr
     await prisma.study.deleteMany({ where: { placeId, id: { notIn: [...estudiosConservados] } } });
   }
 
-  if (borradorLimpio.kind === "farmacia" && borradorLimpio.dutyStart && borradorLimpio.dutyEnd) {
-    const startsOn = new Date(`${borradorLimpio.dutyStart}T00:00:00-03:00`);
-    const endsOn = new Date(`${borradorLimpio.dutyEnd}T23:59:00-03:00`);
-    if (Number.isNaN(startsOn.getTime()) || Number.isNaN(endsOn.getTime()) || endsOn < startsOn) {
-      return { ok: false, error: "Revisá las fechas del turno." };
-    }
-    const previo = await prisma.pharmacyDuty.findFirst({ where: { placeId }, orderBy: { endsOn: "desc" } });
-    if (previo) {
-      await prisma.pharmacyDuty.update({
-        where: { id: previo.id },
-        data: { startsOn, endsOn, source: borradorLimpio.dutySource.trim() },
-      });
-    } else {
-      await prisma.pharmacyDuty.create({
-        data: { placeId, startsOn, endsOn, source: borrador.dutySource.trim() },
-      });
-    }
-  }
-
   return { ok: true, horarios: [], studies };
 }
 
