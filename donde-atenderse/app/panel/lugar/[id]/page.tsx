@@ -80,7 +80,11 @@ export default async function PaginaEditorLugar({
               },
             ]}
           />
-          {ok === "publicar" ? <p className="text-sm text-menta">Lugar publicado.</p> : null}
+          {ok === "publicar" ? (
+            <p className="rounded-xl border border-menta bg-[#e8f7f3] px-3 py-2 text-sm font-semibold text-menta">
+              Lugar publicado en la web.
+            </p>
+          ) : null}
           {ok === "bajar" ? <p className="text-sm text-muted">Lugar sin publicar en la web.</p> : null}
           {error === "accion" ? <p className="text-sm text-warn">No se pudo completar la acción. Probá de nuevo.</p> : null}
           <form action={`/api/lugar/${lugar.id}/editor`} method="post" className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">

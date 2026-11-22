@@ -5,13 +5,15 @@ import { LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
 export default async function NuevoLugar({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; ok?: string; nombre?: string; n?: string }>;
 }) {
   const usuario = await usuarioActual();
   if (!usuario) redirect("/entrar");
   if (!esAdmin(usuario)) redirect("/panel");
 
-  const { error } = await searchParams;
+  const { error, ok, nombre, n } = await searchParams;
+  const cantidad = Number(n);
+  const variosPublicados = ok === "publicado" && Number.isFinite(cantidad) && cantidad > 1;
   const mensaje =
     error === "nombre"
       ? "Escribí el nombre del lugar."
@@ -27,6 +29,18 @@ export default async function NuevoLugar({
     <form action="/api/lugar/crear" method="post" className="grid max-w-xl gap-4">
       <h1 className="text-4xl font-semibold tracking-tight">Cargar un lugar</h1>
       <p className="text-muted">Hospitales, sanatorios, consultorios, estudios y farmacias del corredor.</p>
+      {ok === "publicado" ? (
+        <div className="rounded-2xl border border-menta bg-[#e8f7f3] p-4" role="status">
+          <p className="font-semibold text-menta">
+            {variosPublicados
+              ? `Publicaste ${cantidad} lugares en la web.`
+              : nombre?.trim()
+                ? `«${nombre.trim()}» quedó publicado en la web.`
+                : "El lugar quedó publicado en la web."}
+          </p>
+          <p className="mt-1 text-sm text-muted">Completá el formulario de abajo para cargar otro.</p>
+        </div>
+      ) : null}
       <label className="grid gap-1">
         Nombre
         <input name="name" className="campo" required />

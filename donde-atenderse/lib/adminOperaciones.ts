@@ -9,6 +9,7 @@ function revalidarPublico() {
   revalidatePath("/buscar");
   revalidatePath("/farmacia");
   revalidatePath("/panel/admin");
+  revalidatePath("/panel/lugar/nuevo");
 }
 
 export function idsDesdeFormulario(formData: FormData) {
@@ -28,6 +29,7 @@ export async function publicarLugares(ids: string[]) {
     data: { published: true },
   });
   for (const id of ids) revalidatePath(`/panel/lugar/${id}`);
+  revalidatePath("/panel/lugar/nuevo");
   revalidarPublico();
 }
 
