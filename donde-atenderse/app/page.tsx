@@ -7,19 +7,34 @@ import { AREAS } from "@/lib/constants";
 import { catalogoObras } from "@/lib/search";
 
 const BENEFICIOS: { titulo: string; texto: string; icono: NombreIconoCercalud }[] = [
-  { titulo: "El corredor entero", texto: "Si en tu pueblo no está esa atención, ves el pueblo de al lado.", icono: "corredor" },
   {
-    titulo: "Sello azul",
-    texto: "El icono al lado del nombre indica que el lugar o el profesional actualizó su ficha en los últimos 30 días.",
+    titulo: "Varios pueblos, una sola guía",
+    texto:
+      "Incluye Santo Pipó, Hipólito Yrigoyen, Jardín América, Ruiz de Montoya, Puerto Rico y Capioví. Si en tu pueblo no aparece lo que buscás, podés ver opciones en un pueblo vecino.",
+    icono: "corredor",
+  },
+  {
+    titulo: "Insignia de verificación",
+    texto:
+      "El distintivo azul con tilde al lado del nombre significa que ese profesional o centro actualizó su ficha en los últimos 30 días.",
     icono: "sello",
   },
-  { titulo: "Tres áreas juntas", texto: "Salud del cuerpo, salud mental y odontología, en la misma búsqueda.", icono: "areas" },
   {
-    titulo: "Cuadro completo",
-    texto: "Horarios, contacto y obras en un solo lugar: la guía más amplia del corredor, pensada para mantenerla actualizada.",
+    titulo: "Tres áreas en el mismo buscador",
+    texto: "Salud del cuerpo, salud mental y odontología. Podés filtrar por área o buscar sin filtro.",
+    icono: "areas",
+  },
+  {
+    titulo: "Ficha con lo que necesitás",
+    texto:
+      "Horarios, teléfono, WhatsApp y qué obras sociales atiende (prepaga, PAMI, OSDE, IPS y las que se usan en Misiones), sin ir de un lado a otro.",
     icono: "ficha",
   },
-  { titulo: "Sin turno desde acá", texto: "Escribís directo al profesional o al lugar. Cercalud no reserva.", icono: "contacto-directo" },
+  {
+    titulo: "Vos pedís el turno",
+    texto: "Cercalud no saca turnos ni reserva: muestra el contacto y le escribís directo al profesional o al centro.",
+    icono: "contacto-directo",
+  },
 ];
 
 const PREGUNTAS = [
@@ -39,7 +54,7 @@ const PREGUNTAS = [
   ["¿Por qué pide mi ubicación?", "Para mostrar primero lo que tenés más cerca. Si no la activás, elegís el pueblo. No se guarda."],
   [
     "¿Los datos que veo son reales?",
-    "Solo publicamos fichas revisadas. Cada profesional verifica su información; el sello azul indica una actualización en los últimos 30 días.",
+    "Solo publicamos fichas revisadas. Cada profesional verifica su información; la insignia de verificación indica que actualizaron la ficha en los últimos 30 días.",
   ],
   [
     "¿Dónde miro la farmacia de turno?",
