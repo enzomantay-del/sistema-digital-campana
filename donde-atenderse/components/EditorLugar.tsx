@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { guardarLugar } from "@/actions/place";
+import type { GuardadoLugar } from "@/lib/guardarLugarCore";
 import { FichaLugar } from "@/components/FichaLugar";
 import { HorarioLugarEditor } from "@/components/HorarioLugarEditor";
 import { LogoLugarEditor } from "@/components/LogoLugarEditor";
@@ -47,7 +47,13 @@ export function EditorLugar({
     setGuardando(true);
     setEstado("Guardando…");
     try {
-      const resultado = await guardarLugar(placeId, snapshot);
+      const respuesta = await fetch(`/api/lugar/${placeId}/guardar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(snapshot),
+        credentials: "same-origin",
+      });
+      const resultado = (await respuesta.json()) as GuardadoLugar;
       if (!resultado?.ok) {
         setEstado(resultado?.error ?? "No se pudo guardar. Probá de nuevo.");
         return;
@@ -94,9 +100,14 @@ export function EditorLugar({
         <p className={`text-sm ${estado.includes("sin guardar") || estado.includes("Guardando") ? "text-warn" : guardadoOk && !hayCambios ? "text-menta" : "text-muted"}`}>
           {estado}
         </p>
-        {guardadoOk && !hayCambios ? (
+        {guardadoOk && !hayCambios && borrador.kind !== "farmacia" ? (
           <Link href={`/lugar/${placeId}`} className="text-sm font-semibold text-link">
             Ver ficha pública
+          </Link>
+        ) : null}
+        {guardadoOk && !hayCambios && borrador.kind === "farmacia" ? (
+          <Link href="/farmacia" className="text-sm font-semibold text-link">
+            Ver farmacia de turno
           </Link>
         ) : null}
       </div>
@@ -286,14 +297,13 @@ export function EditorLugar({
       </form>
       <aside className="grid gap-3 lg:sticky lg:top-24">
         <h2 className="text-2xl font-semibold">Así lo ve el paciente</h2>
+        <FichaLugar vista={vista} enlazar={false} mostrarProfesionalesEnFicha={borrador.kind !== "farmacia"} />
         {borrador.kind === "farmacia" ? (
-          <p>
-            {borrador.name || "Farmacia"} · {borrador.locality}. En la web pública el turno se muestra cuando corresponda
-            según el turnero.
+          <p className="text-sm text-muted">
+            El turno de farmacia se publica en <strong>Farmacia de turno</strong> cuando corresponda según el turnero
+            (no desde esta ficha).
           </p>
-        ) : (
-          <FichaLugar vista={vista} enlazar={false} mostrarProfesionalesEnFicha />
-        )}
+        ) : null}
       </aside>
     </div>
   );

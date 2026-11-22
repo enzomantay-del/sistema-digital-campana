@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { quitarLogoLugar, subirLogoLugar } from "@/actions/place";
 
 export function LogoLugarEditor({
   placeId,
@@ -24,10 +23,11 @@ export function LogoLugarEditor({
     setMensaje("Subiendo…");
     const datos = new FormData();
     datos.set("logo", archivo);
-    const resultado = await subirLogoLugar(placeId, datos);
+    const respuesta = await fetch(`/api/lugar/${placeId}/logo`, { method: "POST", body: datos, credentials: "same-origin" });
+    const resultado = (await respuesta.json()) as { ok: boolean; logoUrl?: string; error?: string };
     setCargando(false);
-    if (!resultado.ok) {
-      setMensaje(resultado.error);
+    if (!resultado.ok || !resultado.logoUrl) {
+      setMensaje(resultado.error ?? "No se pudo subir el logo.");
       return;
     }
     onChange(resultado.logoUrl);
@@ -38,10 +38,11 @@ export function LogoLugarEditor({
   async function quitar() {
     setCargando(true);
     setMensaje("Quitando…");
-    const resultado = await quitarLogoLugar(placeId);
+    const respuesta = await fetch(`/api/lugar/${placeId}/logo`, { method: "DELETE", credentials: "same-origin" });
+    const resultado = (await respuesta.json()) as { ok: boolean; error?: string };
     setCargando(false);
     if (!resultado.ok) {
-      setMensaje(resultado.error);
+      setMensaje(resultado.error ?? "No se pudo quitar el logo.");
       return;
     }
     onChange("");
@@ -52,7 +53,7 @@ export function LogoLugarEditor({
   return (
     <fieldset className="grid gap-3">
       <legend className="font-semibold">Logo del lugar</legend>
-      <p className="text-sm text-muted">Aparece en la ficha pública. JPG, PNG, WebP o GIF, hasta 2 MB.</p>
+      <p className="text-sm text-muted">Aparece en la ficha pública. JPG, JFIF, PNG, WebP o GIF, hasta 2 MB.</p>
       <div className="flex flex-wrap items-center gap-4">
         {logoUrl ? (
           <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-line bg-white">
@@ -64,7 +65,14 @@ export function LogoLugarEditor({
           </div>
         )}
         <div className="grid gap-2">
-          <input ref={entrada} type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="text-sm" disabled={cargando} onChange={(event) => void elegirArchivo(event)} />
+          <input
+            ref={entrada}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif,.jfif,.jpe"
+            className="text-sm"
+            disabled={cargando}
+            onChange={(event) => void elegirArchivo(event)}
+          />
           {logoUrl ? (
             <button type="button" className="w-fit text-sm font-semibold text-accent" disabled={cargando} onClick={() => void quitar()}>
               Quitar logo

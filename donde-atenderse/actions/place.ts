@@ -4,29 +4,10 @@ import { guardarImagenEntidad, quitarImagenesEntidad } from "@/lib/almacenamient
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { esAdmin, usuarioActual } from "@/lib/auth";
-import { LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
-import { MODOS_OBRAS_LUGAR, obrasModoDefault, obrasModoEfectivo } from "@/lib/placeObras";
-import { horarioLugarParaGuardar, notaHorarioParaGuardar, validarHorarioLugar } from "@/lib/placeSchedule";
 import type { BorradorLugar } from "@/lib/draft";
+import { guardarLugarCore, type GuardadoLugar } from "@/lib/guardarLugarCore";
 
-export type GuardadoLugar =
-  | {
-      ok: true;
-      horarios: { key: string; id: string; professionalId: string }[];
-      studies: { key: string; id: string }[];
-    }
-  | { ok: false; error: string };
-
-async function obraId(nombre: string) {
-  const name = nombre.trim();
-  if (!name) return null;
-  const obra = await prisma.obraSocial.upsert({
-    where: { name },
-    update: {},
-    create: { name },
-  });
-  return obra.id;
-}
+export type { GuardadoLugar };
 
 async function puedeEditarLugar(user: NonNullable<Awaited<ReturnType<typeof usuarioActual>>>, placeId: string) {
   if (esAdmin(user)) return true;
@@ -54,77 +35,7 @@ export async function crearLugar(formData: FormData) {
 export async function guardarLugar(placeId: string, borrador: BorradorLugar): Promise<GuardadoLugar> {
   const user = await usuarioActual();
   if (!user) return { ok: false, error: "Tenés que entrar de nuevo." };
-  if (!(await puedeEditarLugar(user, placeId))) {
-    return { ok: false, error: "Esta ficha no está en tu cuenta." };
-  }
-
-  const schedule = horarioLugarParaGuardar(borrador.schedule);
-  const borradorLimpio = { ...borrador, schedule };
-  if (borradorLimpio.name.trim().length < 2) return { ok: false, error: "Escribí el nombre del lugar." };
-  if (!TIPOS_LUGAR.some((tipo) => tipo.id === borradorLimpio.kind)) return { ok: false, error: "Elegí el tipo de lugar." };
-  if (!LOCALIDADES.includes(borradorLimpio.locality as (typeof LOCALIDADES)[number])) {
-    return { ok: false, error: "Elegí una localidad del corredor." };
-  }
-
-  const errorHorario = validarHorarioLugar(borradorLimpio.schedule);
-  if (errorHorario) return { ok: false, error: errorHorario };
-
-  const lugar = await prisma.place.findUnique({ where: { id: placeId } });
-  if (!lugar) return { ok: false, error: "Ese lugar ya no está." };
-
-  await prisma.place.update({
-    where: { id: placeId },
-    data: {
-      name: borradorLimpio.name.trim(),
-      kind: borradorLimpio.kind,
-      locality: borradorLimpio.locality,
-      address: borradorLimpio.address.trim(),
-      whatsapp: borradorLimpio.whatsapp.trim(),
-      phone: borradorLimpio.phone.trim(),
-      scheduleNote: notaHorarioParaGuardar(borradorLimpio.schedule, borradorLimpio.scheduleLegacy),
-      obrasMode: MODOS_OBRAS_LUGAR.some((item) => item.id === borradorLimpio.obrasMode)
-        ? borradorLimpio.obrasMode
-        : obrasModoEfectivo(borradorLimpio.kind, lugar.obrasMode),
-      published: esAdmin(user) ? lugar.published : lugar.published,
-    },
-  });
-
-  const modo = obrasModoEfectivo(borradorLimpio.kind, borradorLimpio.obrasMode);
-  if (modo === "por_profesional") {
-    await prisma.placeObra.deleteMany({ where: { placeId } });
-  } else {
-    const nombres = [...borradorLimpio.obras, borradorLimpio.otraObra].map((item) => item.trim()).filter(Boolean);
-    const ids = (await Promise.all(nombres.map(obraId))).filter((id): id is string => Boolean(id));
-    await prisma.placeObra.deleteMany({ where: { placeId } });
-    if (ids.length) {
-      await prisma.placeObra.createMany({ data: ids.map((id) => ({ placeId, obraId: id })) });
-    }
-  }
-
-  const estudiosActuales = await prisma.study.findMany({ where: { placeId } });
-  const estudiosConservados = new Set<string>();
-  const studies: { key: string; id: string }[] = [];
-  for (const estudio of borradorLimpio.studies) {
-    if (!estudio.name.trim()) continue;
-    const data = { name: estudio.name.trim(), preparation: estudio.preparation.trim(), attention: estudio.attention };
-    const existente = estudio.id ? estudiosActuales.find((item) => item.id === estudio.id) : undefined;
-    if (existente) {
-      await prisma.study.update({ where: { id: existente.id }, data });
-      estudiosConservados.add(existente.id);
-      studies.push({ key: estudio.key, id: existente.id });
-    } else {
-      const creado = await prisma.study.create({ data: { placeId, ...data } });
-      estudiosConservados.add(creado.id);
-      studies.push({ key: estudio.key, id: creado.id });
-    }
-  }
-  if (estudiosConservados.size === 0) {
-    await prisma.study.deleteMany({ where: { placeId } });
-  } else {
-    await prisma.study.deleteMany({ where: { placeId, id: { notIn: [...estudiosConservados] } } });
-  }
-
-  return { ok: true, horarios: [], studies };
+  return guardarLugarCore(placeId, borrador, user);
 }
 
 const LOGO_MAX_BYTES = 2 * 1024 * 1024;
@@ -151,13 +62,19 @@ export async function subirLogoLugar(
   if (!archivo || !(archivo instanceof File) || archivo.size === 0) {
     return { ok: false, error: "Elegí una imagen." };
   }
-  if (!LOGO_TIPOS.has(archivo.type)) {
-    return { ok: false, error: "Usá JPG, PNG, WebP o GIF." };
+  const esJfif = archivo.name.toLowerCase().endsWith(".jfif") || archivo.type === "image/jfif";
+  if (!LOGO_TIPOS.has(archivo.type) && !esJfif && archivo.type !== "image/pjpeg") {
+    return { ok: false, error: "Usá JPG, PNG, WebP, GIF o JFIF." };
   }
   if (archivo.size > LOGO_MAX_BYTES) {
     return { ok: false, error: "La imagen no puede pesar más de 2 MB." };
   }
-  const extension = extensionLogo(archivo.type);
+  let mime = archivo.type;
+  let extension = extensionLogo(archivo.type);
+  if (esJfif || archivo.type === "image/pjpeg" || archivo.type === "image/jfif") {
+    mime = "image/jpeg";
+    extension = "jpg";
+  }
   if (!extension) return { ok: false, error: "Formato de imagen no admitido." };
 
   let logoUrl: string;
@@ -166,7 +83,7 @@ export async function subirLogoLugar(
       "logos",
       placeId,
       Buffer.from(await archivo.arrayBuffer()),
-      archivo.type,
+      mime,
       extension,
     );
   } catch {
