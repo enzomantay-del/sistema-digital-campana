@@ -10,7 +10,7 @@ Orden sugerido. Vos podés avanzar hosting en paralelo; el resto es operación +
 2. Elegí visibilidad **pública** (o team si preferís solo equipo).
 3. En Secrets, cargá: `AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (y opcional `CERCALUD_CONTACTO_EMAIL`).
 4. El hosting asigna **Postgres** (`cursor-app.json`); en el primer `start` se crean tablas y el admin con `seed-produccion` si la base está vacía.
-5. Cuando tengas dominio, en el panel de la app publicada configurá el **dominio personalizado** (o el CNAME que te indiquen) apuntando a Cursor.
+5. Dominio propio: seguí [dominio-cercalud.md](./dominio-cercalud.md) (NIC → Cloudflare → pestaña **Domain** en Cursor → `CERCALUD_SITE_URL`).
 
 ### Opción B — Servidor propio
 

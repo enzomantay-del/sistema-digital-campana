@@ -23,7 +23,7 @@ Podés reenviar las dos al **mismo** Gmail de Cercalud.
 - Cuenta gratuita en [Cloudflare](https://dash.cloudflare.com/sign-up).
 - Un Gmail **nuevo** solo para el proyecto (ej. `cercalud.ar@gmail.com`).
 
-**Importante:** Si ya tenés la web (`www.cercalud.com.ar`) apuntando a otro lado, anotá hoy los DNS actuales (desde el panel donde los manejes hoy) para copiarlos en Cloudflare y **no cortar el sitio**.
+**Importante:** Primero conectá la web con [dominio-cercalud.md](./dominio-cercalud.md). El mismo Cloudflare después sirve para el correo.
 
 ## Paso 1 — Agregar el dominio en Cloudflare
 

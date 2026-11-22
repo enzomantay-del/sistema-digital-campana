@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import { Encabezado } from "@/components/Encabezado";
 import { Pie } from "@/components/Pie";
-import { mostrarDatosEjemplo } from "@/lib/config";
+import { mostrarDatosEjemplo, urlSitioPublico } from "@/lib/config";
 import { prisma } from "@/lib/prisma";
 import "./globals.css";
 
@@ -12,6 +12,7 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(urlSitioPublico()),
   title: "Cercalud",
   applicationName: "Cercalud",
   description:
