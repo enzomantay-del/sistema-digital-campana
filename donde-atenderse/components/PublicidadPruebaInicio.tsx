@@ -4,11 +4,11 @@ import { TarjetaPublicidad } from "@/components/TarjetaPublicidad";
 /** Prueba visual: banner debajo del buscador en inicio (sin enlace). */
 export function PublicidadPruebaInicio() {
   return (
-    <TarjetaPublicidad>
-      <div className="relative w-full overflow-hidden rounded-xl">
+    <TarjetaPublicidad variante="leaderboard" ejemplo>
+      <div className="relative w-full overflow-hidden">
         <Image
           src="/ejemplos/publicidad-farma-tu-prueba.jpg"
-          alt="Publicidad de farmacia — prueba de formato en la portada"
+          alt="Aviso de ejemplo: formato de banda horizontal en la portada"
           width={1712}
           height={624}
           className="h-auto w-full object-contain"

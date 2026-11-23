@@ -48,6 +48,7 @@ No uses `npm run db:seed` en producción (carga el corredor de ejemplo).
 - [ ] Sin `CERCALUD_MOSTRAR_EJEMPLOS=1` en producción.
 - [ ] Si algún dato `example` quedó en la base, despublicarlo o borrarlo desde admin.
 - [ ] Columna lateral: placeholder comercial (mail de contacto) en lugar de avisos de muestra.
+- [ ] Publicidad: ver [publicidad.md](./publicidad.md) (ejemplo rotulado; pasar a creatividad real cuando haya patrocinio).
 
 ## 5. Confianza
 

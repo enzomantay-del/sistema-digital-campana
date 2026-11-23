@@ -1,12 +1,29 @@
 import type { ReactNode } from "react";
 
-export function TarjetaPublicidad({ children }: { children: ReactNode }) {
+/** Presentación de avisos al estilo portal de noticias (ej. banda horizontal + columna tipo 300×600). */
+export function TarjetaPublicidad({
+  children,
+  variante = "contenido",
+  ejemplo = false,
+}: {
+  children: ReactNode;
+  /** leaderboard = banda bajo el buscador; skyscraper = columna lateral ~300px. */
+  variante?: "leaderboard" | "skyscraper" | "contenido";
+  /** Muestra “Publicidad · ejemplo” hasta tener anunciante real. */
+  ejemplo?: boolean;
+}) {
+  const rotulo = ejemplo ? "Publicidad · ejemplo" : "Publicidad";
+  const ancho =
+    variante === "skyscraper" ? "w-full max-w-[300px] mx-auto lg:mx-0" : "w-full max-w-[970px] mx-auto";
+
   return (
-    <div className="grid w-full gap-3 overflow-hidden rounded-2xl border-2 border-[#dce5ee] bg-white shadow-md ring-1 ring-black/5">
-      <div className="bg-gradient-to-r from-[#12275c]/10 to-transparent px-3 py-1">
-        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#5c6b8a]">Publicidad</p>
-      </div>
-      <div className="grid gap-3 px-3.5 pb-4 pt-0 sm:px-4">{children}</div>
+    <div
+      className={`grid gap-2 ${ancho}`}
+      data-publicidad-variante={variante}
+      data-publicidad-ejemplo={ejemplo ? "1" : undefined}
+    >
+      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">{rotulo}</p>
+      <div className="overflow-hidden rounded-lg border border-line/90 bg-[#f8fafc]">{children}</div>
     </div>
   );
 }
