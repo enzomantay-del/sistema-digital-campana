@@ -75,15 +75,24 @@ export function parsearTurneroFarmacia(texto: string): FilaTurneroFarmacia[] | {
   return filas;
 }
 
+function nombreTurneroClave(nombre: string) {
+  return normalizar(nombre).replace(/^farmacia\s+/, "").trim();
+}
+
 async function buscarFarmacia(locality: string, nombre: string) {
   const farmacias = await prisma.place.findMany({
     where: { kind: "farmacia", locality },
     select: { id: true, name: true },
   });
-  const buscado = normalizar(nombre);
-  const exacta = farmacias.find((f) => normalizar(f.name) === buscado);
+  const buscado = nombreTurneroClave(nombre);
+  const exacta = farmacias.find((f) => nombreTurneroClave(f.name) === buscado);
   if (exacta) return exacta;
-  return farmacias.find((f) => normalizar(f.name).includes(buscado) || buscado.includes(normalizar(f.name))) ?? null;
+  return (
+    farmacias.find((f) => {
+      const clave = nombreTurneroClave(f.name);
+      return clave.includes(buscado) || buscado.includes(clave);
+    }) ?? null
+  );
 }
 
 export async function importarTurneroFarmacia(texto: string): Promise<ResultadoImportarTurnero> {
