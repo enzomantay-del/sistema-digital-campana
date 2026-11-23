@@ -1,11 +1,39 @@
 import { IconoCercalud } from "@/components/iconos/IconoCercalud";
-import { TarjetaFarmaciaTurno } from "@/components/TarjetaFarmaciaTurno";
+import { FarmaciaTurnoPagina, type FarmaciaTurnoPorLocalidad } from "@/components/FarmaciaTurnoPagina";
 import { LOCALIDADES } from "@/lib/constants";
-import { fecha } from "@/lib/format";
 import { farmaciasDeTurno } from "@/lib/search";
 
 export default async function PaginaFarmacia() {
   const farmacias = await farmaciasDeTurno();
+  const ahora = new Date();
+
+  const porLocalidad: FarmaciaTurnoPorLocalidad[] = LOCALIDADES.map((localidad) => {
+    const deAhi = farmacias.filter((farmacia) => farmacia.locality === localidad);
+    const vigente = deAhi.find((farmacia) => farmacia.vigente);
+    const vencido = !vigente
+      ? deAhi.find((farmacia) => farmacia.ultimo && farmacia.ultimo.endsOn < ahora)
+      : undefined;
+
+    return {
+      localidad,
+      vigente:
+        vigente?.vigente ?
+          {
+            nombre: vigente.name,
+            direccion: vigente.address,
+            logoUrl: vigente.logoUrl,
+            whatsapp: vigente.whatsapp,
+            telefono: vigente.phone,
+            ejemplo: vigente.example,
+            startsOn: vigente.vigente.startsOn.toISOString(),
+            endsOn: vigente.vigente.endsOn.toISOString(),
+            source: vigente.vigente.source,
+          }
+        : null,
+      ultimoVencio: vencido?.ultimo ? vencido.ultimo.endsOn.toISOString() : null,
+    };
+  });
+
   return (
     <div className="grid max-w-3xl gap-8">
       <header className="grid gap-3">
@@ -14,41 +42,11 @@ export default async function PaginaFarmacia() {
           Farmacia de turno
         </h1>
         <p className="text-muted">
-          Mostramos el turno con día y hora de inicio y fin, según el turnero oficial del corredor. Fuera de ese rango, esa
-          farmacia no figura como de turno.
+          Primero la farmacia de turno de tu ciudad (según tu ubicación o la localidad que elijas). Abajo podés consultar
+          otras localidades del corredor si lo necesitás.
         </p>
       </header>
-      {LOCALIDADES.map((localidad) => {
-        const deAhi = farmacias.filter((farmacia) => farmacia.locality === localidad);
-        const vigente = deAhi.find((farmacia) => farmacia.vigente);
-        const vencido = !vigente ? deAhi.find((farmacia) => farmacia.ultimo && farmacia.ultimo.endsOn < new Date()) : undefined;
-        return (
-          <section key={localidad} className="tarjeta grid gap-4">
-            <h2 className="text-2xl font-bold tracking-tight">{localidad}</h2>
-            {vigente?.vigente ? (
-              <TarjetaFarmaciaTurno
-                nombre={vigente.name}
-                localidad={vigente.locality}
-                direccion={vigente.address}
-                logoUrl={vigente.logoUrl}
-                whatsapp={vigente.whatsapp}
-                telefono={vigente.phone}
-                ejemplo={vigente.example}
-                turno={{
-                  startsOn: vigente.vigente.startsOn,
-                  endsOn: vigente.vigente.endsOn,
-                  source: vigente.vigente.source,
-                }}
-              />
-            ) : (
-              <p className="text-muted">
-                Todavía no hay un turno cargado para esta fecha.
-                {vencido?.ultimo ? ` El último venció el ${fecha(vencido.ultimo.endsOn)}.` : ""}
-              </p>
-            )}
-          </section>
-        );
-      })}
+      <FarmaciaTurnoPagina porLocalidad={porLocalidad} />
     </div>
   );
 }
