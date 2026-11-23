@@ -1,6 +1,7 @@
 import { IconoCercalud } from "@/components/iconos/IconoCercalud";
+import { TarjetaFarmaciaTurno } from "@/components/TarjetaFarmaciaTurno";
 import { LOCALIDADES } from "@/lib/constants";
-import { fecha, textoVigenciaTurnoFarmacia } from "@/lib/format";
+import { fecha } from "@/lib/format";
 import { farmaciasDeTurno } from "@/lib/search";
 
 export default async function PaginaFarmacia() {
@@ -22,16 +23,23 @@ export default async function PaginaFarmacia() {
         const vigente = deAhi.find((farmacia) => farmacia.vigente);
         const vencido = !vigente ? deAhi.find((farmacia) => farmacia.ultimo && farmacia.ultimo.endsOn < new Date()) : undefined;
         return (
-          <section key={localidad} className="tarjeta grid gap-2">
+          <section key={localidad} className="tarjeta grid gap-4">
             <h2 className="text-2xl font-bold tracking-tight">{localidad}</h2>
             {vigente?.vigente ? (
-              <div className="grid gap-1">
-                <p className="text-xl">{vigente.name}</p>
-                {vigente.address ? <p>{vigente.address}</p> : null}
-                <p className="text-muted">{textoVigenciaTurnoFarmacia(vigente.vigente.startsOn, vigente.vigente.endsOn)}</p>
-                {vigente.vigente.source ? <p className="text-base text-muted">{vigente.vigente.source}</p> : null}
-                {vigente.example ? <p className="text-base text-warn">Dato de ejemplo.</p> : null}
-              </div>
+              <TarjetaFarmaciaTurno
+                nombre={vigente.name}
+                localidad={vigente.locality}
+                direccion={vigente.address}
+                logoUrl={vigente.logoUrl}
+                whatsapp={vigente.whatsapp}
+                telefono={vigente.phone}
+                ejemplo={vigente.example}
+                turno={{
+                  startsOn: vigente.vigente.startsOn,
+                  endsOn: vigente.vigente.endsOn,
+                  source: vigente.vigente.source,
+                }}
+              />
             ) : (
               <p className="text-muted">
                 Todavía no hay un turno cargado para esta fecha.

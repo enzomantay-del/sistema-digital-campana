@@ -46,6 +46,25 @@ export function textoVigenciaTurnoFarmacia(desde: Date, hasta: Date) {
   return `Desde el ${fechaHora(desde)} hasta el ${fechaHora(hasta)} (hora de Misiones).`;
 }
 
+export function soloHora(date: Date | string | null | undefined) {
+  if (!date) return "";
+  const value = typeof date === "string" ? new Date(date) : date;
+  if (Number.isNaN(value.getTime())) return "";
+  return new Intl.DateTimeFormat("es-AR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: ZONA_CORREDOR,
+  }).format(value);
+}
+
+export function partesVigenciaTurnoFarmacia(desde: Date, hasta: Date) {
+  return {
+    desde: { fecha: fecha(desde), hora: soloHora(desde) },
+    hasta: { fecha: fecha(hasta), hora: soloHora(hasta) },
+  };
+}
+
 export function textoDias(ids: string[]) {
   const orden = DIAS.map((dia) => dia.id);
   const elegidos = orden.filter((id) => ids.includes(id));

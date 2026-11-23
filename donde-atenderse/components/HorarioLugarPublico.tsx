@@ -30,9 +30,9 @@ export function HorarioLugarPublico({
         </div>
       ) : null}
       {horario.length > 0 ? (
-        <ListaHorarioTexto lineas={horario} />
+        <ListaHorarioTexto lineas={horario} scheduleNote={scheduleNote} />
       ) : (
-        <p className="text-base text-ink">{textoFallback}</p>
+        <ListaHorarioTexto lineas={textoFallback.trim() ? [textoFallback] : []} scheduleNote={scheduleNote} />
       )}
     </section>
   );
