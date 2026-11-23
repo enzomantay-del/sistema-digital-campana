@@ -116,8 +116,28 @@ function filaLugar(
   };
 }
 
-export default async function PanelAdmin() {
+export default async function PanelAdmin({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    turnero_ok?: string;
+    cargados?: string;
+    turnero_sin?: string;
+    turnero_invalidas?: string;
+    turnero_error?: string;
+  }>;
+}) {
   const admin = await requiereAdmin();
+  const {
+    turnero_ok: turneroOk,
+    cargados,
+    turnero_sin: turneroSinRaw,
+    turnero_invalidas: turneroInvalidasRaw,
+    turnero_error: turneroError,
+  } = await searchParams;
+  const cargadosN = cargados ? Number(cargados) : undefined;
+  const turneroSin = turneroSinRaw ? turneroSinRaw.split("|").filter(Boolean) : undefined;
+  const turneroInvalidas = turneroInvalidasRaw ? turneroInvalidasRaw.split("|").filter(Boolean) : undefined;
   const [profesionalesPendientes, lugaresSugeridos, profesionales, lugares] = await Promise.all([
     prisma.professional.findMany({
       where: { reviewed: false },
@@ -206,7 +226,13 @@ export default async function PanelAdmin() {
       </section>
 
       <section className="flex justify-center">
-        <ImportarTurneroFarmacia />
+        <ImportarTurneroFarmacia
+          turneroOk={turneroOk === "1"}
+          cargados={Number.isFinite(cargadosN) ? cargadosN : undefined}
+          turneroSin={turneroSin}
+          turneroInvalidas={turneroInvalidas}
+          turneroError={turneroError}
+        />
       </section>
 
       <section className="grid gap-2">
