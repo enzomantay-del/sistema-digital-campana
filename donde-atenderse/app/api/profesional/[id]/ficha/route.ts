@@ -6,7 +6,7 @@ import {
 } from "@/actions/professional";
 import type { BorradorProfesional } from "@/lib/draft";
 import { esAdmin, esSecretaria, usuarioActual } from "@/lib/auth";
-import { puedeEditarProfesional } from "@/lib/permisosProfesional";
+import { secretariaPuedeGuardarFicha } from "@/lib/permisosProfesional";
 
 type CuerpoGuardado = {
   borrador: BorradorProfesional;
@@ -37,9 +37,10 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       if (!esSecretaria(user)) {
         return NextResponse.json({ ok: false, error: "Solo secretarias con lugar asignado." }, { status: 403 });
       }
-      if (!(await puedeEditarProfesional(user, professionalId, {
-        placeIdsEnCarga: cuerpo.borrador.horarios?.map((h) => h.placeId).filter(Boolean) as string[],
-      }))) {
+      const placeIdsBorrador = (cuerpo.borrador.horarios ?? [])
+        .map((h) => h.placeId)
+        .filter((id): id is string => Boolean(id));
+      if (!(await secretariaPuedeGuardarFicha(user, professionalId, placeIdsBorrador))) {
         return NextResponse.json({ ok: false, error: "No podés editar esta ficha." }, { status: 403 });
       }
       resultado = await guardarProfesionalSecretaria(professionalId, cuerpo.borrador);
@@ -52,7 +53,13 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       resultado = await guardarProfesional(cuerpo.borrador);
     } else if (esAdmin(user)) {
       resultado = await guardarProfesionalAdmin(professionalId, cuerpo.borrador);
-    } else if (esSecretaria(user) && (await puedeEditarProfesional(user, professionalId))) {
+    } else if (esSecretaria(user)) {
+      const placeIdsBorrador = (cuerpo.borrador.horarios ?? [])
+        .map((h) => h.placeId)
+        .filter((id): id is string => Boolean(id));
+      if (!(await secretariaPuedeGuardarFicha(user, professionalId, placeIdsBorrador))) {
+        return NextResponse.json({ ok: false, error: "No podés editar esta ficha." }, { status: 403 });
+      }
       resultado = await guardarProfesionalSecretaria(professionalId, cuerpo.borrador);
     } else {
       return NextResponse.json({ ok: false, error: "Esta ficha no está en tu cuenta." }, { status: 403 });

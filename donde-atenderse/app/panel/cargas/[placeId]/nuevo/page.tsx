@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { EditorProfesional } from "@/components/EditorProfesional";
 import { AvisoFotosHosting } from "@/components/AvisoFotosHosting";
 import { esSecretaria, usuarioActual } from "@/lib/auth";
+import { secretariaPuedeTrabajarFichaEnLugar } from "@/lib/permisosProfesional";
 import { lugarPermiteCargaSecretaria } from "@/lib/lugarAsignacion";
 import { horarioBorradorParaLugar } from "@/lib/cargarBorradorProfesional";
 import { prisma } from "@/lib/prisma";
@@ -21,6 +22,10 @@ export default async function NuevaFichaEnLugar({ params }: { params: Promise<{ 
   const borradorVacio = await prisma.professional.create({
     data: { fullName: "", published: false, reviewed: false },
   });
+
+  if (!(await secretariaPuedeTrabajarFichaEnLugar(usuario, borradorVacio.id, placeId))) {
+    notFound();
+  }
 
   return (
     <div className="grid gap-4">

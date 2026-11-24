@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { EditorProfesional } from "@/components/EditorProfesional";
 import { AvisoFotosHosting } from "@/components/AvisoFotosHosting";
 import { esSecretaria, usuarioActual } from "@/lib/auth";
+import { secretariaPuedeTrabajarFichaEnLugar } from "@/lib/permisosProfesional";
 import { lugarPermiteCargaSecretaria } from "@/lib/lugarAsignacion";
 import { borradorDesdeProfesional, horarioBorradorParaLugar } from "@/lib/cargarBorradorProfesional";
 import { prisma } from "@/lib/prisma";
@@ -20,6 +21,10 @@ export default async function EditarFichaEnLugar({
 
   const lugar = await prisma.place.findUnique({ where: { id: placeId } });
   if (!lugar || !lugarPermiteCargaSecretaria(lugar.kind)) notFound();
+
+  if (!(await secretariaPuedeTrabajarFichaEnLugar(usuario, professionalId, placeId))) {
+    notFound();
+  }
 
   const completo = await prisma.professional.findUnique({
     where: { id: professionalId },

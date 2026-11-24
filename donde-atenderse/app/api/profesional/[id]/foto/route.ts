@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { guardarImagenEntidad, quitarImagenesEntidad } from "@/lib/almacenamientoImagen";
-import { puedeEditarProfesional } from "@/lib/permisosProfesional";
+import { puedeEditarProfesional, secretariaPuedeSubirFoto } from "@/lib/permisosProfesional";
 import { usuarioActual } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { FOTO_MAX_BYTES, tipoYExtensionFoto } from "@/lib/validarFoto";
@@ -12,11 +12,10 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   if (!user) return NextResponse.json({ ok: false, error: "Tenés que entrar de nuevo." }, { status: 401 });
   const formData = await request.formData();
   const placeIdEnfoque = String(formData.get("placeIdEnfoque") ?? "").trim() || undefined;
-  if (
-    !(await puedeEditarProfesional(user, professionalId, {
-      placeIdsEnCarga: placeIdEnfoque ? [placeIdEnfoque] : undefined,
-    }))
-  ) {
+  const permitido =
+    (await puedeEditarProfesional(user, professionalId)) ||
+    (await secretariaPuedeSubirFoto(user, professionalId, placeIdEnfoque));
+  if (!permitido) {
     return NextResponse.json({ ok: false, error: "Esta ficha no está en tu cuenta." }, { status: 403 });
   }
   const archivo = formData.get("foto");
@@ -56,11 +55,10 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
   if (!user) return NextResponse.json({ ok: false, error: "Tenés que entrar de nuevo." }, { status: 401 });
   const url = new URL(request.url);
   const placeIdEnfoque = url.searchParams.get("placeIdEnfoque")?.trim() || undefined;
-  if (
-    !(await puedeEditarProfesional(user, professionalId, {
-      placeIdsEnCarga: placeIdEnfoque ? [placeIdEnfoque] : undefined,
-    }))
-  ) {
+  const permitido =
+    (await puedeEditarProfesional(user, professionalId)) ||
+    (await secretariaPuedeSubirFoto(user, professionalId, placeIdEnfoque));
+  if (!permitido) {
     return NextResponse.json({ ok: false, error: "Esta ficha no está en tu cuenta." }, { status: 403 });
   }
   await quitarImagenesEntidad("profesionales", professionalId);

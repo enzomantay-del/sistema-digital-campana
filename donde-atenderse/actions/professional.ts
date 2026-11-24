@@ -14,7 +14,7 @@ import {
   notaHorarioParaGuardar,
   validarHorarioLugar,
 } from "@/lib/placeSchedule";
-import { puedeEditarProfesional } from "@/lib/permisosProfesional";
+import { puedeEditarProfesional, secretariaPuedeGuardarFicha } from "@/lib/permisosProfesional";
 import { validarBorradorProfesional } from "@/lib/validarProfesional";
 import { FOTO_MAX_BYTES, tipoYExtensionFoto } from "@/lib/validarFoto";
 
@@ -145,18 +145,22 @@ async function guardarProfesionalInterno(
     return { ok: false, error: "Esa ficha ya no está." };
   }
 
+  let editarDatosGlobales = !modoSecretaria;
   if (modoSecretaria && professional) {
     for (const placeId of placeIdsEnCarga) {
       if (!lugaresPermitidos.has(placeId)) {
         return { ok: false, error: "Solo podés cargar horarios en los lugares que te asignó la administración." };
       }
     }
-    if (!(await puedeEditarProfesional(user, professional.id, { placeIdsEnCarga }))) {
+    if (!(await secretariaPuedeGuardarFicha(user, professional.id, placeIdsEnCarga))) {
       return {
         ok: false,
         error: "Solo podés editar profesionales que atienden en tu lugar o que estás cargando por primera vez ahí.",
       };
     }
+    const asistenciasPrevias = await prisma.attendance.count({ where: { professionalId: professional.id } });
+    editarDatosGlobales =
+      (await puedeEditarProfesional(user, professional.id)) || asistenciasPrevias === 0;
   }
 
   if (!professional) {
@@ -202,25 +206,27 @@ async function guardarProfesionalInterno(
   const specialtiesCampo = campoDesdeEspecialidades(listaEspecialidades);
   const specialtyPrincipal = listaEspecialidades[0] ?? "";
 
-  const price = borrador.price.trim();
-  const precioCambio = price !== professional.price;
-  await prisma.professional.update({
-    where: { id: professional.id },
-    data: {
-      fullName: borrador.fullName.trim(),
-      license,
-      licenseKey,
-      area: borrador.area || "cuerpo",
-      specialty: specialtyPrincipal,
-      specialties: specialtiesCampo,
-      whatsapp: borrador.whatsapp.trim(),
-      phone: borrador.phone.trim(),
-      agendaWhatsapp: borrador.agendaWhatsapp.trim(),
-      agendaPhone: borrador.agendaPhone.trim(),
-      price,
-      priceUpdatedAt: precioCambio ? new Date() : professional.priceUpdatedAt,
-    },
-  });
+  if (editarDatosGlobales) {
+    const price = borrador.price.trim();
+    const precioCambio = price !== professional.price;
+    await prisma.professional.update({
+      where: { id: professional.id },
+      data: {
+        fullName: borrador.fullName.trim(),
+        license,
+        licenseKey,
+        area: borrador.area || "cuerpo",
+        specialty: specialtyPrincipal,
+        specialties: specialtiesCampo,
+        whatsapp: borrador.whatsapp.trim(),
+        phone: borrador.phone.trim(),
+        agendaWhatsapp: borrador.agendaWhatsapp.trim(),
+        agendaPhone: borrador.agendaPhone.trim(),
+        price,
+        priceUpdatedAt: precioCambio ? new Date() : professional.priceUpdatedAt,
+      },
+    });
+  }
 
   const actuales = await prisma.attendance.findMany({
     where: { professionalId: professional.id },
