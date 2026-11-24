@@ -1,88 +1,51 @@
 import type { BorradorProfesional, HorarioBorrador } from "@/lib/draft";
 import {
-  franjaConDatos,
-  horarioLugarConDatos,
-  horarioLugarParaGuardar,
-  periodicidadDefecto,
-  validarHorarioLugar,
-} from "@/lib/placeSchedule";
-import { mensajeSolapamientoEntreSedes } from "@/lib/solapamientoHorarios";
+  erroresCamposFichaProfesional,
+  fichaTieneErrores,
+  primerMensajeGuardado,
+  errorHorarioEnSede,
+} from "@/lib/erroresCamposFicha";
 
-function obrasDelHorario(horario: BorradorProfesional["horarios"][number]) {
-  return [...(horario.obras ?? []), horario.otraObra?.trim() ?? ""].filter(Boolean);
+export { erroresCamposFichaProfesional, type ErroresCamposFicha } from "@/lib/erroresCamposFicha";
+
+function conSede(sede: string, mensaje: string) {
+  const texto = mensaje.charAt(0).toLowerCase() + mensaje.slice(1);
+  return `En ${sede}, ${texto}`;
 }
 
 export function validarBorradorProfesional(
   borrador: BorradorProfesional,
   opts: { exigeHorario: boolean; tieneFoto: boolean },
 ): string | null {
-  if (borrador.fullName.trim().length < 2) return "Escribí el nombre completo del profesional.";
-  if (borrador.license.trim().length < 3) return "Indicá la matrícula profesional.";
-  const especialidades = [...(borrador.specialties ?? []), borrador.specialty.trim()].filter(Boolean);
-  if (especialidades.length === 0) return "Elegí al menos una especialidad.";
-  if (!opts.tieneFoto) return "Subí la foto del profesional.";
-  if (opts.exigeHorario) {
-    const conLugar = borrador.horarios.filter((h) => h.placeId);
-    if (conLugar.length === 0) return "Agregá al menos una sede y elegí el centro en el desplegable.";
-    const errorHorario = validarHorariosEnBorrador(conLugar);
-    if (errorHorario) return errorHorario;
-    const solapamiento = mensajeSolapamientoEntreSedes(conLugar);
-    if (solapamiento) return solapamiento;
-    for (const horario of conLugar) {
-      const obras = obrasDelHorario(horario);
-      if (obras.length === 0) {
-        return `En ${horario.placeName || "esta sede"}, marcá las obras que atendés o «Solo particular».`;
-      }
-    }
+  const errores = erroresCamposFichaProfesional(borrador, opts);
+  if (!fichaTieneErrores(errores)) return null;
+  if (errores.fullName) return errores.fullName;
+  if (errores.license) return errores.license;
+  if (errores.specialties) return errores.specialties;
+  if (errores.photo) return errores.photo;
+  if (errores.sedes) return errores.sedes;
+  for (const horario of borrador.horarios) {
+    const item = errores.porHorario[horario.key];
+    if (!item) continue;
+    const sede = horario.placeName?.trim() || "esta sede";
+    if (item.lugar) return conSede(sede, item.lugar);
+    if (item.horario) return conSede(sede, item.horario);
   }
-  return null;
+  if (errores.solapamiento) return errores.solapamiento;
+  for (const horario of borrador.horarios) {
+    const item = errores.porHorario[horario.key];
+    if (item?.obras) return conSede(horario.placeName?.trim() || "esta sede", item.obras);
+  }
+  return primerMensajeGuardado(errores);
 }
 
 /** Mensajes claros antes de guardar (panel profesional / secretaría). */
 export function validarHorariosEnBorrador(horarios: HorarioBorrador[]): string | null {
   for (const horario of horarios) {
     const sede = horario.placeName?.trim() || "esta sede";
-  if (!horario.placeId) continue;
-
-    const paraGuardar = horarioLugarParaGuardar(horario.schedule);
-    if (!horarioLugarConDatos(paraGuardar)) {
-      return `En ${sede}, completá el horario: elegí días, turnos u otro patrón (franja con datos).`;
-    }
-
-    const errorEstructura = validarHorarioLugar(paraGuardar);
-    if (errorEstructura) return `${sede}: ${errorEstructura}`;
-
-    for (const franja of horario.schedule.franjas) {
-      if (!franjaConDatos(franja)) continue;
-      const p = franja.periodicidad ?? periodicidadDefecto();
-      if (p.tipo === "semanal" && !franja.cerrado && franja.dias.length === 0) {
-        return `En ${sede}, marcá al menos un día de la semana (lun–dom) en el horario.`;
-      }
-      if (p.tipo === "semanal" && !franja.cerrado && !franja.guardia24) {
-        const tieneTurno = [franja.manana, franja.tarde, franja.noche].some((t) => t.activo);
-        if (!tieneTurno) {
-          return `En ${sede}, activá mañana, tarde o noche (o guardia 24 h) en el horario.`;
-        }
-        const turnoSinHora = [franja.manana, franja.tarde, franja.noche].find(
-          (t) => t.activo && !t.desde.trim() && !t.hasta.trim(),
-        );
-        if (turnoSinHora) {
-          return `En ${sede}, completá desde y hasta en el turno que activaste, o desactivá ese turno.`;
-        }
-      }
-      if (p.tipo === "fechas") {
-        const fechasValidas = p.fechas.filter((f) => /^\d{4}-\d{2}-\d{2}$/.test(f));
-        if (fechasValidas.length === 0) {
-          return `En ${sede}, cargá al menos una fecha concreta en el calendario.`;
-        }
-      }
-      if (p.tipo === "nota" && !p.texto.trim() && !franja.cerrado && !franja.guardia24) {
-        const tieneTurno = [franja.manana, franja.tarde, franja.noche].some((t) => t.activo);
-        if (!tieneTurno) {
-          return `En ${sede}, escribí en «horario especial» cómo atendés, o usá días y turnos.`;
-        }
-      }
-    }
+    if (!horario.placeId) continue;
+    const error = errorHorarioEnSede(horario);
+    if (error) return `En ${sede}, ${error.charAt(0).toLowerCase()}${error.slice(1)}`;
   }
   return null;
 }

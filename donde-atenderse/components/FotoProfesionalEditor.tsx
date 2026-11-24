@@ -8,11 +8,13 @@ export function FotoProfesionalEditor({
   photoUrl,
   onChange,
   placeIdEnfoque,
+  avisoCampo,
 }: {
   professionalId: string;
   photoUrl: string;
   onChange: (photoUrl: string) => void;
   placeIdEnfoque?: string;
+  avisoCampo?: string | null;
 }) {
   const entrada = useRef<HTMLInputElement>(null);
   const [mensaje, setMensaje] = useState("");
@@ -72,8 +74,13 @@ export function FotoProfesionalEditor({
     }
   }
 
+  const bordeFalta = avisoCampo && !photoUrl;
+
   return (
-    <fieldset className="grid gap-3">
+    <fieldset
+      className={`grid gap-3 ${bordeFalta ? "rounded-2xl border border-warn bg-[#fff8f8] p-3" : ""}`}
+      id={avisoCampo ? "campo-error-foto" : undefined}
+    >
       <legend className="font-semibold">Foto del profesional</legend>
       <p className="text-sm text-muted">
         Aparece en la ficha pública. JPG, JPEG, JFIF, PNG, WebP o GIF, hasta 2 MB.
@@ -105,6 +112,11 @@ export function FotoProfesionalEditor({
         </div>
       </div>
       {mensaje ? <p className="text-sm text-muted">{mensaje}</p> : null}
+      {avisoCampo ? (
+        <p className="text-sm font-semibold leading-snug text-warn" role="alert">
+          {avisoCampo}
+        </p>
+      ) : null}
     </fieldset>
   );
 }

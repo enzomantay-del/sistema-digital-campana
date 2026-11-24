@@ -10,6 +10,7 @@ type Props = {
   onSeleccionadas: (obras: string[]) => void;
   onOtraObra: (valor: string) => void;
   titulo?: string;
+  avisoCampo?: string | null;
 };
 
 /** Catálogo de obras en panel acotado, con búsqueda y pastillas chicas. */
@@ -20,6 +21,7 @@ export function SelectorObras({
   onSeleccionadas,
   onOtraObra,
   titulo = "Obra social",
+  avisoCampo,
 }: Props) {
   const [filtro, setFiltro] = useState("");
   const [listadoAbierto, setListadoAbierto] = useState(seleccionadas.length === 0);
@@ -110,6 +112,11 @@ export function SelectorObras({
         value={otraObra}
         onChange={(event) => onOtraObra(event.target.value)}
       />
+      {avisoCampo ? (
+        <p className="text-sm font-semibold leading-snug text-warn" role="alert">
+          {avisoCampo}
+        </p>
+      ) : null}
     </fieldset>
   );
 }

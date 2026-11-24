@@ -444,7 +444,11 @@ export function HorarioLugarEditor({
       {conflictos.length ? (
         <p className="text-sm text-warn">Días en más de una franja: {etiquetasDias(conflictos)}.</p>
       ) : null}
-      {aviso ? <p className="text-sm text-warn">{aviso}</p> : null}
+      {aviso ? (
+        <p className="text-sm font-semibold leading-snug text-warn" role="alert">
+          {aviso}
+        </p>
+      ) : null}
       {sinCubrir.length ? (
         <p className="text-xs text-muted">Sin franja (no se publica horario): {etiquetasDias(sinCubrir)}.</p>
       ) : null}

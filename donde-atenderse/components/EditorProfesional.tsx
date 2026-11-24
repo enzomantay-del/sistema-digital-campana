@@ -14,6 +14,8 @@ import { campoDesdeEspecialidades } from "@/lib/especialidades";
 import type { BorradorProfesional, HorarioBorrador } from "@/lib/draft";
 import { horarioLugarParaGuardar, horarioLugarVacio, notaHorarioParaGuardar } from "@/lib/placeSchedule";
 import { armarVistaProfesional } from "@/lib/view";
+import { AvisoCampo, claseCampoConError } from "@/components/AvisoCampo";
+import { erroresCamposFichaProfesional, idPrimerCampoConError } from "@/lib/erroresCamposFicha";
 import { mensajeSolapamientoEntreSedes } from "@/lib/solapamientoHorarios";
 import { validarAntesDeGuardar } from "@/lib/validarProfesional";
 import type { FilaHorario } from "@/lib/schedule";
@@ -87,6 +89,7 @@ export function EditorProfesional({
   const [guardadoOk, setGuardadoOk] = useState(false);
   const [estado, setEstado] = useState("Cuando termines, tocá Guardar ficha para que quede en la ficha pública.");
   const [avisoRojo, setAvisoRojo] = useState<string | null>(null);
+  const [marcarCamposEnRojo, setMarcarCamposEnRojo] = useState(false);
   const ultimo = useRef(borrador);
   ultimo.current = borrador;
   const modoPropio = !modoAdmin && !modoSecretaria;
@@ -95,6 +98,25 @@ export function EditorProfesional({
     () => mensajeSolapamientoEntreSedes(borrador.horarios.filter((h) => h.placeId)),
     [borrador.horarios],
   );
+  const erroresCampos = useMemo(
+  () =>
+      erroresCamposFichaProfesional(borrador, {
+        exigeHorario: true,
+        tieneFoto: Boolean(borrador.photoUrl?.trim()),
+      }),
+    [borrador],
+  );
+  const erroresVisibles = marcarCamposEnRojo ? erroresCampos : null;
+
+  function avisoCampo(mensaje?: string) {
+    return erroresVisibles ? mensaje : null;
+  }
+
+  function enfocarPrimerError(errores = erroresCampos) {
+    const id = idPrimerCampoConError(errores);
+    if (!id) return;
+    requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "center" }));
+  }
 
   useEffect(() => {
     setLugaresLista(lugares);
@@ -174,11 +196,14 @@ export function EditorProfesional({
     const tieneFoto = Boolean(snapshot.photoUrl?.trim());
     const errorLocal = validarAntesDeGuardar(snapshot, { exigeHorario: true, tieneFoto });
     if (errorLocal) {
+      setMarcarCamposEnRojo(true);
       setAvisoRojo(errorLocal);
       setEstado("Revisá lo marcado en rojo antes de guardar.");
+      enfocarPrimerError();
       return;
     }
     setAvisoRojo(null);
+    setMarcarCamposEnRojo(false);
     setGuardando(true);
     setEstado("Guardando…");
     try {
@@ -196,8 +221,10 @@ export function EditorProfesional({
         | { ok: false; error: string };
       if (!resultado.ok) {
         const mensaje = resultado.error ?? "No se pudo guardar. Probá de nuevo.";
+        setMarcarCamposEnRojo(true);
         setAvisoRojo(mensaje);
         setEstado("Revisá lo marcado en rojo antes de guardar.");
+        enfocarPrimerError();
         return;
       }
       const fusion = {
@@ -220,6 +247,7 @@ export function EditorProfesional({
       setHayCambios(false);
       setGuardadoOk(true);
       setAvisoRojo(null);
+      setMarcarCamposEnRojo(false);
       try {
         sessionStorage.removeItem(claveBorradorLocal);
       } catch {
@@ -365,18 +393,29 @@ export function EditorProfesional({
             professionalId={professionalId}
             photoUrl={borrador.photoUrl}
             placeIdEnfoque={placeIdEnfoque}
+            avisoCampo={avisoCampo(erroresVisibles?.photo)}
             onChange={(photoUrl) => {
               marcarCambio();
               setBorrador((actual) => ({ ...actual, photoUrl }));
             }}
           />
-          <label className="grid gap-1">
+          <label className="grid gap-1" id="campo-error-nombre">
             Nombre
-            <input className="campo" value={borrador.fullName} onChange={(event) => cambiar({ fullName: event.target.value })} />
+            <input
+              className={claseCampoConError(avisoCampo(erroresVisibles?.fullName))}
+              value={borrador.fullName}
+              onChange={(event) => cambiar({ fullName: event.target.value })}
+            />
+            <AvisoCampo mensaje={avisoCampo(erroresVisibles?.fullName)} />
           </label>
-          <label className="grid gap-1">
+          <label className="grid gap-1" id="campo-error-matricula">
             Matrícula
-            <input className="campo" value={borrador.license} onChange={(event) => cambiar({ license: event.target.value })} />
+            <input
+              className={claseCampoConError(avisoCampo(erroresVisibles?.license))}
+              value={borrador.license}
+              onChange={(event) => cambiar({ license: event.target.value })}
+            />
+            <AvisoCampo mensaje={avisoCampo(erroresVisibles?.license)} />
           </label>
           {modoPropio ? <AvisoMatriculaEditor matricula={borrador.license} professionalId={professionalId} /> : null}
           <label className="grid gap-1">
@@ -389,7 +428,10 @@ export function EditorProfesional({
               ))}
             </select>
           </label>
-          <fieldset className="grid gap-2">
+          <fieldset
+            className={`grid gap-2 ${avisoCampo(erroresVisibles?.specialties) ? "rounded-2xl border border-warn bg-[#fff8f8] p-3" : ""}`}
+            id="campo-error-especialidades"
+          >
             <legend className="font-semibold">Especialidades</legend>
             <p className="text-sm text-muted">Podés marcar más de una.</p>
             <div className="flex flex-wrap gap-2">
@@ -416,6 +458,7 @@ export function EditorProfesional({
                 );
               })}
             </div>
+            <AvisoCampo mensaje={avisoCampo(erroresVisibles?.specialties)} />
           </fieldset>
           <fieldset className="grid gap-3 rounded-2xl border border-line bg-[#f8fafc] p-4">
             <legend className="font-semibold">Secretaría / agenda del profesional (opcional)</legend>
@@ -456,17 +499,32 @@ export function EditorProfesional({
             </p>
           </div>
           {avisoSolapamiento ? (
-            <p className="rounded-2xl border border-warn bg-[#fff8f0] px-4 py-3 text-sm font-semibold leading-snug text-warn" role="alert">
+            <p
+              id="campo-error-solapamiento"
+              className="rounded-2xl border border-warn bg-[#fff8f0] px-4 py-3 text-sm font-semibold leading-snug text-warn"
+              role="alert"
+            >
               {avisoSolapamiento}
+            </p>
+          ) : null}
+          {avisoCampo(erroresVisibles?.solapamiento) && !avisoSolapamiento ? (
+            <p
+              id="campo-error-solapamiento"
+              className="rounded-2xl border border-warn bg-[#fff8f0] px-4 py-3 text-sm font-semibold leading-snug text-warn"
+              role="alert"
+            >
+              {erroresVisibles?.solapamiento}
             </p>
           ) : null}
           {borrador.horarios.map((horario, indiceHorario) => {
             const variasSedes = borrador.horarios.length > 1;
+            const errH = erroresVisibles?.porHorario[horario.key];
             const bloqueHorario = horario.placeId && horario.placeName.trim() ? (
               <>
                 <HorarioLugarEditor
                   valor={horario.schedule}
                   legacy={horario.scheduleLegacy}
+                  aviso={avisoCampo(errH?.horario)}
                   onChange={(schedule) => cambiarHorario(horario.key, { schedule })}
                 />
                 <SelectorObras
@@ -474,6 +532,7 @@ export function EditorProfesional({
                   seleccionadas={horario.obras ?? []}
                   otraObra={horario.otraObra ?? ""}
                   titulo={`Obra social en ${horario.placeName || "esta sede"}`}
+                  avisoCampo={avisoCampo(errH?.obras)}
                   onSeleccionadas={(obras) => cambiarHorario(horario.key, { obras })}
                   onOtraObra={(otraObra) => cambiarHorario(horario.key, { otraObra })}
                 />
@@ -481,7 +540,11 @@ export function EditorProfesional({
             ) : null;
 
             return (
-            <div key={horario.key} className="grid gap-3 border-t border-line pt-4">
+            <div
+              key={horario.key}
+              id={errH?.lugar ? `campo-error-lugar-${horario.key}` : errH?.horario ? `campo-error-horario-${horario.key}` : errH?.obras ? `campo-error-obras-${horario.key}` : undefined}
+              className={`grid gap-3 border-t pt-4 ${errH ? "border-warn bg-[#fffaf8]" : "border-line"}`}
+            >
               {horario.placeId && (modoSecretaria || placeIdEnfoque) ? (
                 <p>
                   {horario.placeName} · {horario.locality}
@@ -498,7 +561,7 @@ export function EditorProfesional({
                 <label className="grid gap-1">
                   Centro donde atendés
                   <select
-                    className="campo"
+                    className={claseCampoConError(avisoCampo(errH?.lugar))}
                     value={horario.placeId || ""}
                     disabled={modoSecretaria || Boolean(placeIdEnfoque)}
                     onChange={(event) => {
@@ -527,6 +590,7 @@ export function EditorProfesional({
                       </option>
                     ))}
                   </select>
+                  <AvisoCampo mensaje={avisoCampo(errH?.lugar)} />
                 </label>
               )}
               {bloqueHorario ? (
@@ -552,7 +616,11 @@ export function EditorProfesional({
           );
           })}
           {!modoSecretaria ? (
-            <div className="grid gap-3 border-t border-line pt-4">
+            <div
+              className={`grid gap-3 border-t pt-4 ${avisoCampo(erroresVisibles?.sedes) ? "rounded-2xl border-warn bg-[#fff8f8] p-3" : "border-line"}`}
+              id="campo-error-sedes"
+            >
+              <AvisoCampo mensaje={avisoCampo(erroresVisibles?.sedes)} />
               <button
                 type="button"
                 className="boton w-fit"
