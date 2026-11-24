@@ -1,5 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { esAdmin, usuarioActual } from "@/lib/auth";
+import { lugarPermiteCargaSecretaria } from "@/lib/lugarAsignacion";
 import { prisma } from "@/lib/prisma";
 import { redirigirSolicitud } from "@/lib/urlSolicitud";
 
@@ -9,12 +10,19 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   if (!user || !esAdmin(user)) {
     return redirigirSolicitud(request, "/entrar");
   }
+  const lugar = await prisma.place.findUnique({ where: { id: placeId }, select: { kind: true } });
+  if (!lugar) {
+    return redirigirSolicitud(request, "/panel/admin");
+  }
   const formData = await request.formData();
   const modo = String(formData.get("modo") ?? "asignar");
   if (modo === "quitar") {
     const userId = String(formData.get("userId") ?? "");
     if (userId) await prisma.placeEditor.deleteMany({ where: { placeId, userId } });
     revalidatePath(`/panel/lugar/${placeId}`);
+    return redirigirSolicitud(request, `/panel/lugar/${placeId}`);
+  }
+  if (!lugarPermiteCargaSecretaria(lugar.kind)) {
     return redirigirSolicitud(request, `/panel/lugar/${placeId}`);
   }
 

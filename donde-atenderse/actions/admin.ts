@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { lugarPermiteCargaSecretaria } from "@/lib/lugarAsignacion";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requiereAdmin } from "@/lib/auth";
@@ -107,6 +108,8 @@ export async function asignarEditor(formData: FormData) {
     .trim()
     .toLowerCase();
   if (!placeId || !email.includes("@")) redirect(`/panel/lugar/${placeId || ""}`);
+  const lugar = await prisma.place.findUnique({ where: { id: placeId }, select: { kind: true } });
+  if (!lugar || !lugarPermiteCargaSecretaria(lugar.kind)) redirect(`/panel/lugar/${placeId}`);
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) redirect(`/panel/lugar/${placeId}?error=correo`);
   await prisma.placeEditor.upsert({

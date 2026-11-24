@@ -9,6 +9,7 @@ import { obrasModoEfectivo } from "@/lib/placeObras";
 import { serviciosIdsDesdeCampo } from "@/lib/placeServices";
 import { leerHorarioLugarDesdeNota } from "@/lib/placeSchedule";
 import { prisma } from "@/lib/prisma";
+import { lugarPermiteCargaSecretaria } from "@/lib/lugarAsignacion";
 import { catalogoObras } from "@/lib/search";
 
 export default async function PaginaEditorLugar({
@@ -88,35 +89,73 @@ export default async function PaginaEditorLugar({
           ) : null}
           {ok === "bajar" ? <p className="text-sm text-muted">Lugar sin publicar en la web.</p> : null}
           {error === "accion" ? <p className="text-sm text-warn">No se pudo completar la acción. Probá de nuevo.</p> : null}
-          <form action={`/api/lugar/${lugar.id}/editor`} method="post" className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
-            <label className="grid gap-1">
-              Asignar editor por correo
-              <input name="email" type="email" className="campo" placeholder="secretaria@ejemplo.com" required />
-            </label>
-            <input type="hidden" name="placeId" value={lugar.id} />
-            <button className="boton-suave" type="submit">
-              Asignar
-            </button>
-          </form>
-          {error === "correo" ? <p className="text-warn">No hay una cuenta con ese correo.</p> : null}
-          {lugar.editors.length > 0 ? (
-            <ul className="grid gap-2">
-              {lugar.editors.map((editor) => (
-                <li key={editor.id} className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
-                  <span>
-                    {editor.user.name} · {editor.user.email}
-                  </span>
-                  <form action={`/api/lugar/${lugar.id}/editor`} method="post">
-                    <input type="hidden" name="modo" value="quitar" />
-                    <input type="hidden" name="userId" value={editor.userId} />
-                    <button className="font-semibold text-link" type="submit">
-                      Quitar
-                    </button>
-                  </form>
-                </li>
-              ))}
-            </ul>
-          ) : null}
+          {lugarPermiteCargaSecretaria(lugar.kind) ? (
+            <>
+              <form
+                action={`/api/lugar/${lugar.id}/editor`}
+                method="post"
+                className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end"
+              >
+                <label className="grid gap-1">
+                  Asignar editor por correo
+                  <input name="email" type="email" className="campo" placeholder="secretaria@ejemplo.com" required />
+                </label>
+                <input type="hidden" name="placeId" value={lugar.id} />
+                <button className="boton-suave" type="submit">
+                  Asignar
+                </button>
+              </form>
+              {error === "correo" ? <p className="text-warn">No hay una cuenta con ese correo.</p> : null}
+              {lugar.editors.length > 0 ? (
+                <ul className="grid gap-2">
+                  {lugar.editors.map((editor) => (
+                    <li
+                      key={editor.id}
+                      className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3"
+                    >
+                      <span>
+                        {editor.user.name} · {editor.user.email}
+                      </span>
+                      <form action={`/api/lugar/${lugar.id}/editor`} method="post">
+                        <input type="hidden" name="modo" value="quitar" />
+                        <input type="hidden" name="userId" value={editor.userId} />
+                        <button className="font-semibold text-link" type="submit">
+                          Quitar
+                        </button>
+                      </form>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-muted">
+                Las farmacias y su turnero las carga solo la administración; no se asignan secretarias nuevas.
+              </p>
+              {lugar.editors.length > 0 ? (
+                <ul className="grid gap-2">
+                  {lugar.editors.map((editor) => (
+                    <li
+                      key={editor.id}
+                      className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3"
+                    >
+                      <span>
+                        {editor.user.name} · {editor.user.email}
+                      </span>
+                      <form action={`/api/lugar/${lugar.id}/editor`} method="post">
+                        <input type="hidden" name="modo" value="quitar" />
+                        <input type="hidden" name="userId" value={editor.userId} />
+                        <button className="font-semibold text-link" type="submit">
+                          Quitar
+                        </button>
+                      </form>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </>
+          )}
         </section>
       ) : null}
       <EditorLugar

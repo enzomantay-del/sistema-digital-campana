@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { BuscarMatriculaProfesional } from "@/components/BuscarMatriculaProfesional";
 import { EspecialidadesLugarEditor } from "@/components/EspecialidadesLugarEditor";
 import { esSecretaria, usuarioActual } from "@/lib/auth";
+import { lugarPermiteCargaSecretaria } from "@/lib/lugarAsignacion";
 import { especialidadesDesdeCampo } from "@/lib/especialidades";
 import { prisma } from "@/lib/prisma";
 
@@ -14,7 +15,7 @@ export default async function CargasPorLugar({ params }: { params: Promise<{ pla
   if (!usuario.places.some((item) => item.placeId === placeId)) notFound();
 
   const lugar = await prisma.place.findUnique({ where: { id: placeId } });
-  if (!lugar) notFound();
+  if (!lugar || !lugarPermiteCargaSecretaria(lugar.kind)) notFound();
 
   const enEsteLugar = await prisma.attendance.findMany({
     where: { placeId },

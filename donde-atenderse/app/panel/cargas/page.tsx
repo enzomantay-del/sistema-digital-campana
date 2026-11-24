@@ -3,11 +3,14 @@ import { redirect } from "next/navigation";
 import { salir } from "@/actions/auth";
 import { esSecretaria, usuarioActual } from "@/lib/auth";
 import { etiquetaLugar } from "@/lib/format";
+import { lugarPermiteCargaSecretaria } from "@/lib/lugarAsignacion";
 
 export default async function PanelCargas() {
   const usuario = await usuarioActual();
   if (!usuario) redirect("/entrar");
   if (!esSecretaria(usuario)) redirect("/panel");
+
+  const lugaresAsignados = usuario.places.filter((item) => lugarPermiteCargaSecretaria(item.place.kind));
 
   return (
     <div className="grid max-w-2xl gap-8">
@@ -18,12 +21,12 @@ export default async function PanelCargas() {
           lugar. Si el médico atiende en otro centro, la secretaría de ese otro lugar carga su horario allí.
         </p>
       </header>
-      {usuario.places.length === 0 ? (
+      {lugaresAsignados.length === 0 ? (
         <p className="text-warn">Todavía no tenés un lugar asignado. Pedile a la administración que te dé acceso.</p>
       ) : (
         <section className="grid gap-3">
           <h2 className="text-xl font-semibold">Tus lugares</h2>
-          {usuario.places.map((item) => (
+          {lugaresAsignados.map((item) => (
             <Link
               key={item.placeId}
               href={`/panel/cargas/${item.placeId}`}

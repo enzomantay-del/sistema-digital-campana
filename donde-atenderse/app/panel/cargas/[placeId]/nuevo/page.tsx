@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { EditorProfesional } from "@/components/EditorProfesional";
 import { AvisoFotosHosting } from "@/components/AvisoFotosHosting";
 import { esSecretaria, usuarioActual } from "@/lib/auth";
+import { lugarPermiteCargaSecretaria } from "@/lib/lugarAsignacion";
 import { horarioBorradorParaLugar } from "@/lib/cargarBorradorProfesional";
 import { prisma } from "@/lib/prisma";
 import { catalogoObras } from "@/lib/search";
@@ -14,7 +15,7 @@ export default async function NuevaFichaEnLugar({ params }: { params: Promise<{ 
   if (!usuario.places.some((item) => item.placeId === placeId)) notFound();
 
   const lugar = await prisma.place.findUnique({ where: { id: placeId } });
-  if (!lugar?.published) notFound();
+  if (!lugar?.published || !lugarPermiteCargaSecretaria(lugar.kind)) notFound();
 
   const obras = await catalogoObras();
   const borradorVacio = await prisma.professional.create({

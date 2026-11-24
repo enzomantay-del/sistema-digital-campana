@@ -16,7 +16,7 @@ export function CrearUsuarioAdmin({
       <h2 className="text-2xl font-semibold">Crear usuario para secretaria o profesional</h2>
       <p className="text-sm text-muted">
         Les pasás el link de ingreso (https://donde-atenderse.apps.grok.bot/entrar), el correo y la contraseña que
-        definís acá. Solo cargan fichas de profesionales; los lugares los gestionás vos.
+        definís acá. Solo cargan fichas de profesionales; los lugares y las farmacias los gestionás vos desde acá.
       </p>
       <form action="/api/admin/usuarios" method="post" className="grid gap-3">
         <label className="grid gap-1">

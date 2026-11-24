@@ -13,6 +13,7 @@ import { ImportarTurneroFarmacia } from "@/components/ImportarTurneroFarmacia";
 import { CrearUsuarioAdmin } from "@/components/CrearUsuarioAdmin";
 import { requiereAdmin } from "@/lib/auth";
 import { etiquetaArea, etiquetaLugar, fecha } from "@/lib/format";
+import { lugarPermiteCargaSecretaria } from "@/lib/lugarAsignacion";
 import { prisma } from "@/lib/prisma";
 
 const accionesProfesional = {
@@ -208,7 +209,7 @@ export default async function PanelAdmin({
         <p className="text-sm text-warn">Las secretarias necesitan al menos un lugar asignado.</p>
       ) : null}
 
-      <CrearUsuarioAdmin lugares={lugares} />
+      <CrearUsuarioAdmin lugares={lugares.filter((lugar) => lugarPermiteCargaSecretaria(lugar.kind))} />
 
       <section className="grid gap-2">
         <h2 className="text-center text-lg font-semibold">Fichas a revisar</h2>

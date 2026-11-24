@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { esAdmin, usuarioActual } from "@/lib/auth";
+import { lugarPermiteCargaSecretaria } from "@/lib/lugarAsignacion";
 import { prisma } from "@/lib/prisma";
 import { redirigirSolicitud } from "@/lib/urlSolicitud";
 
@@ -48,6 +49,13 @@ export async function POST(request: Request) {
   }
 
   if (role === "secretaria" && placeIds.length > 0) {
+    const lugares = await prisma.place.findMany({
+      where: { id: { in: placeIds } },
+      select: { id: true, kind: true },
+    });
+    if (lugares.some((lugar) => !lugarPermiteCargaSecretaria(lugar.kind))) {
+      return redirigirSolicitud(request, "/panel/admin?error=lugares");
+    }
     for (const placeId of placeIds) {
       await prisma.placeEditor.upsert({
         where: { userId_placeId: { userId: user.id, placeId } },
