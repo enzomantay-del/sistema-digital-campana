@@ -8,6 +8,7 @@ import { HorarioLugarEditor } from "@/components/HorarioLugarEditor";
 import { LogoLugarEditor } from "@/components/LogoLugarEditor";
 import { LOCALIDADES, OBRAS_INICIALES, TIPOS_LUGAR } from "@/lib/constants";
 import type { BorradorLugar, EstudioBorrador } from "@/lib/draft";
+import { SelectorObras } from "@/components/SelectorObras";
 import { MODOS_OBRAS_LUGAR, obrasModoDefault } from "@/lib/placeObras";
 import { SERVICIOS_LUGAR } from "@/lib/placeServices";
 import type { ObrasModoLugar } from "@/lib/placeObras";
@@ -224,39 +225,14 @@ export function EditorLugar({
             {borrador.obrasMode === "por_profesional" ? (
               <p className="text-sm text-muted">No hace falta marcar obras acá. Cada profesional las carga en su ficha.</p>
             ) : (
-              <>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {catalogo.map((obra) => {
-                    const activa = borrador.obras.includes(obra);
-                    return (
-                      <label
-                        key={obra}
-                        className={activa ? "pastilla pastilla-compacta pastilla-activa" : "pastilla pastilla-compacta"}
-                      >
-                        <input
-                          className="sr-only"
-                          type="checkbox"
-                          checked={activa}
-                          onChange={(event) =>
-                            cambiar({
-                              obras: event.target.checked
-                                ? [...borrador.obras, obra]
-                                : borrador.obras.filter((item) => item !== obra),
-                            })
-                          }
-                        />
-                        {obra}
-                      </label>
-                    );
-                  })}
-                </div>
-                <input
-                  className="campo"
-                  placeholder="Otra obra social"
-                  value={borrador.otraObra}
-                  onChange={(event) => cambiar({ otraObra: event.target.value })}
-                />
-              </>
+              <SelectorObras
+                catalogo={catalogo}
+                seleccionadas={borrador.obras}
+                otraObra={borrador.otraObra}
+                titulo="Obras que atiende el lugar"
+                onSeleccionadas={(obras) => cambiar({ obras })}
+                onOtraObra={(otraObra) => cambiar({ otraObra })}
+              />
             )}
           </fieldset>
         </section>

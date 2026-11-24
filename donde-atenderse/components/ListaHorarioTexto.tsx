@@ -6,11 +6,13 @@ export function ListaHorarioTexto({
   lineas,
   className = "text-base text-ink",
   compacto = false,
+  denso = false,
   scheduleNote,
 }: {
   lineas: string[];
   className?: string;
   compacto?: boolean;
+  denso?: boolean;
   scheduleNote?: string;
 }) {
   if (lineas.length === 0 && !scheduleNote?.trim()) return null;
@@ -24,5 +26,7 @@ export function ListaHorarioTexto({
     );
   }
 
-  return <HorarioLegible lineas={lineas} scheduleNote={scheduleNote} className={className} />;
+  return (
+    <HorarioLegible lineas={lineas} scheduleNote={scheduleNote} className={className} denso={denso} />
+  );
 }

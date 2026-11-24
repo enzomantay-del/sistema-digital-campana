@@ -3,6 +3,7 @@ import Link from "next/link";
 import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { HorarioLugarPublico } from "@/components/HorarioLugarPublico";
 import { ListaHorarioTexto } from "@/components/ListaHorarioTexto";
+import { ListaObrasCompacta } from "@/components/ListaObrasCompacta";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
 import { MENSAJE_WHATSAPP } from "@/lib/constants";
 import { enlaceMaps, enlaceTelefono, enlaceWhatsApp, etiquetaLugar } from "@/lib/format";
@@ -147,10 +148,7 @@ export function FichaLugar({
 
       {vista.obrasNota ? <p className="text-sm text-muted">{vista.obrasNota}</p> : null}
       {vista.mostrarObrasLista && vista.obras.length > 0 ? (
-        <p>
-          <span className="text-muted">Obra social: </span>
-          {vista.obras.join(" · ")}
-        </p>
+        <ListaObrasCompacta obras={vista.obras} etiqueta="Obra social" />
       ) : null}
 
       {vista.whatsapp || vista.telefono ? (
