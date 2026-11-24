@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { salir } from "@/actions/auth";
 import {
   bajarLugar,
   bajarProfesional,
@@ -190,7 +189,7 @@ export default async function PanelAdmin({
           <Link href="/panel/lugar/nuevo" className="boton">
             Cargar un lugar
           </Link>
-          <form action={salir}>
+          <form method="POST" action="/api/salir">
             <button className="boton-suave" type="submit">
               Salir
             </button>

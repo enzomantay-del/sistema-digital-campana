@@ -59,7 +59,14 @@ export async function crearSesion(userId: string) {
 
 export async function cerrarSesion() {
   const jar = await cookies();
-  jar.delete(COOKIE);
+  jar.set(COOKIE, "", {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 0,
+    expires: new Date(0),
+  });
 }
 
 export async function usuarioActual() {

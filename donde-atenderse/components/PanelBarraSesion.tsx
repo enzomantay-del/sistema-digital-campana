@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { salir } from "@/actions/auth";
 import { destinoPanelTrasLogin, esAdmin, esProfesional, esSecretaria } from "@/lib/auth";
 
 type UsuarioBarra = {
@@ -33,7 +32,7 @@ export function PanelBarraSesion({ usuario }: { usuario: UsuarioBarra }) {
         <Link href="/" className="font-semibold text-muted hover:text-ink">
           Sitio público
         </Link>
-        <form action={salir}>
+        <form method="POST" action="/api/salir">
           <button type="submit" className="boton-suave px-3 py-1.5 text-sm">
             Cerrar sesión
           </button>

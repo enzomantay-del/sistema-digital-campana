@@ -87,6 +87,7 @@ export async function crearCuenta(_estado: Resultado | null, formData: FormData)
   return { ok: true, irA: "/panel" };
 }
 
+/** @deprecated Preferí POST `/api/salir` (formulario estable tras deploys). */
 export async function salir() {
   await cerrarSesion();
   redirect("/entrar");

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { salir } from "@/actions/auth";
 import { FormularioEntrarWeb } from "@/components/FormularioEntrarWeb";
 import { destinoPanelTrasLogin, esSecretaria, usuarioActual } from "@/lib/auth";
 import { enlaceRecuperacionIngreso } from "@/lib/recuperacion";
@@ -25,7 +24,7 @@ export default async function Entrar({
           <Link href={destino} className="boton w-fit">
             Ir al panel
           </Link>
-          <form action={salir}>
+          <form method="POST" action="/api/salir">
             <button type="submit" className="boton-suave w-fit">
               Cerrar sesión
             </button>
