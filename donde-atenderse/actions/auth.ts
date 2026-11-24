@@ -89,5 +89,5 @@ export async function crearCuenta(_estado: Resultado | null, formData: FormData)
 
 export async function salir() {
   await cerrarSesion();
-  redirect("/");
+  redirect("/entrar");
 }

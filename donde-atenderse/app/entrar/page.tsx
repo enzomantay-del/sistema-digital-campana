@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { salir } from "@/actions/auth";
 import { FormularioEntrarWeb } from "@/components/FormularioEntrarWeb";
-import { destinoPanelTrasLogin, usuarioActual } from "@/lib/auth";
+import { destinoPanelTrasLogin, esSecretaria, usuarioActual } from "@/lib/auth";
 import { enlaceRecuperacionIngreso } from "@/lib/recuperacion";
 
 export default async function Entrar({
@@ -12,13 +13,24 @@ export default async function Entrar({
   const usuario = await usuarioActual();
   if (usuario) {
     const destino = destinoPanelTrasLogin(usuario);
+    const rol = esSecretaria(usuario) ? "secretaría" : usuario.role === "admin" ? "administración" : "profesional";
     return (
       <div className="grid max-w-xl gap-4">
         <h1 className="text-4xl font-bold tracking-tight">Ya entraste</h1>
-        <p className="text-muted">Sesión abierta como {usuario.name}.</p>
-        <Link href={destino} className="boton w-fit">
-          Ir al panel
-        </Link>
+        <p className="text-muted">
+          Sesión abierta como <strong>{usuario.name}</strong> ({rol}). Podés seguir en el panel o cerrar sesión para
+          entrar con otra cuenta.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link href={destino} className="boton w-fit">
+            Ir al panel
+          </Link>
+          <form action={salir}>
+            <button type="submit" className="boton-suave w-fit">
+              Cerrar sesión
+            </button>
+          </form>
+        </div>
       </div>
     );
   }

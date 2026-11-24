@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { salir } from "@/actions/auth";
 import { esSecretaria, usuarioActual } from "@/lib/auth";
 import { etiquetaLugar } from "@/lib/format";
 import { lugarPermiteCargaSecretaria } from "@/lib/lugarAsignacion";
@@ -40,11 +39,6 @@ export default async function PanelCargas() {
           ))}
         </section>
       )}
-      <form action={salir}>
-        <button className="font-semibold text-link" type="submit">
-          Salir
-        </button>
-      </form>
     </div>
   );
 }

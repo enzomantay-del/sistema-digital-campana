@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { IconoCercalud, ICONO_NAV } from "@/components/iconos/IconoCercalud";
 import { Marca } from "@/components/Marca";
-import { esAdmin, usuarioActual } from "@/lib/auth";
+import { destinoPanelTrasLogin, esAdmin, esSecretaria, usuarioActual } from "@/lib/auth";
 import { mostrarDatosEjemplo } from "@/lib/config";
 import { RUTA_PROFESIONAL_EJEMPLO } from "@/lib/ejemplo";
 
@@ -21,6 +21,9 @@ export async function Encabezado({ ejemplo }: { ejemplo: boolean }) {
     usuario = null;
   }
   const admin = esAdmin(usuario);
+  const secretaria = esSecretaria(usuario);
+  const enlacePanel = usuario ? destinoPanelTrasLogin(usuario) : "/entrar";
+  const textoPanel = usuario ? (admin ? "Administración" : secretaria ? "Mis cargas" : "Mi ficha") : "Soy profesional";
   const demo = mostrarDatosEjemplo();
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-white/95 backdrop-blur">
@@ -45,11 +48,8 @@ export async function Encabezado({ ejemplo }: { ejemplo: boolean }) {
               Ver ficha de ejemplo
             </Link>
           ) : null}
-          <Link
-            href={usuario ? (admin ? "/panel/admin" : "/panel") : "/entrar"}
-            className="whitespace-nowrap text-[15px] font-semibold hover:text-link"
-          >
-            {usuario ? (admin ? "Administración" : "Mi ficha") : "Soy profesional"}
+          <Link href={enlacePanel} className="whitespace-nowrap text-[15px] font-semibold hover:text-link">
+            {textoPanel}
           </Link>
         </div>
       </div>

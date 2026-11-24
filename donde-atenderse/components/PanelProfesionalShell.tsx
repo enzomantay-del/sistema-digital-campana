@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { salir } from "@/actions/auth";
 import type { ReactNode } from "react";
 
 export function PanelProfesionalShell({
@@ -28,16 +27,9 @@ export function PanelProfesionalShell({
             <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">{nombre || "Tu ficha"}</h1>
             <p className="text-sm text-muted">{estadoPublicacion}</p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/" className="boton-suave text-sm">
-              Ver sitio público
-            </Link>
-            <form action={salir}>
-              <button type="submit" className="boton-suave text-sm">
-                Salir
-              </button>
-            </form>
-          </div>
+          <Link href="/" className="boton-suave text-sm">
+            Ver sitio público
+          </Link>
         </div>
         <ol className="grid gap-2 text-sm sm:grid-cols-2">
           <li className="rounded-2xl border border-line bg-white/90 px-4 py-3">
