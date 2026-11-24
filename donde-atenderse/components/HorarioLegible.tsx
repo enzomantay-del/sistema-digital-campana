@@ -1,5 +1,9 @@
 import { expandirLineasHorario, partirLineaHorario, trozosDetalleHorario } from "@/lib/horarioPresentacion";
-import { franjasHorarioLugarPublico, type FranjaHorarioPublica } from "@/lib/placeSchedule";
+import {
+  complementoHorarioLugar,
+  franjasHorarioLugarPublico,
+  type FranjaHorarioPublica,
+} from "@/lib/placeSchedule";
 
 function TarjetaFranja({ franja }: { franja: FranjaHorarioPublica }) {
   return (
@@ -68,6 +72,7 @@ export function HorarioLegible({
   className?: string;
 }) {
   const franjas = scheduleNote ? franjasHorarioLugarPublico(scheduleNote) : [];
+  const complemento = scheduleNote ? complementoHorarioLugar(scheduleNote) : "";
   const lineasVisibles = expandirLineasHorario(lineas);
 
   if (franjas.length > 0) {
@@ -76,6 +81,9 @@ export function HorarioLegible({
         {franjas.map((franja) => (
           <TarjetaFranja key={franja.diasLabel + franja.turnos.map((t) => t.label).join()} franja={franja} />
         ))}
+        {complemento ? (
+          <li className="rounded-2xl border border-line bg-white/80 px-4 py-3 text-sm text-ink shadow-sm">{complemento}</li>
+        ) : null}
       </ul>
     );
   }

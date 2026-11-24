@@ -1,6 +1,7 @@
 import type { IdTurnoHorarioLugar } from "./placeSchedule";
 import {
   TURNOS_HORARIO_LUGAR,
+  esPeriodicidadSemanal,
   franjaConDatos,
   horarioLugarVacio,
   leerHorarioLugarDesdeNota,
@@ -36,7 +37,9 @@ export function leerHorarioProfesional(nota: string, days: string, time: string,
 }
 
 export function camposLegacyDesdeHorario(data: HorarioLugarData) {
-  const franja = data.franjas.find(franjaConDatos);
+  const franja =
+    data.franjas.find((item) => franjaConDatos(item) && esPeriodicidadSemanal(item.periodicidad)) ??
+    data.franjas.find(franjaConDatos);
   if (!franja) return { days: "", time: "", shift: "manana" };
   if (franja.guardia24) {
     return { days: franja.dias.join(","), time: "24 h", shift: "guardia" };
