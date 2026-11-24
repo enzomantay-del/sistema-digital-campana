@@ -6,6 +6,7 @@ import { EditorLugar } from "@/components/EditorLugar";
 import { esAdmin, usuarioActual } from "@/lib/auth";
 import { fechaInput } from "@/lib/format";
 import { obrasModoEfectivo } from "@/lib/placeObras";
+import { serviciosIdsDesdeCampo } from "@/lib/placeServices";
 import { leerHorarioLugarDesdeNota } from "@/lib/placeSchedule";
 import { prisma } from "@/lib/prisma";
 import { catalogoObras } from "@/lib/search";
@@ -142,6 +143,7 @@ export default async function PaginaEditorLugar({
             preparation: estudio.preparation,
             attention: estudio.attention,
           })),
+          servicios: serviciosIdsDesdeCampo(lugar.services),
           dutyStart: fechaInput(turno?.startsOn),
           dutyEnd: fechaInput(turno?.endsOn),
           dutySource: turno?.source ?? "",

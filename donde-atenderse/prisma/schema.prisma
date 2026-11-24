@@ -51,6 +51,8 @@ model Place {
   whatsapp      String         @default("")
   phone         String         @default("")
   scheduleNote  String         @default("")
+  // IDs de SERVICIOS_LUGAR separados por coma
+  services      String         @default("")
   obrasMode     String         @default("del_lugar")
   example       Boolean        @default(false)
   published     Boolean        @default(false)

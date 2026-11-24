@@ -2,6 +2,7 @@ import { etiquetaArea, etiquetaTurno, fecha, textoPrecio } from "./format";
 import { lineasHorarioLegacy, textoHorarioUnido } from "./horarioTexto";
 import { datosActualizadosRecientes, fechaMasReciente } from "./verificacion";
 import { ObrasModoLugar, obrasModoEfectivo, presentacionObrasLugar } from "./placeObras";
+import { etiquetasServiciosLugar, serviciosIdsDesdeCampo } from "./placeServices";
 import { lineasHorarioLugar, textoHorarioLugarPublico } from "./placeSchedule";
 import { lineaHorario, ordenarTurnos, type FilaHorario, type LineaHorario } from "./schedule";
 
@@ -50,7 +51,7 @@ export type VistaLugar = {
   especialidades: string[];
   actualizacion: string;
   datosVerificados: boolean;
-  notaHospital: string;
+  servicios: string[];
   estudios: { nombre: string; preparacion: string; atencion: string }[];
   bloques: { shift: string; titulo: string; lineas: VistaLinea[] }[];
 };
@@ -161,6 +162,8 @@ export function armarVistaLugar(input: {
   cantidadProfesionales: number;
   especialidades: string[];
   updatedAt: Date | null;
+  services?: string | null;
+  servicios?: string[];
   studies: { name: string; preparation: string; attention: string }[];
   filas: (FilaHorario & { professionalName: string; professionalId: string })[];
 }): VistaLugar {
@@ -193,7 +196,9 @@ export function armarVistaLugar(input: {
     datosVerificados: datosActualizadosRecientes(
       fechaMasReciente(input.updatedAt, ...input.filas.map((fila) => fila.placeUpdatedAt)),
     ),
-    notaHospital: "",
+    servicios: etiquetasServiciosLugar(
+      input.servicios ?? serviciosIdsDesdeCampo(input.services ?? ""),
+    ),
     estudios: input.studies
       .filter((estudio) => estudio.name.trim())
       .map((estudio) => ({

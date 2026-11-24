@@ -77,6 +77,8 @@ export type BorradorLugar = {
   obras: string[];
   otraObra: string;
   studies: EstudioBorrador[];
+  /** IDs del catálogo SERVICIOS_LUGAR */
+  servicios: string[];
   dutyStart: string;
   dutyEnd: string;
   dutySource: string;

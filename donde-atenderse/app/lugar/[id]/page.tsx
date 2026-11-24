@@ -35,6 +35,7 @@ export default async function PaginaLugar({ params }: { params: Promise<{ id: st
     cantidadProfesionales: equipo.cantidad,
     especialidades: equipo.especialidades,
     updatedAt: lugar.updatedAt,
+    services: lugar.services,
     studies: lugar.studies,
     filas: lugar.attendances
       .filter((item) => item.professional.published)

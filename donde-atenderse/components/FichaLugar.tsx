@@ -119,6 +119,19 @@ export function FichaLugar({
         </div>
       ) : null}
 
+      {vista.servicios.length > 0 ? (
+        <section className="grid gap-3">
+          <h2 className="text-2xl font-semibold">Servicios</h2>
+          <ul className="flex flex-wrap gap-2">
+            {vista.servicios.map((servicio) => (
+              <li key={servicio} className="pastilla pastilla-compacta pastilla-activa">
+                {servicio}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       {vista.estudios.length > 0 ? (
         <section className="grid gap-3">
           <h2 className="text-2xl font-semibold">Estudios</h2>

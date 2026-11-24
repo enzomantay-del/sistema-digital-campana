@@ -146,6 +146,7 @@ async function main() {
       phone: "3743 00-0100",
       whatsapp: "3743000100",
       scheduleNote: "Consultorios externos de lunes a viernes, de 7 a 18.",
+      services: "internacion,uti,cirugia,emergencias,ambulatorio,imagenes_propio",
       example: true,
     },
   });
@@ -158,6 +159,7 @@ async function main() {
       phone: "3743 00-0200",
       whatsapp: "3743000200",
       scheduleNote: "Guardia las 24 horas. Consultorios de 8 a 20.",
+      services: "internacion,cirugia,emergencias,maternidad,ambulatorio",
       example: true,
     },
   });

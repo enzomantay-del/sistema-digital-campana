@@ -9,6 +9,7 @@ import { LogoLugarEditor } from "@/components/LogoLugarEditor";
 import { LOCALIDADES, OBRAS_INICIALES, TIPOS_LUGAR } from "@/lib/constants";
 import type { BorradorLugar, EstudioBorrador } from "@/lib/draft";
 import { MODOS_OBRAS_LUGAR, obrasModoDefault } from "@/lib/placeObras";
+import { SERVICIOS_LUGAR } from "@/lib/placeServices";
 import type { ObrasModoLugar } from "@/lib/placeObras";
 import { notaHorarioParaGuardar } from "@/lib/placeSchedule";
 import { armarVistaLugar } from "@/lib/view";
@@ -129,6 +130,7 @@ export function EditorLugar({
     cantidadProfesionales: 0,
     especialidades: [],
     updatedAt: new Date(),
+    servicios: borrador.servicios,
     studies: borrador.studies.map((estudio) => ({
       name: estudio.name,
       preparation: estudio.preparation,
@@ -258,6 +260,40 @@ export function EditorLugar({
             )}
           </fieldset>
         </section>
+
+        {borrador.kind !== "farmacia" ? (
+          <section className="grid gap-3">
+            <h2 className="text-2xl font-semibold">Servicios del lugar</h2>
+            <p className="text-sm text-muted">
+              Marcá lo que ofrece el centro: internación, cirugía, terapia intensiva, etc. Aparece en la ficha pública.
+            </p>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {SERVICIOS_LUGAR.map((servicio) => {
+                const activo = borrador.servicios.includes(servicio.id);
+                return (
+                  <label
+                    key={servicio.id}
+                    className={activo ? "pastilla pastilla-compacta pastilla-activa" : "pastilla pastilla-compacta"}
+                  >
+                    <input
+                      className="sr-only"
+                      type="checkbox"
+                      checked={activo}
+                      onChange={(event) =>
+                        cambiar({
+                          servicios: event.target.checked
+                            ? [...borrador.servicios, servicio.id]
+                            : borrador.servicios.filter((item) => item !== servicio.id),
+                        })
+                      }
+                    />
+                    {servicio.label}
+                  </label>
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
 
         {borrador.kind === "farmacia" ? (
           <section className="grid gap-3 rounded-xl border border-line bg-paper px-4 py-3">

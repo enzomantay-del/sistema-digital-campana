@@ -4,6 +4,7 @@ import { esAdmin } from "@/lib/auth";
 import { LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
 import type { BorradorLugar } from "@/lib/draft";
 import { MODOS_OBRAS_LUGAR, obrasModoEfectivo } from "@/lib/placeObras";
+import { serviciosCampoDesdeIds } from "@/lib/placeServices";
 import { horarioLugarParaGuardar, notaHorarioParaGuardar, validarHorarioLugar } from "@/lib/placeSchedule";
 
 export type GuardadoLugar =
@@ -60,6 +61,7 @@ export async function guardarLugarCore(placeId: string, borrador: BorradorLugar,
         whatsapp: borradorLimpio.whatsapp.trim(),
         phone: borradorLimpio.phone.trim(),
         scheduleNote: notaHorarioParaGuardar(borradorLimpio.schedule, borradorLimpio.scheduleLegacy),
+        services: serviciosCampoDesdeIds(borradorLimpio.servicios ?? []),
         obrasMode: MODOS_OBRAS_LUGAR.some((item) => item.id === borradorLimpio.obrasMode)
           ? borradorLimpio.obrasMode
           : obrasModoEfectivo(borradorLimpio.kind, lugar.obrasMode),
