@@ -20,13 +20,19 @@ export function BuscarMatriculaProfesional({ placeId }: { placeId: string }) {
       router.push(`/panel/cargas/${placeId}/${resultado.id}`);
       return;
     }
-    setMensaje(resultado.error);
+    setMensaje(
+      resultado.error ??
+        "No hay ficha con esa matrícula. Podés crear una nueva abajo solo si estás seguro de que no existe otra.",
+    );
   }
 
   return (
     <form onSubmit={(event) => void buscar(event)} className="tarjeta grid gap-3">
       <h2 className="text-lg font-semibold">¿El profesional ya está en Cercalud?</h2>
-      <p className="text-sm text-muted">Buscá por matrícula. Si ya existe, solo cargás o corregís el horario en este lugar.</p>
+      <p className="text-sm text-muted">
+        Siempre buscá primero por matrícula. Si el profesional ya está en Cercalud, abrí su ficha y cargá solo el horario en
+        este lugar — no crees otra ficha.
+      </p>
       <label className="grid gap-1">
         Matrícula
         <input className="campo" value={matricula} onChange={(event) => setMatricula(event.target.value)} required />

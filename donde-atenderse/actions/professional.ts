@@ -168,7 +168,11 @@ async function guardarProfesionalInterno(
     if (duplicado) {
       return {
         ok: false,
-        error: `Ya existe la ficha de ${duplicado.fullName} con esa matrícula. Buscá por matrícula y cargá solo el horario en tu lugar.`,
+        error: modoSecretaria
+          ? `Ya existe la ficha de ${duplicado.fullName} con esa matrícula. Usá «Buscar por matrícula» y cargá solo el horario en este lugar; no crees otra ficha.`
+          : modo === "propio"
+            ? `Ya existe la ficha de ${duplicado.fullName} con esa matrícula. Si sos vos, usá «Vincular mi cuenta» junto al campo matrícula.`
+            : `Ya existe la ficha de ${duplicado.fullName} con esa matrícula.`,
       };
     }
   }
@@ -210,10 +214,6 @@ async function guardarProfesionalInterno(
   const ahora = new Date();
 
   for (const horario of borrador.horarios) {
-    if (horario.sugerido) {
-      return { ok: false, error: "Los lugares los carga solo la administración. Elegí un lugar ya publicado." };
-    }
-
     let placeId = horario.placeId;
     if (!placeId) continue;
 
@@ -224,7 +224,16 @@ async function guardarProfesionalInterno(
       return { ok: false, error: "Solo podés cargar horarios en los lugares que te asignó la administración." };
     }
     if (!modoAdmin && !lugar.published) {
-      return { ok: false, error: "Ese lugar todavía no está publicado." };
+      const propioSugerido = modo === "propio" && lugar.suggestedById === user.id;
+      const secretariaDelLugar = modoSecretaria && lugaresPermitidos.has(placeId);
+      if (!propioSugerido && !secretariaDelLugar) {
+        return {
+          ok: false,
+          error: modoSecretaria
+            ? "Ese lugar todavía no está publicado. Elegí solo lugares confirmados por Cercalud."
+            : "Ese lugar todavía no está publicado. Si lo sugeriste vos, esperá la revisión o elegí uno ya publicado.",
+        };
+      }
     }
 
     const existente = horario.id

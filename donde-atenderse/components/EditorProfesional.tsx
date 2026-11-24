@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { ESPECIALIDADES_CATALOGO } from "@/lib/especialidades";
 import { FichaProfesional } from "@/components/FichaProfesional";
+import { AvisoMatriculaEditor } from "@/components/AvisoMatriculaEditor";
 import { FotoProfesionalEditor } from "@/components/FotoProfesionalEditor";
+import { SugerirLugarProfesional } from "@/components/SugerirLugarProfesional";
 import { HorarioLugarEditor } from "@/components/HorarioLugarEditor";
 import { AREAS, OBRAS_INICIALES } from "@/lib/constants";
 import { campoDesdeEspecialidades } from "@/lib/especialidades";
@@ -55,7 +57,15 @@ export function EditorProfesional({
   ejemplo = false,
 }: {
   inicial: BorradorProfesional & { priceUpdatedAt: string | null };
-  lugares: { id: string; name: string; locality: string; kind: string; whatsapp?: string; phone?: string }[];
+  lugares: {
+    id: string;
+    name: string;
+    locality: string;
+    kind: string;
+    published?: boolean;
+    whatsapp?: string;
+    phone?: string;
+  }[];
   obras: string[];
   revisada: boolean;
   publicada: boolean;
@@ -73,7 +83,27 @@ export function EditorProfesional({
   const [estado, setEstado] = useState("Cuando termines, tocá Guardar ficha para que quede en la ficha pública.");
   const ultimo = useRef(borrador);
   ultimo.current = borrador;
+  const modoPropio = !modoAdmin && !modoSecretaria;
   const catalogo = Array.from(new Set([...OBRAS_INICIALES, ...obras])).sort((a, b) => a.localeCompare(b, "es"));
+
+  function agregarLugarSugerido(lugar: { id: string; name: string; locality: string; kind: string }) {
+    marcarCambio();
+    setBorrador((actual) => ({
+      ...actual,
+      horarios: [
+        ...actual.horarios,
+        {
+          ...horarioVacio(),
+          placeId: lugar.id,
+          placeName: lugar.name,
+          locality: lugar.locality,
+          kind: lugar.kind,
+          sugerido: true,
+          publicado: false,
+        },
+      ],
+    }));
+  }
 
   function marcarCambio() {
     setHayCambios(true);
@@ -228,8 +258,15 @@ export function EditorProfesional({
   });
 
   return (
-    <div className="grid items-start gap-10 lg:grid-cols-2">
-      <form className="tarjeta grid gap-8" onSubmit={(event) => event.preventDefault()}>
+    <div
+      className={
+        modoPropio ? "panel-profesional-editor grid items-start gap-10 lg:grid-cols-2" : "grid items-start gap-10 lg:grid-cols-2"
+      }
+    >
+      <form
+        className={modoPropio ? "tarjeta grid gap-8 border-menta/20 shadow-md" : "tarjeta grid gap-8"}
+        onSubmit={(event) => event.preventDefault()}
+      >
         <BarraGuardar />
         {modoAdmin && ejemplo ? (
           <p className="rounded-2xl border border-warn/30 bg-paper px-4 py-3 text-base text-warn">
@@ -260,6 +297,7 @@ export function EditorProfesional({
             Matrícula
             <input className="campo" value={borrador.license} onChange={(event) => cambiar({ license: event.target.value })} />
           </label>
+          {modoPropio ? <AvisoMatriculaEditor matricula={borrador.license} professionalId={professionalId} /> : null}
           <label className="grid gap-1">
             Área
             <select className="campo" value={borrador.area} onChange={(event) => cambiar({ area: event.target.value })}>
@@ -333,15 +371,23 @@ export function EditorProfesional({
             <p className="text-muted">
               {modoSecretaria
                 ? "Cargá el horario de este profesional en el lugar asignado."
-                : "Elegí cada lugar publicado por Cercalud y el horario en el que atendés ahí."}
+                : "Elegí sedes publicadas o sugerí un lugar que aún no esté en la lista."}
             </p>
           </div>
+          {modoPropio ? <SugerirLugarProfesional onSugerido={agregarLugarSugerido} /> : null}
           {borrador.horarios.map((horario) => (
             <div key={horario.key} className="grid gap-3 border-t border-line pt-4">
-              {horario.placeId && !horario.sugerido ? (
+              {horario.placeId && (modoSecretaria || placeIdEnfoque) ? (
                 <p>
                   {horario.placeName} · {horario.locality}
-                  {horario.publicado ? null : " · Pendiente de publicación"}
+                  {!horario.publicado ? " · Lugar en revisión" : null}
+                </p>
+              ) : horario.placeId && modoPropio ? (
+                <p>
+                  <span className="font-semibold">{horario.placeName}</span> · {horario.locality}
+                  {!horario.publicado ? (
+                    <span className="text-menta"> · Tu sugerencia en revisión</span>
+                  ) : null}
                 </p>
               ) : (
                 <label className="grid gap-1">
@@ -353,10 +399,11 @@ export function EditorProfesional({
                     onChange={(event) => {
                       const lugar = lugares.find((item) => item.id === event.target.value);
                       if (!lugar) return;
+                      const publicado = lugar.published !== false;
                       cambiarHorario(horario.key, {
                         placeId: lugar.id,
-                        sugerido: false,
-                        publicado: true,
+                        sugerido: !publicado,
+                        publicado,
                         ownsPlace: false,
                         placeName: lugar.name,
                         locality: lugar.locality,
@@ -371,6 +418,7 @@ export function EditorProfesional({
                       .map((lugar) => (
                       <option key={lugar.id} value={lugar.id}>
                         {lugar.name} · {lugar.locality}
+                        {lugar.published === false ? " (en revisión)" : ""}
                       </option>
                     ))}
                   </select>
@@ -448,8 +496,8 @@ export function EditorProfesional({
         </section>
         <BarraGuardar alFinal />
       </form>
-      <aside className="grid gap-3 lg:sticky lg:top-24">
-        <h2 className="text-2xl font-semibold">Así lo ve el paciente</h2>
+      <aside className={`grid gap-3 lg:sticky lg:top-24 ${modoPropio ? "rounded-3xl border border-line bg-white/90 p-4 shadow-sm" : ""}`}>
+        <h2 className="text-2xl font-semibold">{modoPropio ? "Vista previa para pacientes" : "Así lo ve el paciente"}</h2>
         <FichaProfesional vista={vista} enlazar={false} />
       </aside>
     </div>

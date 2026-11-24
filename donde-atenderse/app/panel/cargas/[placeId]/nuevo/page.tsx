@@ -25,6 +25,10 @@ export default async function NuevaFichaEnLugar({ params }: { params: Promise<{ 
   return (
     <div className="grid gap-4">
       <AvisoFotosHosting />
+      <p className="rounded-2xl border border-line bg-[#f8fafc] px-4 py-3 text-sm text-muted">
+        Antes de crear, usá la búsqueda por matrícula en la página del lugar. Si el médico ya tiene ficha, solo agregás horario
+        acá.
+      </p>
       <EditorProfesional
         professionalId={borradorVacio.id}
         modoSecretaria

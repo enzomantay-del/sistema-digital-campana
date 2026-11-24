@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { esAdmin, esProfesional, esSecretaria } from "@/lib/auth";
 import { AvisoFotosHosting } from "@/components/AvisoFotosHosting";
 import { EditorProfesional } from "@/components/EditorProfesional";
+import { PanelProfesionalShell } from "@/components/PanelProfesionalShell";
 import { usuarioActual } from "@/lib/auth";
 import { borradorDesdeProfesional } from "@/lib/cargarBorradorProfesional";
 import { prisma } from "@/lib/prisma";
@@ -32,8 +33,19 @@ export default async function PaginaEditorProfesional() {
   });
   const [lugares, obras] = await Promise.all([
     prisma.place.findMany({
-      where: { published: true, kind: { not: "farmacia" } },
-      select: { id: true, name: true, locality: true, kind: true, whatsapp: true, phone: true },
+      where: {
+        kind: { not: "farmacia" },
+        OR: [{ published: true }, { suggestedById: usuario.id, published: false }],
+      },
+      select: {
+        id: true,
+        name: true,
+        locality: true,
+        kind: true,
+        published: true,
+        whatsapp: true,
+        phone: true,
+      },
       orderBy: [{ locality: "asc" }, { name: "asc" }],
     }),
     catalogoObras(),
@@ -41,18 +53,24 @@ export default async function PaginaEditorProfesional() {
   const propios = new Set(usuario.places.map((item) => item.placeId));
 
   return (
-    <div className="grid gap-4">
+    <div className="mx-auto grid max-w-6xl gap-4">
       <AvisoFotosHosting />
-      <EditorProfesional
-      professionalId={completo.id}
-      obras={obras}
-      lugares={lugares}
-      revisada={completo.reviewed}
-      publicada={completo.published}
-      inicial={borradorDesdeProfesional(completo, {
-        editorEnLugar: (placeId) => propios.has(placeId),
-      })}
-      />
+      <PanelProfesionalShell
+        nombre={completo.fullName || usuario.name}
+        publicada={completo.published}
+        revisada={completo.reviewed}
+      >
+        <EditorProfesional
+          professionalId={completo.id}
+          obras={obras}
+          lugares={lugares}
+          revisada={completo.reviewed}
+          publicada={completo.published}
+          inicial={borradorDesdeProfesional(completo, {
+            editorEnLugar: (placeId) => propios.has(placeId),
+          })}
+        />
+      </PanelProfesionalShell>
     </div>
   );
 }
