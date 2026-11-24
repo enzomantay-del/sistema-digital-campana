@@ -151,9 +151,9 @@ export default async function PanelAdmin({
       orderBy: { createdAt: "asc" },
     }),
     prisma.place.findMany({
-      where: { suggestedById: { not: null } },
+      where: { suggestedById: { not: null }, published: false },
       include: { suggestedBy: true },
-      orderBy: { createdAt: "asc" },
+      orderBy: { createdAt: "desc" },
     }),
     prisma.professional.findMany({
       include: { user: true },

@@ -40,7 +40,9 @@ export function SugerirLugarProfesional({
         locality: resultado.locality,
         kind: resultado.kind,
       });
-      setMensaje("Sugerencia enviada. Cercalud la revisa; mientras tanto podés cargar tu horario ahí.");
+      setMensaje(
+        "Centro sugerido y agregado a tu ficha. Completá el horario y tocá «Guardar ficha» para no perder tus datos.",
+      );
       setName("");
       setAddress("");
       setAbierto(false);

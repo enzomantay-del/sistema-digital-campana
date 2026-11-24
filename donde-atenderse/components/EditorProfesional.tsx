@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ESPECIALIDADES_CATALOGO } from "@/lib/especialidades";
 import { FichaProfesional } from "@/components/FichaProfesional";
 import { AvisoMatriculaEditor } from "@/components/AvisoMatriculaEditor";
@@ -77,7 +77,9 @@ export function EditorProfesional({
   professionalId: string;
   ejemplo?: boolean;
 }) {
+  const claveBorradorLocal = `cercalud-borrador-${professionalId}`;
   const [borrador, setBorrador] = useState(inicial);
+  const [lugaresLista, setLugaresLista] = useState(lugares);
   const [hayCambios, setHayCambios] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [guardadoOk, setGuardadoOk] = useState(false);
@@ -87,23 +89,69 @@ export function EditorProfesional({
   const modoPropio = !modoAdmin && !modoSecretaria;
   const catalogo = Array.from(new Set([...OBRAS_INICIALES, ...obras])).sort((a, b) => a.localeCompare(b, "es"));
 
+  useEffect(() => {
+    setLugaresLista(lugares);
+  }, [lugares]);
+
+  useEffect(() => {
+    if (!modoPropio) return;
+    try {
+      const crudo = sessionStorage.getItem(claveBorradorLocal);
+      if (!crudo) return;
+      const guardado = JSON.parse(crudo) as { borrador: typeof inicial; dirty?: boolean };
+      if (guardado.dirty && guardado.borrador) {
+        setBorrador(guardado.borrador);
+        setHayCambios(true);
+        setEstado("Recuperamos datos que todavía no habías guardado en el servidor.");
+      }
+    } catch {
+      /* ignorar */
+    }
+    // Solo al montar: recuperar borrador local si hubo recarga accidental.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [claveBorradorLocal, modoPropio]);
+
+  useEffect(() => {
+    if (!modoPropio) return;
+    const timer = window.setTimeout(() => {
+      try {
+        sessionStorage.setItem(claveBorradorLocal, JSON.stringify({ borrador, dirty: hayCambios }));
+      } catch {
+        /* ignorar */
+      }
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, [borrador, claveBorradorLocal, hayCambios, modoPropio]);
+
   function agregarLugarSugerido(lugar: { id: string; name: string; locality: string; kind: string }) {
+    setLugaresLista((lista) => {
+      if (lista.some((item) => item.id === lugar.id)) return lista;
+      return [...lista, { ...lugar, published: false, whatsapp: "", phone: "" }];
+    });
     marcarCambio();
-    setBorrador((actual) => ({
-      ...actual,
-      horarios: [
-        ...actual.horarios,
-        {
-          ...horarioVacio(),
-          placeId: lugar.id,
-          placeName: lugar.name,
-          locality: lugar.locality,
-          kind: lugar.kind,
-          sugerido: true,
-          publicado: false,
-        },
-      ],
-    }));
+    const datosSede = {
+      placeId: lugar.id,
+      placeName: lugar.name,
+      locality: lugar.locality,
+      kind: lugar.kind,
+      sugerido: true,
+      publicado: false,
+    };
+    setBorrador((actual) => {
+      const sinSede = actual.horarios.find((horario) => !horario.placeId);
+      if (sinSede) {
+        return {
+          ...actual,
+          horarios: actual.horarios.map((horario) =>
+            horario.key === sinSede.key ? { ...horario, ...datosSede } : horario,
+          ),
+        };
+      }
+      return {
+        ...actual,
+        horarios: [...actual.horarios, { ...horarioVacio(), ...datosSede }],
+      };
+    });
   }
 
   function marcarCambio() {
@@ -153,6 +201,11 @@ export function EditorProfesional({
       setBorrador(fusion);
       setHayCambios(false);
       setGuardadoOk(true);
+      try {
+        sessionStorage.removeItem(claveBorradorLocal);
+      } catch {
+        /* ignorar */
+      }
       setEstado(
         modoSecretaria
           ? "Guardado. La administración revisa antes de publicar en la web."
@@ -211,7 +264,7 @@ export function EditorProfesional({
   const filas: FilaHorario[] = borrador.horarios
     .filter((horario) => horario.placeName.trim() || horario.placeId)
     .map((horario) => {
-      const lugar = horario.placeId ? lugares.find((item) => item.id === horario.placeId) : null;
+      const lugar = horario.placeId ? lugaresLista.find((item) => item.id === horario.placeId) : null;
       return {
         id: horario.id || horario.key,
         placeId: horario.placeId || horario.key,
@@ -264,10 +317,7 @@ export function EditorProfesional({
         modoPropio ? "panel-profesional-editor grid items-start gap-10 lg:grid-cols-2" : "grid items-start gap-10 lg:grid-cols-2"
       }
     >
-      <form
-        className={modoPropio ? "tarjeta grid gap-8 border-menta/20 shadow-md" : "tarjeta grid gap-8"}
-        onSubmit={(event) => event.preventDefault()}
-      >
+      <div className={modoPropio ? "tarjeta grid gap-8 border-menta/20 shadow-md" : "tarjeta grid gap-8"}>
         <BarraGuardar />
         {modoAdmin && ejemplo ? (
           <p className="rounded-2xl border border-warn/30 bg-paper px-4 py-3 text-base text-warn">
@@ -289,7 +339,10 @@ export function EditorProfesional({
             professionalId={professionalId}
             photoUrl={borrador.photoUrl}
             placeIdEnfoque={placeIdEnfoque}
-            onChange={(photoUrl) => setBorrador((actual) => ({ ...actual, photoUrl }))}
+            onChange={(photoUrl) => {
+              marcarCambio();
+              setBorrador((actual) => ({ ...actual, photoUrl }));
+            }}
           />
           <label className="grid gap-1">
             Nombre
@@ -418,7 +471,7 @@ export function EditorProfesional({
                     value={horario.placeId || ""}
                     disabled={modoSecretaria || Boolean(placeIdEnfoque)}
                     onChange={(event) => {
-                      const lugar = lugares.find((item) => item.id === event.target.value);
+                      const lugar = lugaresLista.find((item) => item.id === event.target.value);
                       if (!lugar) return;
                       const publicado = lugar.published !== false;
                       cambiarHorario(horario.key, {
@@ -434,7 +487,7 @@ export function EditorProfesional({
                     }}
                   >
                     <option value="">Elegí hospital, consultorio u otro centro…</option>
-                    {lugares
+                    {lugaresLista
                       .filter((lugar) => !placeIdEnfoque || lugar.id === placeIdEnfoque)
                       .map((lugar) => (
                       <option key={lugar.id} value={lugar.id}>
@@ -480,12 +533,20 @@ export function EditorProfesional({
                 Buscá el nombre en el desplegable de cada sede. Son hospitales, sanatorios, consultorios y
                 policonsultorios del corredor.
               </p>
-              <SugerirLugarProfesional onSugerido={agregarLugarSugerido} />
             </div>
           ) : null}
         </section>
+        {!modoSecretaria ? (
+          <div className="grid gap-2 rounded-2xl border border-dashed border-line bg-[#f8fafc] px-4 py-3">
+            <p className="text-xs text-muted">
+              Si el centro no está en el desplegable, sugerilo acá. Después tocá «Guardar ficha» para enviar todo a
+              Cercalud y que aparezca en administración.
+            </p>
+            <SugerirLugarProfesional onSugerido={agregarLugarSugerido} />
+          </div>
+        ) : null}
         <BarraGuardar alFinal />
-      </form>
+      </div>
       <aside className={`grid gap-3 lg:sticky lg:top-24 ${modoPropio ? "rounded-3xl border border-line bg-white/90 p-4 shadow-sm" : ""}`}>
         <h2 className="text-2xl font-semibold">{modoPropio ? "Vista previa para pacientes" : "Así lo ve el paciente"}</h2>
         <FichaProfesional vista={vista} enlazar={false} />

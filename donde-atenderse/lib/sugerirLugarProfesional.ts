@@ -62,7 +62,7 @@ export async function sugerirLugarProfesional(input: {
         obrasMode: obrasModoDefault(kind),
       },
     });
-    revalidatePath("/panel/profesional");
+    /** No revalidar /panel/profesional: resetea el editor y pierde el borrador sin guardar. */
     revalidatePath("/panel/admin");
     return { ok: true, placeId: place.id, name: place.name, locality: place.locality, kind: place.kind };
   } catch (error) {
