@@ -55,7 +55,7 @@ function PeriodicidadEditor({
 
   function cambiarModo(tipo: ModoPeriodicidad) {
     let periodicidad: PeriodicidadFranja;
-    if (tipo === "semanal") periodicidad = { tipo: "semanal", cadaSemanas: 1 };
+    if (tipo === "semanal") periodicidad = { tipo: "semanal" };
     else if (tipo === "mensual_dia") periodicidad = { tipo: "mensual_dia", diaDelMes: 1 };
     else if (tipo === "mensual_semana") periodicidad = { tipo: "mensual_semana", ordinal: "primero", dia: "mie" };
     else if (tipo === "fechas") periodicidad = { tipo: "fechas", fechas: [""] };
@@ -88,15 +88,13 @@ function PeriodicidadEditor({
 
       {modo === "semanal" && actual.tipo === "semanal" ? (
         <label className="grid gap-1 text-sm text-muted">
-          Repetición
+          ¿Cada cuántas semanas? (dejá «Todas las semanas» si atendés siempre los mismos días)
           <select
             className="campo text-sm"
             value={String(actual.cadaSemanas ?? 1)}
             onChange={(event) => {
               const valor = Number(event.target.value);
-              cambiarPeriodicidad(
-                valor > 1 ? { tipo: "semanal", cadaSemanas: valor } : { tipo: "semanal", cadaSemanas: 1 },
-              );
+              cambiarPeriodicidad(valor > 1 ? { tipo: "semanal", cadaSemanas: valor } : { tipo: "semanal" });
             }}
           >
             <option value="1">Todas las semanas</option>

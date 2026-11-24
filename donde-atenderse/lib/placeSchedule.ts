@@ -81,7 +81,7 @@ function claveFranja() {
 }
 
 export function periodicidadDefecto(): PeriodicidadFranja {
-  return { tipo: "semanal", cadaSemanas: 1 };
+  return { tipo: "semanal" };
 }
 
 export function esPeriodicidadSemanal(periodicidad: PeriodicidadFranja | undefined) {
@@ -328,8 +328,13 @@ export function validarHorarioLugar(data: HorarioLugarData): string | null {
       const invalida = p.fechas.find((f) => !/^\d{4}-\d{2}-\d{2}$/.test(f));
       if (invalida) return `Fecha inválida: ${invalida}. Usá el formato año-mes-día.`;
     }
-    if (p.tipo === "semanal" && p.cadaSemanas && (p.cadaSemanas < 2 || p.cadaSemanas > 4)) {
-      return "La repetición semanal puede ser cada 2, 3 o 4 semanas.";
+    if (
+      p.tipo === "semanal" &&
+      p.cadaSemanas != null &&
+      p.cadaSemanas !== 1 &&
+      (p.cadaSemanas < 2 || p.cadaSemanas > 4)
+    ) {
+      return "Si no es todas las semanas, elegí cada 2, 3 o 4 semanas.";
     }
   }
   return null;

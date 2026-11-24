@@ -14,6 +14,7 @@ import { campoDesdeEspecialidades } from "@/lib/especialidades";
 import type { BorradorProfesional, HorarioBorrador } from "@/lib/draft";
 import { horarioLugarParaGuardar, horarioLugarVacio, notaHorarioParaGuardar } from "@/lib/placeSchedule";
 import { armarVistaProfesional } from "@/lib/view";
+import { validarAntesDeGuardar } from "@/lib/validarProfesional";
 import type { FilaHorario } from "@/lib/schedule";
 
 function clave() {
@@ -84,6 +85,7 @@ export function EditorProfesional({
   const [guardando, setGuardando] = useState(false);
   const [guardadoOk, setGuardadoOk] = useState(false);
   const [estado, setEstado] = useState("Cuando termines, tocá Guardar ficha para que quede en la ficha pública.");
+  const [avisoRojo, setAvisoRojo] = useState<string | null>(null);
   const ultimo = useRef(borrador);
   ultimo.current = borrador;
   const modoPropio = !modoAdmin && !modoSecretaria;
@@ -157,12 +159,21 @@ export function EditorProfesional({
   function marcarCambio() {
     setHayCambios(true);
     setGuardadoOk(false);
+    setAvisoRojo(null);
     setEstado("Tenés cambios sin guardar.");
   }
 
   async function guardarFicha() {
     if (guardando) return;
     const snapshot = ultimo.current;
+    const tieneFoto = Boolean(snapshot.photoUrl?.trim());
+    const errorLocal = validarAntesDeGuardar(snapshot, { exigeHorario: true, tieneFoto });
+    if (errorLocal) {
+      setAvisoRojo(errorLocal);
+      setEstado("Revisá lo marcado en rojo antes de guardar.");
+      return;
+    }
+    setAvisoRojo(null);
     setGuardando(true);
     setEstado("Guardando…");
     try {
@@ -179,7 +190,9 @@ export function EditorProfesional({
         | { ok: true; rows: { key: string; id: string; placeId: string }[]; professionalId: string }
         | { ok: false; error: string };
       if (!resultado.ok) {
-        setEstado(resultado.error ?? "No se pudo guardar. Probá de nuevo.");
+        const mensaje = resultado.error ?? "No se pudo guardar. Probá de nuevo.";
+        setAvisoRojo(mensaje);
+        setEstado("Revisá lo marcado en rojo antes de guardar.");
         return;
       }
       const fusion = {
@@ -201,6 +214,7 @@ export function EditorProfesional({
       setBorrador(fusion);
       setHayCambios(false);
       setGuardadoOk(true);
+      setAvisoRojo(null);
       try {
         sessionStorage.removeItem(claveBorradorLocal);
       } catch {
@@ -238,15 +252,22 @@ export function EditorProfesional({
 
   function BarraGuardar({ alFinal = false }: { alFinal?: boolean }) {
     return (
-      <div className={`flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-[#f8fafc] p-4 ${alFinal ? "mt-2" : ""}`}>
+      <div
+        className={`flex flex-wrap items-center gap-3 rounded-2xl border p-4 ${avisoRojo ? "border-warn bg-[#fff5f5]" : "border-line bg-[#f8fafc]"} ${alFinal ? "mt-2" : ""}`}
+      >
         <button type="button" className="boton" disabled={guardando} onClick={() => void guardarFicha()}>
           {guardando ? "Guardando…" : "Guardar ficha"}
         </button>
         <p
-          className={`text-sm ${estado.includes("sin guardar") || estado.includes("Guardando") ? "text-warn" : guardadoOk && !hayCambios ? "text-menta" : "text-muted"}`}
+          className={`text-sm ${avisoRojo ? "hidden" : estado.includes("sin guardar") || estado.includes("Guardando") ? "text-warn" : guardadoOk && !hayCambios ? "text-menta" : "text-muted"}`}
         >
           {estado}
         </p>
+        {avisoRojo ? (
+          <p className="w-full text-sm font-semibold leading-snug text-warn" role="alert">
+            {avisoRojo}
+          </p>
+        ) : null}
         {guardadoOk && !hayCambios && !modoSecretaria && publicada ? (
           <Link href={`/profesional/${professionalId}`} className="text-sm font-semibold text-link">
             Ver ficha pública
