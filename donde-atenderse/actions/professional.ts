@@ -129,6 +129,9 @@ async function guardarProfesionalInterno(
   const lugaresPermitidos = new Set(
     modoSecretaria ? user.places.map((item) => item.placeId) : user.places.map((item) => item.placeId),
   );
+  const placeIdsEnCarga = borrador.horarios
+    .map((h) => h.placeId)
+    .filter((id): id is string => Boolean(id));
 
   let professional =
     modoAdmin || modoSecretaria
@@ -141,6 +144,21 @@ async function guardarProfesionalInterno(
   if ((modoAdmin || modoSecretaria) && professionalId && !professional) {
     return { ok: false, error: "Esa ficha ya no está." };
   }
+
+  if (modoSecretaria && professional) {
+    for (const placeId of placeIdsEnCarga) {
+      if (!lugaresPermitidos.has(placeId)) {
+        return { ok: false, error: "Solo podés cargar horarios en los lugares que te asignó la administración." };
+      }
+    }
+    if (!(await puedeEditarProfesional(user, professional.id, { placeIdsEnCarga }))) {
+      return {
+        ok: false,
+        error: "Solo podés editar profesionales que atienden en tu lugar o que estás cargando por primera vez ahí.",
+      };
+    }
+  }
+
   if (!professional) {
     professional = await prisma.professional.create({
       data: {
@@ -171,7 +189,7 @@ async function guardarProfesionalInterno(
         error: modoSecretaria
           ? `Ya existe la ficha de ${duplicado.fullName} con esa matrícula. Usá «Buscar por matrícula» y cargá solo el horario en este lugar; no crees otra ficha.`
           : modo === "propio"
-            ? `Ya existe la ficha de ${duplicado.fullName} con esa matrícula. Si sos vos, usá «Vincular mi cuenta» junto al campo matrícula.`
+            ? `Ya existe la ficha de ${duplicado.fullName} con esa matrícula. Pedí a administración que vincule tu cuenta o escribinos por contacto.`
             : `Ya existe la ficha de ${duplicado.fullName} con esa matrícula.`,
       };
     }

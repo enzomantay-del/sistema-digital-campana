@@ -37,6 +37,11 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       if (!esSecretaria(user)) {
         return NextResponse.json({ ok: false, error: "Solo secretarias con lugar asignado." }, { status: 403 });
       }
+      if (!(await puedeEditarProfesional(user, professionalId, {
+        placeIdsEnCarga: cuerpo.borrador.horarios?.map((h) => h.placeId).filter(Boolean) as string[],
+      }))) {
+        return NextResponse.json({ ok: false, error: "No podés editar esta ficha." }, { status: 403 });
+      }
       resultado = await guardarProfesionalSecretaria(professionalId, cuerpo.borrador);
     } else if (cuerpo.modo === "admin") {
       if (!esAdmin(user)) {

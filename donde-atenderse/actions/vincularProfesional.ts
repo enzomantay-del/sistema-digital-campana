@@ -1,59 +1,39 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { esProfesional, usuarioActual } from "@/lib/auth";
-import { claveMatricula } from "@/lib/matricula";
+import { requiereAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function vincularFichaPorMatricula(
-  matricula: string,
-): Promise<{ ok: true; professionalId: string } | { ok: false; error: string }> {
-  const user = await usuarioActual();
-  if (!user || (!esProfesional(user) && !user.professional)) {
-    return { ok: false, error: "Solo con cuenta de profesional." };
-  }
+/** Solo administración: une una cuenta con la ficha ya cargada (p. ej. por secretaría). */
+export async function vincularCuentaProfesionalAdmin(
+  professionalId: string,
+  userId: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  await requiereAdmin();
 
-  const clave = claveMatricula(matricula);
-  if (!clave) return { ok: false, error: "Escribí la matrícula completa para vincular." };
-
-  const existente = await prisma.professional.findFirst({
-    where: { licenseKey: clave },
-    select: { id: true, fullName: true, userId: true },
-  });
-  if (!existente) {
-    return { ok: false, error: "No hay otra ficha con esa matrícula. Seguí editando la tuya." };
+  const [persona, cuenta] = await Promise.all([
+    prisma.professional.findUnique({ where: { id: professionalId }, select: { id: true, userId: true, fullName: true } }),
+    prisma.user.findUnique({ where: { id: userId }, select: { id: true, role: true, professional: { select: { id: true } } } }),
+  ]);
+  if (!persona) return { ok: false, error: "No existe esa ficha." };
+  if (!cuenta) return { ok: false, error: "No existe esa cuenta." };
+  if (cuenta.role !== "profesional") {
+    return { ok: false, error: "La cuenta no es de tipo profesional." };
   }
-  if (existente.userId && existente.userId !== user.id) {
-    return {
-      ok: false,
-      error: `Esa matrícula ya está vinculada a otra cuenta. Escribinos por contacto si necesitás recuperar el acceso.`,
-    };
+  if (persona.userId && persona.userId !== userId) {
+    return { ok: false, error: "La ficha ya tiene otra cuenta vinculada." };
   }
-  if (existente.userId === user.id) {
-    return { ok: true, professionalId: existente.id };
-  }
-
-  const actual = await prisma.professional.findUnique({
-    where: { userId: user.id },
-    include: { _count: { select: { attendances: true } } },
-  });
-
-  if (actual && actual.id !== existente.id) {
-    if (actual._count.attendances > 0 || actual.license.trim().length >= 3) {
-      return {
-        ok: false,
-        error: `Ya cargaste datos en otra ficha. Pedí a administración que una las fichas de ${existente.fullName}.`,
-      };
-    }
-    await prisma.professional.delete({ where: { id: actual.id } });
+  if (cuenta.professional && cuenta.professional.id !== professionalId) {
+    return { ok: false, error: "Esa cuenta ya tiene otra ficha. Desvinculala antes." };
   }
 
   await prisma.professional.update({
-    where: { id: existente.id },
-    data: { userId: user.id },
+    where: { id: professionalId },
+    data: { userId },
   });
 
+  revalidatePath("/panel/admin");
   revalidatePath("/panel/profesional");
-  revalidatePath(`/profesional/${existente.id}`);
-  return { ok: true, professionalId: existente.id };
+  revalidatePath(`/profesional/${professionalId}`);
+  return { ok: true };
 }

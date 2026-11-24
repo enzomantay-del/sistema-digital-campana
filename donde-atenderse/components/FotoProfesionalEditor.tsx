@@ -7,10 +7,12 @@ export function FotoProfesionalEditor({
   professionalId,
   photoUrl,
   onChange,
+  placeIdEnfoque,
 }: {
   professionalId: string;
   photoUrl: string;
   onChange: (photoUrl: string) => void;
+  placeIdEnfoque?: string;
 }) {
   const entrada = useRef<HTMLInputElement>(null);
   const [mensaje, setMensaje] = useState("");
@@ -24,6 +26,7 @@ export function FotoProfesionalEditor({
     try {
       const datos = new FormData();
       datos.set("foto", archivo);
+      if (placeIdEnfoque) datos.set("placeIdEnfoque", placeIdEnfoque);
       const respuesta = await fetch(`/api/profesional/${professionalId}/foto`, {
         method: "POST",
         body: datos,
@@ -47,7 +50,10 @@ export function FotoProfesionalEditor({
   async function quitar() {
     setCargando(true);
     try {
-      const respuesta = await fetch(`/api/profesional/${professionalId}/foto`, {
+      const deleteUrl = placeIdEnfoque
+        ? `/api/profesional/${professionalId}/foto?placeIdEnfoque=${encodeURIComponent(placeIdEnfoque)}`
+        : `/api/profesional/${professionalId}/foto`;
+      const respuesta = await fetch(deleteUrl, {
         method: "DELETE",
         credentials: "same-origin",
       });

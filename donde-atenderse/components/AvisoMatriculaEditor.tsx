@@ -1,7 +1,7 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { vincularFichaPorMatricula } from "@/actions/vincularProfesional";
 
 type Consulta =
   | { estado: "incompleta" | "libre" }
@@ -16,15 +16,11 @@ type Consulta =
 export function AvisoMatriculaEditor({
   matricula,
   professionalId,
-  onVinculado,
 }: {
   matricula: string;
   professionalId: string;
-  onVinculado?: () => void;
 }) {
   const [consulta, setConsulta] = useState<Consulta | null>(null);
-  const [vinculando, setVinculando] = useState(false);
-  const [mensaje, setMensaje] = useState("");
 
   useEffect(() => {
     const texto = matricula.trim();
@@ -53,43 +49,22 @@ export function AvisoMatriculaEditor({
   if (!consulta || consulta.estado !== "existe") return null;
   const existente = consulta;
 
-  async function vincular() {
-    setVinculando(true);
-    setMensaje("");
-    const resultado = await vincularFichaPorMatricula(matricula);
-    setVinculando(false);
-    if (!resultado.ok) {
-      setMensaje(resultado.error);
-      return;
-    }
-    setMensaje("Ficha vinculada. Recargamos la página con tus datos.");
-    onVinculado?.();
-    window.location.assign("/panel/profesional");
-  }
-
   return (
     <div className="grid gap-2 rounded-2xl border border-warn/40 bg-[#fff8ed] px-4 py-3 text-sm">
       <p className="font-semibold text-ink">
         Ya existe en Cercalud la ficha de <strong>{existente.fullName}</strong> con la matrícula {matricula.trim()}.
         {existente.tieneCuenta
-          ? " Está vinculada a otra cuenta: no crees una ficha nueva."
-          : " Si sos vos, vinculá esta cuenta a esa ficha."}
+          ? " Está vinculada a otra cuenta: no cargues otra ficha."
+          : " Si la cargó la secretaría de tu consultorio, no dupliques datos."}
       </p>
-      {!existente.tieneCuenta ? (
-        <button
-          type="button"
-          className="boton-suave w-fit text-sm font-semibold"
-          disabled={vinculando}
-          onClick={() => void vincular()}
-        >
-          {vinculando ? "Vinculando…" : "Soy esa persona · vincular mi cuenta"}
-        </button>
-      ) : (
-        <p className="text-muted">
-          Si la creó la secretaría de tu consultorio, pediles que editen la existente. Para recuperar acceso usá Contacto.
-        </p>
-      )}
-      {mensaje ? <p className="text-muted">{mensaje}</p> : null}
+      <p className="text-muted">
+        Para usar <strong>esa</strong> ficha con tu cuenta, pedile a la administración de Cercalud que vincule tu correo de
+        ingreso. Mientras tanto podés{" "}
+        <Link href="/contacto" className="font-semibold text-link">
+          escribirnos por contacto
+        </Link>
+        .
+      </p>
     </div>
   );
 }

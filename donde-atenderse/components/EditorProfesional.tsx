@@ -287,6 +287,7 @@ export function EditorProfesional({
           <FotoProfesionalEditor
             professionalId={professionalId}
             photoUrl={borrador.photoUrl}
+            placeIdEnfoque={placeIdEnfoque}
             onChange={(photoUrl) => setBorrador((actual) => ({ ...actual, photoUrl }))}
           />
           <label className="grid gap-1">
