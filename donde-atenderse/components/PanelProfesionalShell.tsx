@@ -38,7 +38,9 @@ export function PanelProfesionalShell({
           </li>
           <li className="rounded-2xl border border-line bg-white/90 px-4 py-3">
             <span className="font-semibold text-menta">2 · Dónde atendés</span>
-            <p className="mt-1 text-muted">Elegí lugares publicados o sugerí uno nuevo. Horario y obras por sede.</p>
+            <p className="mt-1 text-muted">
+              Agregá cada sede (hospital, consultorio…), el horario y las obras en ese centro.
+            </p>
           </li>
         </ol>
       </header>

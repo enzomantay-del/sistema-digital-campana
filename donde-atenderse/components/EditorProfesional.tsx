@@ -372,11 +372,10 @@ export function EditorProfesional({
             <h2 className="text-2xl font-semibold">Dónde atendés</h2>
             <p className="text-muted">
               {modoSecretaria
-                ? "Cargá el horario de este profesional en el lugar asignado."
-                : "Elegí sedes publicadas o sugerí un lugar que aún no esté en la lista."}
+                ? "Cargá el horario de este profesional en el centro asignado (hospital, consultorio, sanatorio, etc.)."
+                : "Indicá cada centro donde atendés: elegí uno que ya figure en Cercalud o agregá una sede nueva."}
             </p>
           </div>
-          {modoPropio ? <SugerirLugarProfesional onSugerido={agregarLugarSugerido} /> : null}
           {borrador.horarios.map((horario, indiceHorario) => {
             const variasSedes = borrador.horarios.length > 1;
             const bloqueHorario = horario.placeId && horario.placeName.trim() ? (
@@ -390,7 +389,7 @@ export function EditorProfesional({
                   catalogo={catalogo}
                   seleccionadas={horario.obras ?? []}
                   otraObra={horario.otraObra ?? ""}
-                  titulo={`Obra social en ${horario.placeName || "este lugar"}`}
+                  titulo={`Obra social en ${horario.placeName || "esta sede"}`}
                   onSeleccionadas={(obras) => cambiarHorario(horario.key, { obras })}
                   onOtraObra={(otraObra) => cambiarHorario(horario.key, { otraObra })}
                 />
@@ -402,7 +401,7 @@ export function EditorProfesional({
               {horario.placeId && (modoSecretaria || placeIdEnfoque) ? (
                 <p>
                   {horario.placeName} · {horario.locality}
-                  {!horario.publicado ? " · Lugar en revisión" : null}
+                  {!horario.publicado ? " · Centro en revisión" : null}
                 </p>
               ) : horario.placeId && modoPropio ? (
                 <p>
@@ -413,7 +412,7 @@ export function EditorProfesional({
                 </p>
               ) : (
                 <label className="grid gap-1">
-                  Lugar
+                  Centro donde atendés
                   <select
                     className="campo"
                     value={horario.placeId || ""}
@@ -434,7 +433,7 @@ export function EditorProfesional({
                       });
                     }}
                   >
-                    <option value="">Elegí un lugar</option>
+                    <option value="">Elegí hospital, consultorio u otro centro…</option>
                     {lugares
                       .filter((lugar) => !placeIdEnfoque || lugar.id === placeIdEnfoque)
                       .map((lugar) => (
@@ -462,20 +461,27 @@ export function EditorProfesional({
                   className="w-fit font-semibold text-accent"
                   onClick={() => cambiar({ horarios: borrador.horarios.filter((item) => item.key !== horario.key) })}
                 >
-                  Quitar este lugar
+                  Quitar esta sede
                 </button>
               ) : null}
             </div>
           );
           })}
           {!modoSecretaria ? (
-            <button
-              type="button"
-              className="boton-suave w-fit"
-              onClick={() => cambiar({ horarios: [...borrador.horarios, horarioVacio()] })}
-            >
-              Agregar un lugar
-            </button>
+            <div className="grid gap-3 border-t border-line pt-4">
+              <button
+                type="button"
+                className="boton w-fit"
+                onClick={() => cambiar({ horarios: [...borrador.horarios, horarioVacio()] })}
+              >
+                Agregar una sede
+              </button>
+              <p className="text-xs text-muted">
+                Buscá el nombre en el desplegable de cada sede. Son hospitales, sanatorios, consultorios y
+                policonsultorios del corredor.
+              </p>
+              <SugerirLugarProfesional onSugerido={agregarLugarSugerido} />
+            </div>
           ) : null}
         </section>
         <BarraGuardar alFinal />

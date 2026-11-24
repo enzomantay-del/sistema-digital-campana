@@ -53,20 +53,21 @@ export function SugerirLugarProfesional({
 
   if (!abierto) {
     return (
-      <button type="button" className="boton-suave w-fit text-sm font-semibold" onClick={() => setAbierto(true)}>
-        No encuentro mi lugar · sugerir uno nuevo
+      <button type="button" className="w-fit text-sm font-semibold text-link underline-offset-2 hover:underline" onClick={() => setAbierto(true)}>
+        ¿No está en la lista? Sugerir un centro nuevo
       </button>
     );
   }
 
   return (
     <form onSubmit={(event) => void enviar(event)} className="grid gap-3 rounded-2xl border border-dashed border-menta/50 bg-[#f0faf7] p-4">
-      <h3 className="font-semibold text-ink">Sugerir lugar donde atendés</h3>
+      <h3 className="font-semibold text-ink">Sugerir un centro donde atendés</h3>
       <p className="text-sm text-muted">
-        Lo revisa la administración antes de publicarlo. Igual podés indicar tu horario mientras tanto.
+        Si el hospital, consultorio o sanatorio no aparece al agregar sede, completá estos datos. Cercalud lo revisa; mientras
+        tanto podés cargar tu horario ahí.
       </p>
       <label className="grid gap-1 text-sm">
-        Nombre del lugar
+        Nombre del centro
         <input className="campo" value={name} onChange={(event) => setName(event.target.value)} required minLength={2} />
       </label>
       <div className="grid gap-3 sm:grid-cols-2">
