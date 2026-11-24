@@ -94,7 +94,7 @@ export function EditorProfesional({
           : modoAdmin && professionalId
             ? await guardarProfesionalAdmin(professionalId, snapshot)
             : await guardarProfesional(snapshot);
-      if (!resultado?.ok) {
+      if (!resultado || !resultado.ok) {
         setEstado(resultado?.error ?? "No se pudo guardar. Probá de nuevo.");
         return;
       }
@@ -128,7 +128,7 @@ export function EditorProfesional({
       );
       if (modoSecretaria && volverHref) window.location.assign(volverHref);
     } catch {
-      setEstado("Falló el guardado. Recargá la página y probá otra vez.");
+      setEstado("No llegó respuesta del servidor. Revisá la conexión, recargá la página y probá otra vez.");
     } finally {
       setGuardando(false);
     }

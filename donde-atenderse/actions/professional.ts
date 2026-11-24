@@ -8,7 +8,13 @@ import type { BorradorProfesional } from "@/lib/draft";
 import { campoDesdeEspecialidades } from "@/lib/especialidades";
 import { claveMatricula } from "@/lib/matricula";
 import { camposLegacyDesdeHorario } from "@/lib/professionalSchedule";
-import { horarioLugarParaGuardar, notaHorarioParaGuardar, validarHorarioLugar } from "@/lib/placeSchedule";
+import {
+  horarioLugarParaGuardar,
+  horarioLugarVacio,
+  notaHorarioParaGuardar,
+  validarHorarioLugar,
+} from "@/lib/placeSchedule";
+import { puedeEditarProfesional } from "@/lib/permisosProfesional";
 import { validarBorradorProfesional } from "@/lib/validarProfesional";
 import { FOTO_MAX_BYTES, tipoYExtensionFoto } from "@/lib/validarFoto";
 
@@ -84,12 +90,40 @@ export async function guardarProfesionalSecretaria(
   }
 }
 
+function normalizarBorradorProfesional(borrador: BorradorProfesional): BorradorProfesional {
+  return {
+    ...borrador,
+    fullName: borrador.fullName ?? "",
+    license: borrador.license ?? "",
+    specialty: borrador.specialty ?? "",
+    specialties: borrador.specialties ?? [],
+    photoUrl: borrador.photoUrl ?? "",
+    whatsapp: borrador.whatsapp ?? "",
+    phone: borrador.phone ?? "",
+    agendaWhatsapp: borrador.agendaWhatsapp ?? "",
+    agendaPhone: borrador.agendaPhone ?? "",
+    price: borrador.price ?? "",
+    obras: borrador.obras ?? [],
+    otraObra: borrador.otraObra ?? "",
+    horarios: (borrador.horarios ?? []).map((horario) => ({
+      ...horario,
+      obras: horario.obras ?? [],
+      otraObra: horario.otraObra ?? "",
+      schedule:
+        horario.schedule && Array.isArray(horario.schedule.franjas)
+          ? horario.schedule
+          : horarioLugarVacio(),
+    })),
+  };
+}
+
 async function guardarProfesionalInterno(
   user: NonNullable<Awaited<ReturnType<typeof usuarioActual>>>,
-  borrador: BorradorProfesional,
+  borradorEntrada: BorradorProfesional,
   professionalId: string | null,
   modo: ModoGuardado,
 ): Promise<GuardadoProfesional> {
+  const borrador = normalizarBorradorProfesional(borradorEntrada);
   const modoAdmin = modo === "admin";
   const modoSecretaria = modo === "secretaria";
   const lugaresPermitidos = new Set(
@@ -235,7 +269,7 @@ async function guardarProfesionalInterno(
     }
 
     const nombresObra = [...(horario.obras ?? []), horario.otraObra ?? ""].map((item) => item.trim()).filter(Boolean);
-    const idsObra = (await Promise.all(nombresObra.map(obraId))).filter((id): id is string => Boolean(id));
+    const idsObra = [...new Set((await Promise.all(nombresObra.map(obraId))).filter((id): id is string => Boolean(id)))];
     nombresObra.forEach((nombre) => obrasProfesional.add(nombre));
     await prisma.attendanceObra.deleteMany({ where: { attendanceId } });
     if (idsObra.length) {
@@ -248,7 +282,9 @@ async function guardarProfesionalInterno(
     rows.push({ key: horario.key, id: attendanceId, placeId });
   }
 
-  const idsUnion = (await Promise.all([...obrasProfesional].map(obraId))).filter((id): id is string => Boolean(id));
+  const idsUnion = [
+    ...new Set((await Promise.all([...obrasProfesional].map(obraId))).filter((id): id is string => Boolean(id))),
+  ];
   await prisma.professionalObra.deleteMany({ where: { professionalId: professional.id } });
   if (idsUnion.length) {
     await prisma.professionalObra.createMany({
@@ -291,32 +327,6 @@ async function guardarProfesionalInterno(
   }
 
   return { ok: true, rows, professionalId: professional.id };
-}
-
-async function puedeEditarProfesional(
-  user: NonNullable<Awaited<ReturnType<typeof usuarioActual>>>,
-  professionalId: string,
-) {
-  if (esAdmin(user)) return true;
-  if (user.professional?.id === professionalId) return true;
-  if (esSecretaria(user)) {
-    const atiende = await prisma.attendance.findFirst({
-      where: {
-        professionalId,
-        placeId: { in: user.places.map((item) => item.placeId) },
-      },
-    });
-    if (atiende) return true;
-    const recien = await prisma.professional.findUnique({
-      where: { id: professionalId },
-      select: { createdAt: true, attendances: { select: { placeId: true } } },
-    });
-    if (!recien) return false;
-    const sinAtenciones = recien.attendances.length === 0;
-    const hacePoco = Date.now() - recien.createdAt.getTime() < 2 * 60 * 60 * 1000;
-    return sinAtenciones && hacePoco;
-  }
-  return false;
 }
 
 export async function subirFotoProfesional(

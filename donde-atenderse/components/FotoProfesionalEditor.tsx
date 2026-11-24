@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { quitarFotoProfesional, subirFotoProfesional } from "@/actions/professional";
 
 export function FotoProfesionalEditor({
   professionalId,
@@ -25,9 +24,14 @@ export function FotoProfesionalEditor({
     try {
       const datos = new FormData();
       datos.set("foto", archivo);
-      const resultado = await subirFotoProfesional(professionalId, datos);
-      if (!resultado.ok) {
-        setMensaje(resultado.error);
+      const respuesta = await fetch(`/api/profesional/${professionalId}/foto`, {
+        method: "POST",
+        body: datos,
+        credentials: "same-origin",
+      });
+      const resultado = (await respuesta.json()) as { ok: boolean; photoUrl?: string; error?: string };
+      if (!resultado.ok || !resultado.photoUrl) {
+        setMensaje(resultado.error ?? "No se pudo subir la foto.");
         return;
       }
       onChange(resultado.photoUrl);
@@ -42,15 +46,24 @@ export function FotoProfesionalEditor({
 
   async function quitar() {
     setCargando(true);
-    const resultado = await quitarFotoProfesional(professionalId);
-    setCargando(false);
-    if (!resultado.ok) {
-      setMensaje(resultado.error);
-      return;
+    try {
+      const respuesta = await fetch(`/api/profesional/${professionalId}/foto`, {
+        method: "DELETE",
+        credentials: "same-origin",
+      });
+      const resultado = (await respuesta.json()) as { ok: boolean; error?: string };
+      if (!resultado.ok) {
+        setMensaje(resultado.error ?? "No se pudo quitar la foto.");
+        return;
+      }
+      onChange("");
+      setMensaje("Foto quitada.");
+    } catch {
+      setMensaje("No se pudo quitar la foto.");
+    } finally {
+      setCargando(false);
+      if (entrada.current) entrada.current.value = "";
     }
-    onChange("");
-    setMensaje("Foto quitada.");
-    if (entrada.current) entrada.current.value = "";
   }
 
   return (
