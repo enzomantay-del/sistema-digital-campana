@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { guardarProfesional, guardarProfesionalAdmin, guardarProfesionalSecretaria } from "@/actions/professional";
 import { ESPECIALIDADES_CATALOGO } from "@/lib/especialidades";
 import { FichaProfesional } from "@/components/FichaProfesional";
 import { FotoProfesionalEditor } from "@/components/FotoProfesionalEditor";
@@ -88,14 +87,20 @@ export function EditorProfesional({
     setGuardando(true);
     setEstado("Guardando…");
     try {
-      const resultado =
-        modoSecretaria
-          ? await guardarProfesionalSecretaria(professionalId, snapshot)
-          : modoAdmin && professionalId
-            ? await guardarProfesionalAdmin(professionalId, snapshot)
-            : await guardarProfesional(snapshot);
-      if (!resultado || !resultado.ok) {
-        setEstado(resultado?.error ?? "No se pudo guardar. Probá de nuevo.");
+      const respuesta = await fetch(`/api/profesional/${professionalId}/ficha`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({
+          borrador: snapshot,
+          modo: modoSecretaria ? "secretaria" : modoAdmin ? "admin" : undefined,
+        }),
+      });
+      const resultado = (await respuesta.json()) as
+        | { ok: true; rows: { key: string; id: string; placeId: string }[]; professionalId: string }
+        | { ok: false; error: string };
+      if (!resultado.ok) {
+        setEstado(resultado.error ?? "No se pudo guardar. Probá de nuevo.");
         return;
       }
       const fusion = {

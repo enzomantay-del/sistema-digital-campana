@@ -112,9 +112,14 @@ export function FichaProfesional({
       )}
 
       {vista.precio ? (
-        <p>
-          Precio de la consulta: {vista.precio}.
-          {vista.precioFecha ? ` Lo escribió el ${vista.precioFecha}.` : ""}
+        <p className="text-base text-ink">
+          Precio de la consulta: <span className="font-semibold">{vista.precio}</span>
+          {vista.precioFecha ? (
+            <span className="ml-1 text-xs font-normal text-muted">
+              {" "}
+              · Precio actualizado el {vista.precioFecha}
+            </span>
+          ) : null}
         </p>
       ) : null}
 

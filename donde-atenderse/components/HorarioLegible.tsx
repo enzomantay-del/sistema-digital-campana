@@ -4,7 +4,7 @@ import { franjasHorarioLugarPublico, type FranjaHorarioPublica } from "@/lib/pla
 function TarjetaFranja({ franja }: { franja: FranjaHorarioPublica }) {
   return (
     <li className="rounded-2xl border border-line bg-white/80 px-4 py-3 shadow-sm">
-      <p className="text-sm font-semibold text-ink">{franja.diasLabel}</p>
+      <p className="text-sm font-semibold text-menta">{franja.diasLabel}</p>
       {franja.cerrado ? (
         <p className="mt-1 text-sm text-muted">Cerrado</p>
       ) : franja.guardia24 ? (
@@ -13,8 +13,8 @@ function TarjetaFranja({ franja }: { franja: FranjaHorarioPublica }) {
         <ul className="mt-2 grid gap-1.5">
           {franja.turnos.map((turno) => (
             <li key={`${franja.diasLabel}-${turno.label}`} className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-sm">
-              <span className="font-medium text-menta">{turno.label}</span>
-              <span className="tabular-nums text-ink">{turno.rango}</span>
+              <span className="font-medium text-link">{turno.label}</span>
+              <span className="tabular-nums font-medium text-ink">{turno.rango}</span>
             </li>
           ))}
         </ul>
@@ -35,7 +35,7 @@ function TarjetaLinea({ linea }: { linea: string }) {
 
   return (
     <li className="rounded-2xl border border-line bg-white/80 px-4 py-3 shadow-sm">
-      <p className="text-sm font-semibold text-ink">{titulo}</p>
+      <p className="text-sm font-semibold text-menta">{titulo}</p>
       {trozos.length > 1 ? (
         <ul className="mt-2 grid gap-1">
           {trozos.map((troz) => {
@@ -44,14 +44,14 @@ function TarjetaLinea({ linea }: { linea: string }) {
             const resto = espacio > 0 ? troz.slice(espacio + 1) : troz;
             return (
               <li key={troz} className="flex flex-wrap items-baseline gap-x-2 text-sm">
-                {etiqueta ? <span className="font-medium capitalize text-menta">{etiqueta}</span> : null}
-                <span className="tabular-nums text-ink">{resto || troz}</span>
+                {etiqueta ? <span className="font-medium capitalize text-link">{etiqueta}</span> : null}
+                <span className="tabular-nums font-medium text-ink">{resto || troz}</span>
               </li>
             );
           })}
         </ul>
       ) : (
-        <p className="mt-1 text-sm tabular-nums text-ink">{detalle}</p>
+        <p className="mt-1 text-sm font-medium tabular-nums text-ink">{detalle}</p>
       )}
     </li>
   );
