@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ESPECIALIDADES_CATALOGO } from "@/lib/especialidades";
 import { FichaProfesional } from "@/components/FichaProfesional";
 import { AvisoMatriculaEditor } from "@/components/AvisoMatriculaEditor";
@@ -14,6 +14,7 @@ import { campoDesdeEspecialidades } from "@/lib/especialidades";
 import type { BorradorProfesional, HorarioBorrador } from "@/lib/draft";
 import { horarioLugarParaGuardar, horarioLugarVacio, notaHorarioParaGuardar } from "@/lib/placeSchedule";
 import { armarVistaProfesional } from "@/lib/view";
+import { mensajeSolapamientoEntreSedes } from "@/lib/solapamientoHorarios";
 import { validarAntesDeGuardar } from "@/lib/validarProfesional";
 import type { FilaHorario } from "@/lib/schedule";
 
@@ -90,6 +91,10 @@ export function EditorProfesional({
   ultimo.current = borrador;
   const modoPropio = !modoAdmin && !modoSecretaria;
   const catalogo = Array.from(new Set([...OBRAS_INICIALES, ...obras])).sort((a, b) => a.localeCompare(b, "es"));
+  const avisoSolapamiento = useMemo(
+    () => mensajeSolapamientoEntreSedes(borrador.horarios.filter((h) => h.placeId)),
+    [borrador.horarios],
+  );
 
   useEffect(() => {
     setLugaresLista(lugares);
@@ -450,6 +455,11 @@ export function EditorProfesional({
                 : "Indicá cada centro donde atendés: elegí uno que ya figure en Cercalud o agregá una sede nueva."}
             </p>
           </div>
+          {avisoSolapamiento ? (
+            <p className="rounded-2xl border border-warn bg-[#fff8f0] px-4 py-3 text-sm font-semibold leading-snug text-warn" role="alert">
+              {avisoSolapamiento}
+            </p>
+          ) : null}
           {borrador.horarios.map((horario, indiceHorario) => {
             const variasSedes = borrador.horarios.length > 1;
             const bloqueHorario = horario.placeId && horario.placeName.trim() ? (

@@ -6,6 +6,7 @@ import {
   periodicidadDefecto,
   validarHorarioLugar,
 } from "@/lib/placeSchedule";
+import { mensajeSolapamientoEntreSedes } from "@/lib/solapamientoHorarios";
 
 function obrasDelHorario(horario: BorradorProfesional["horarios"][number]) {
   return [...(horario.obras ?? []), horario.otraObra?.trim() ?? ""].filter(Boolean);
@@ -25,6 +26,8 @@ export function validarBorradorProfesional(
     if (conLugar.length === 0) return "Agregá al menos una sede y elegí el centro en el desplegable.";
     const errorHorario = validarHorariosEnBorrador(conLugar);
     if (errorHorario) return errorHorario;
+    const solapamiento = mensajeSolapamientoEntreSedes(conLugar);
+    if (solapamiento) return solapamiento;
     for (const horario of conLugar) {
       const obras = obrasDelHorario(horario);
       if (obras.length === 0) {
