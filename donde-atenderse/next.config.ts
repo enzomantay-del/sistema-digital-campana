@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
   distDir: esBuildProduccion ? ".next-prod" : ".next",
   experimental: {
     serverActions: {
-      bodySizeLimit: "3mb",
+      bodySizeLimit: "4mb",
     },
   },
   async headers() {

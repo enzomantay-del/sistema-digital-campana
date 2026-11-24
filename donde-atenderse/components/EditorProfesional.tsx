@@ -233,8 +233,7 @@ export function EditorProfesional({
         ) : null}
         {!modoAdmin && !revisada ? (
           <p className="rounded-2xl border border-line bg-paper px-4 py-3 text-base">
-            La primera vez revisamos nombre, matrícula y WhatsApp. Mientras tanto tu ficha no aparece en la búsqueda
-            pública.
+            La primera vez revisamos nombre, matrícula y foto. Mientras tanto tu ficha no aparece en la búsqueda pública.
           </p>
         ) : !modoAdmin && !publicada ? (
           <p className="rounded-2xl border border-line bg-paper px-4 py-3 text-base">

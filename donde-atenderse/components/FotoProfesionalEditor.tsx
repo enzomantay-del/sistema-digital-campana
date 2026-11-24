@@ -22,17 +22,22 @@ export function FotoProfesionalEditor({
     if (!archivo) return;
     setCargando(true);
     setMensaje("Subiendo…");
-    const datos = new FormData();
-    datos.set("foto", archivo);
-    const resultado = await subirFotoProfesional(professionalId, datos);
-    setCargando(false);
-    if (!resultado.ok) {
-      setMensaje(resultado.error);
-      return;
+    try {
+      const datos = new FormData();
+      datos.set("foto", archivo);
+      const resultado = await subirFotoProfesional(professionalId, datos);
+      if (!resultado.ok) {
+        setMensaje(resultado.error);
+        return;
+      }
+      onChange(resultado.photoUrl);
+      setMensaje("Foto guardada.");
+    } catch {
+      setMensaje("No se pudo subir la foto. Recargá la página e intentá de nuevo.");
+    } finally {
+      setCargando(false);
+      if (entrada.current) entrada.current.value = "";
     }
-    onChange(resultado.photoUrl);
-    setMensaje("Foto guardada.");
-    if (entrada.current) entrada.current.value = "";
   }
 
   async function quitar() {
@@ -51,7 +56,9 @@ export function FotoProfesionalEditor({
   return (
     <fieldset className="grid gap-3">
       <legend className="font-semibold">Foto del profesional</legend>
-      <p className="text-sm text-muted">Aparece en la ficha pública. JPG, PNG, WebP o GIF, hasta 2 MB.</p>
+      <p className="text-sm text-muted">
+        Aparece en la ficha pública. JPG, JPEG, JFIF, PNG, WebP o GIF, hasta 2 MB.
+      </p>
       <div className="flex flex-wrap items-center gap-4">
         {photoUrl ? (
           <div className="relative h-24 w-24 overflow-hidden rounded-full border border-line bg-white">
@@ -66,7 +73,7 @@ export function FotoProfesionalEditor({
           <input
             ref={entrada}
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
+            accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.jfif"
             className="text-sm"
             disabled={cargando}
             onChange={(event) => void elegirArchivo(event)}

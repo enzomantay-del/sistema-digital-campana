@@ -10,6 +10,7 @@ import { claveMatricula } from "@/lib/matricula";
 import { camposLegacyDesdeHorario } from "@/lib/professionalSchedule";
 import { horarioLugarParaGuardar, notaHorarioParaGuardar, validarHorarioLugar } from "@/lib/placeSchedule";
 import { validarBorradorProfesional } from "@/lib/validarProfesional";
+import { FOTO_MAX_BYTES, tipoYExtensionFoto } from "@/lib/validarFoto";
 
 export type GuardadoProfesional =
   | { ok: true; rows: { key: string; id: string; placeId: string }[]; professionalId: string }
@@ -46,29 +47,41 @@ export async function buscarProfesionalPorMatricula(
 }
 
 export async function guardarProfesional(borrador: BorradorProfesional): Promise<GuardadoProfesional> {
-  const user = await usuarioActual();
-  if (!user) return { ok: false, error: "Tenés que entrar de nuevo." };
-  if (esSecretaria(user)) return { ok: false, error: "Las secretarias cargan desde el panel de su lugar." };
-  return guardarProfesionalInterno(user, borrador, null, "propio");
+  try {
+    const user = await usuarioActual();
+    if (!user) return { ok: false, error: "Tenés que entrar de nuevo." };
+    if (esSecretaria(user)) return { ok: false, error: "Las secretarias cargan desde el panel de su lugar." };
+    return await guardarProfesionalInterno(user, borrador, null, "propio");
+  } catch {
+    return { ok: false, error: "No se pudo guardar la ficha. Probá de nuevo en unos minutos." };
+  }
 }
 
 export async function guardarProfesionalAdmin(
   professionalId: string,
   borrador: BorradorProfesional,
 ): Promise<GuardadoProfesional> {
-  const user = await usuarioActual();
-  if (!user || !esAdmin(user)) return { ok: false, error: "Solo administración puede editar otra ficha." };
-  return guardarProfesionalInterno(user, borrador, professionalId, "admin");
+  try {
+    const user = await usuarioActual();
+    if (!user || !esAdmin(user)) return { ok: false, error: "Solo administración puede editar otra ficha." };
+    return await guardarProfesionalInterno(user, borrador, professionalId, "admin");
+  } catch {
+    return { ok: false, error: "No se pudo guardar la ficha. Probá de nuevo en unos minutos." };
+  }
 }
 
 export async function guardarProfesionalSecretaria(
   professionalId: string | null,
   borrador: BorradorProfesional,
 ): Promise<GuardadoProfesional> {
-  const user = await usuarioActual();
-  if (!user || !esSecretaria(user)) return { ok: false, error: "Solo secretarias con lugar asignado." };
-  if (user.places.length === 0) return { ok: false, error: "No tenés un lugar asignado." };
-  return guardarProfesionalInterno(user, borrador, professionalId, "secretaria");
+  try {
+    const user = await usuarioActual();
+    if (!user || !esSecretaria(user)) return { ok: false, error: "Solo secretarias con lugar asignado." };
+    if (user.places.length === 0) return { ok: false, error: "No tenés un lugar asignado." };
+    return await guardarProfesionalInterno(user, borrador, professionalId, "secretaria");
+  } catch {
+    return { ok: false, error: "No se pudo guardar la ficha. Probá de nuevo en unos minutos." };
+  }
 }
 
 async function guardarProfesionalInterno(
@@ -280,17 +293,6 @@ async function guardarProfesionalInterno(
   return { ok: true, rows, professionalId: professional.id };
 }
 
-const FOTO_MAX_BYTES = 2 * 1024 * 1024;
-const FOTO_TIPOS = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
-
-function extensionFoto(tipo: string) {
-  if (tipo === "image/jpeg") return "jpg";
-  if (tipo === "image/png") return "png";
-  if (tipo === "image/webp") return "webp";
-  if (tipo === "image/gif") return "gif";
-  return null;
-}
-
 async function puedeEditarProfesional(
   user: NonNullable<Awaited<ReturnType<typeof usuarioActual>>>,
   professionalId: string,
@@ -330,14 +332,13 @@ export async function subirFotoProfesional(
   if (!archivo || !(archivo instanceof File) || archivo.size === 0) {
     return { ok: false, error: "Elegí una imagen." };
   }
-  if (!FOTO_TIPOS.has(archivo.type)) {
-    return { ok: false, error: "Usá JPG, PNG, WebP o GIF." };
-  }
   if (archivo.size > FOTO_MAX_BYTES) {
     return { ok: false, error: "La imagen no puede pesar más de 2 MB." };
   }
-  const extension = extensionFoto(archivo.type);
-  if (!extension) return { ok: false, error: "Formato de imagen no admitido." };
+  const formato = tipoYExtensionFoto(archivo);
+  if (!formato) {
+    return { ok: false, error: "Usá JPG, JPEG, JFIF, PNG, WebP o GIF." };
+  }
 
   let photoUrl: string;
   try {
@@ -345,11 +346,11 @@ export async function subirFotoProfesional(
       "profesionales",
       professionalId,
       Buffer.from(await archivo.arrayBuffer()),
-      archivo.type,
-      extension,
+      formato.tipoMime,
+      formato.extension,
     );
   } catch {
-    return { ok: false, error: "No se pudo guardar la imagen. Revisá el almacenamiento en la nube." };
+    return { ok: false, error: "No se pudo guardar la imagen. Probá con otro archivo o más chico." };
   }
   await prisma.professional.update({ where: { id: professionalId }, data: { photoUrl } });
   revalidatePath("/panel/profesional");
