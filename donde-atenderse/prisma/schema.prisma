@@ -25,8 +25,10 @@ model Professional {
   user           User?              @relation(fields: [userId], references: [id])
   fullName       String
   license        String             @default("")
+  licenseKey     String?            @unique
   area           String             @default("cuerpo")
   specialty      String             @default("")
+  specialties    String             @default("")
   photoUrl       String             @default("")
   whatsapp       String             @default("")
   phone          String             @default("")

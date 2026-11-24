@@ -10,6 +10,7 @@ import {
 } from "@/actions/admin";
 import { GestionAdminLista, type FilaAdmin } from "@/components/GestionAdminLista";
 import { ImportarTurneroFarmacia } from "@/components/ImportarTurneroFarmacia";
+import { CrearUsuarioAdmin } from "@/components/CrearUsuarioAdmin";
 import { requiereAdmin } from "@/lib/auth";
 import { etiquetaArea, etiquetaLugar, fecha } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
@@ -125,6 +126,8 @@ export default async function PanelAdmin({
     turnero_sin?: string;
     turnero_invalidas?: string;
     turnero_error?: string;
+    ok?: string;
+    error?: string;
   }>;
 }) {
   const admin = await requiereAdmin();
@@ -134,6 +137,8 @@ export default async function PanelAdmin({
     turnero_sin: turneroSinRaw,
     turnero_invalidas: turneroInvalidasRaw,
     turnero_error: turneroError,
+    ok,
+    error,
   } = await searchParams;
   const cargadosN = cargados ? Number(cargados) : undefined;
   const turneroSin = turneroSinRaw ? turneroSinRaw.split("|").filter(Boolean) : undefined;
@@ -191,6 +196,19 @@ export default async function PanelAdmin({
           </form>
         </div>
       </header>
+
+      {ok === "usuario" ? (
+        <p className="rounded-xl border border-menta bg-[#e8f7f3] px-3 py-2 text-sm text-menta">
+          Usuario creado. Pasale el link de ingreso, el correo y la contraseña que definiste.
+        </p>
+      ) : null}
+      {error === "usuario" ? <p className="text-sm text-warn">Revisá nombre, correo, contraseña y rol.</p> : null}
+      {error === "correo" ? <p className="text-sm text-warn">Ya existe una cuenta con ese correo.</p> : null}
+      {error === "lugares" ? (
+        <p className="text-sm text-warn">Las secretarias necesitan al menos un lugar asignado.</p>
+      ) : null}
+
+      <CrearUsuarioAdmin lugares={lugares} />
 
       <section className="grid gap-2">
         <h2 className="text-center text-lg font-semibold">Fichas a revisar</h2>

@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { guardarProfesional, guardarProfesionalAdmin } from "@/actions/professional";
+import { guardarProfesional, guardarProfesionalAdmin, guardarProfesionalSecretaria } from "@/actions/professional";
+import { ESPECIALIDADES_CATALOGO } from "@/lib/especialidades";
 import { FichaProfesional } from "@/components/FichaProfesional";
 import { FotoProfesionalEditor } from "@/components/FotoProfesionalEditor";
 import { HorarioLugarEditor } from "@/components/HorarioLugarEditor";
-import { AREAS, LOCALIDADES, OBRAS_INICIALES, TIPOS_LUGAR } from "@/lib/constants";
+import { AREAS, OBRAS_INICIALES } from "@/lib/constants";
+import { campoDesdeEspecialidades } from "@/lib/especialidades";
 import type { BorradorProfesional, HorarioBorrador } from "@/lib/draft";
 import { horarioLugarParaGuardar, horarioLugarVacio, notaHorarioParaGuardar } from "@/lib/placeSchedule";
 import { armarVistaProfesional } from "@/lib/view";
@@ -45,6 +47,9 @@ export function EditorProfesional({
   revisada,
   publicada,
   modoAdmin = false,
+  modoSecretaria = false,
+  placeIdEnfoque,
+  volverHref,
   professionalId,
   ejemplo = false,
 }: {
@@ -54,6 +59,9 @@ export function EditorProfesional({
   revisada: boolean;
   publicada: boolean;
   modoAdmin?: boolean;
+  modoSecretaria?: boolean;
+  placeIdEnfoque?: string;
+  volverHref?: string;
   professionalId: string;
   ejemplo?: boolean;
 }) {
@@ -79,9 +87,11 @@ export function EditorProfesional({
     setEstado("Guardando…");
     try {
       const resultado =
-        modoAdmin && professionalId
-          ? await guardarProfesionalAdmin(professionalId, snapshot)
-          : await guardarProfesional(snapshot);
+        modoSecretaria
+          ? await guardarProfesionalSecretaria(professionalId, snapshot)
+          : modoAdmin && professionalId
+            ? await guardarProfesionalAdmin(professionalId, snapshot)
+            : await guardarProfesional(snapshot);
       if (!resultado?.ok) {
         setEstado(resultado?.error ?? "No se pudo guardar. Probá de nuevo.");
         return;
@@ -106,12 +116,15 @@ export function EditorProfesional({
       setHayCambios(false);
       setGuardadoOk(true);
       setEstado(
-        modoAdmin
-          ? "Guardado. Los datos quedaron en la ficha del profesional."
-          : revisada
-            ? "Guardado. Los datos quedaron en tu ficha pública."
-            : "Guardado. Queda a la espera de revisión antes de aparecer en la búsqueda.",
+        modoSecretaria
+          ? "Guardado. La administración revisa antes de publicar en la web."
+          : modoAdmin
+            ? "Guardado. Los datos quedaron en la ficha del profesional."
+            : revisada
+              ? "Guardado. Los datos quedaron en tu ficha pública."
+              : "Guardado. Queda a la espera de revisión antes de aparecer en la búsqueda.",
       );
+      if (modoSecretaria && volverHref) window.location.assign(volverHref);
     } catch {
       setEstado("Falló el guardado. Recargá la página y probá otra vez.");
     } finally {
@@ -143,9 +156,14 @@ export function EditorProfesional({
         >
           {estado}
         </p>
-        {guardadoOk && !hayCambios ? (
+        {guardadoOk && !hayCambios && !modoSecretaria && publicada ? (
           <Link href={`/profesional/${professionalId}`} className="text-sm font-semibold text-link">
             Ver ficha pública
+          </Link>
+        ) : null}
+        {volverHref && !modoSecretaria ? (
+          <Link href={volverHref} className="text-sm font-semibold text-link">
+            Volver
           </Link>
         ) : null}
       </div>
@@ -176,6 +194,7 @@ export function EditorProfesional({
   const vista = armarVistaProfesional({
     fullName: borrador.fullName,
     specialty: borrador.specialty,
+    specialties: campoDesdeEspecialidades(borrador.specialties ?? []),
     area: borrador.area,
     license: borrador.license,
     photoUrl: borrador.photoUrl,
@@ -237,32 +256,34 @@ export function EditorProfesional({
               ))}
             </select>
           </label>
-          <label className="grid gap-1">
-            Especialidad
-            <input
-              className="campo"
-              value={borrador.specialty}
-              list="especialidades"
-              onChange={(event) => cambiar({ specialty: event.target.value })}
-            />
-            <datalist id="especialidades">
-              {[
-                "Clínica médica",
-                "Pediatría",
-                "Traumatología",
-                "Ginecología",
-                "Cardiología",
-                "Oftalmología",
-                "Psiquiatría",
-                "Psicología",
-                "Odontología",
-                "Kinesiología",
-                "Nutrición",
-              ].map((item) => (
-                <option key={item} value={item} />
-              ))}
-            </datalist>
-          </label>
+          <fieldset className="grid gap-2">
+            <legend className="font-semibold">Especialidades</legend>
+            <p className="text-sm text-muted">Podés marcar más de una.</p>
+            <div className="flex flex-wrap gap-2">
+              {ESPECIALIDADES_CATALOGO.map((item) => {
+                const lista = borrador.specialties ?? [];
+                const activa = lista.includes(item);
+                return (
+                  <label key={item} className={activa ? "pastilla pastilla-activa" : "pastilla"}>
+                    <input
+                      className="sr-only"
+                      type="checkbox"
+                      checked={activa}
+                      onChange={(event) =>
+                        cambiar({
+                          specialties: event.target.checked
+                            ? [...lista, item]
+                            : lista.filter((esp) => esp !== item),
+                          specialty: event.target.checked ? item : lista.filter((esp) => esp !== item)[0] ?? "",
+                        })
+                      }
+                    />
+                    {item}
+                  </label>
+                );
+              })}
+            </div>
+          </fieldset>
           <label className="grid gap-1">
             WhatsApp
             <input className="campo" value={borrador.whatsapp} onChange={(event) => cambiar({ whatsapp: event.target.value })} />
@@ -310,8 +331,9 @@ export function EditorProfesional({
           <div className="grid gap-2">
             <h2 className="text-2xl font-semibold">Dónde atendés</h2>
             <p className="text-muted">
-              Elegí un lugar que ya esté en Cercalud. Si no está, sugerilo: lo revisamos y lo publicamos nosotros. En
-              cada lugar cargá el horario en el que atendés ahí.
+              {modoSecretaria
+                ? "Cargá el horario de este profesional en el lugar asignado."
+                : "Elegí cada lugar publicado por Cercalud y el horario en el que atendés ahí."}
             </p>
           </div>
           {borrador.horarios.map((horario) => (
@@ -326,20 +348,9 @@ export function EditorProfesional({
                   Lugar
                   <select
                     className="campo"
-                    value={horario.sugerido ? "__sugerir" : horario.placeId || ""}
+                    value={horario.placeId || ""}
+                    disabled={modoSecretaria || Boolean(placeIdEnfoque)}
                     onChange={(event) => {
-                      if (event.target.value === "__sugerir") {
-                        cambiarHorario(horario.key, {
-                          placeId: undefined,
-                          sugerido: true,
-                          publicado: false,
-                          ownsPlace: false,
-                          placeName: "",
-                          address: "",
-                          kind: "consultorio",
-                        });
-                        return;
-                      }
                       const lugar = lugares.find((item) => item.id === event.target.value);
                       if (!lugar) return;
                       cambiarHorario(horario.key, {
@@ -355,8 +366,9 @@ export function EditorProfesional({
                     }}
                   >
                     <option value="">Elegí un lugar</option>
-                    <option value="__sugerir">El lugar no está · sugerirlo</option>
-                    {lugares.map((lugar) => (
+                    {lugares
+                      .filter((lugar) => !placeIdEnfoque || lugar.id === placeIdEnfoque)
+                      .map((lugar) => (
                       <option key={lugar.id} value={lugar.id}>
                         {lugar.name} · {lugar.locality}
                       </option>
@@ -364,76 +376,33 @@ export function EditorProfesional({
                   </select>
                 </label>
               )}
-              {horario.sugerido ? (
-                <>
-                  <p className="text-sm text-muted">Sugerencia pendiente de revisión.</p>
-                  <label className="grid gap-1">
-                    Nombre del lugar
-                    <input
-                      className="campo"
-                      value={horario.placeName}
-                      onChange={(event) => cambiarHorario(horario.key, { placeName: event.target.value })}
-                    />
-                  </label>
-                  <label className="grid gap-1">
-                    Tipo
-                    <select
-                      className="campo"
-                      value={horario.kind}
-                      onChange={(event) => cambiarHorario(horario.key, { kind: event.target.value })}
-                    >
-                      {TIPOS_LUGAR.filter((tipo) => tipo.id !== "farmacia").map((tipo) => (
-                        <option key={tipo.id} value={tipo.id}>
-                          {tipo.label}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="grid gap-1">
-                    Localidad
-                    <select
-                      className="campo"
-                      value={horario.locality}
-                      onChange={(event) => cambiarHorario(horario.key, { locality: event.target.value })}
-                    >
-                      {LOCALIDADES.map((localidad) => (
-                        <option key={localidad}>{localidad}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="grid gap-1">
-                    Dirección
-                    <input
-                      className="campo"
-                      value={horario.address}
-                      onChange={(event) => cambiarHorario(horario.key, { address: event.target.value })}
-                    />
-                  </label>
-                </>
-              ) : null}
-              {(horario.placeId || horario.sugerido) && horario.placeName.trim() ? (
+              {horario.placeId && horario.placeName.trim() ? (
                 <HorarioLugarEditor
                   valor={horario.schedule}
                   legacy={horario.scheduleLegacy}
                   onChange={(schedule) => cambiarHorario(horario.key, { schedule })}
                 />
               ) : null}
-              <button
-                type="button"
-                className="w-fit font-semibold text-accent"
-                onClick={() => cambiar({ horarios: borrador.horarios.filter((item) => item.key !== horario.key) })}
-              >
-                Quitar este lugar
-              </button>
+              {!modoSecretaria ? (
+                <button
+                  type="button"
+                  className="w-fit font-semibold text-accent"
+                  onClick={() => cambiar({ horarios: borrador.horarios.filter((item) => item.key !== horario.key) })}
+                >
+                  Quitar este lugar
+                </button>
+              ) : null}
             </div>
           ))}
-          <button
-            type="button"
-            className="boton-suave w-fit"
-            onClick={() => cambiar({ horarios: [...borrador.horarios, horarioVacio()] })}
-          >
-            Agregar un lugar
-          </button>
+          {!modoSecretaria ? (
+            <button
+              type="button"
+              className="boton-suave w-fit"
+              onClick={() => cambiar({ horarios: [...borrador.horarios, horarioVacio()] })}
+            >
+              Agregar un lugar
+            </button>
+          ) : null}
         </section>
         <BarraGuardar alFinal />
       </form>

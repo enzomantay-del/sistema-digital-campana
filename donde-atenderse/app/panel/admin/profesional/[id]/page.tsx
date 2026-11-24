@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { EditorProfesional } from "@/components/EditorProfesional";
 import { AccionesAdmin } from "@/components/AccionesAdmin";
 import { requiereAdmin } from "@/lib/auth";
+import { especialidadesDesdeCampo } from "@/lib/especialidades";
 import { horarioProfesional } from "@/lib/map";
 import { prisma } from "@/lib/prisma";
 import { catalogoObras } from "@/lib/search";
@@ -99,6 +100,11 @@ export default async function EditarProfesionalAdmin({
           license: persona.license,
           area: persona.area,
           specialty: persona.specialty,
+          specialties: especialidadesDesdeCampo(persona.specialties).length
+            ? especialidadesDesdeCampo(persona.specialties)
+            : persona.specialty
+              ? [persona.specialty]
+              : [],
           photoUrl: persona.photoUrl,
           whatsapp: persona.whatsapp,
           phone: persona.phone,

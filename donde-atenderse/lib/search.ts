@@ -63,7 +63,9 @@ export async function buscar(filtros: {
   const personas = professionals.filter((persona) => {
     const obras = persona.obras.map((item) => item.obra.name);
     const lugares = asistenciasEnLugaresPublicados(persona.attendances).map((item) => item.place);
-    const texto = [persona.fullName, persona.specialty, ...lugares.map((lugar) => lugar.name)].join(" ");
+    const texto = [persona.fullName, persona.specialty, persona.specialties, ...lugares.map((lugar) => lugar.name)].join(
+      " ",
+    );
     if (q && !incluye(texto, q)) return false;
     if (area && persona.area !== area) return false;
     if (localidad && !lugares.some((lugar) => lugar.locality === localidad)) return false;

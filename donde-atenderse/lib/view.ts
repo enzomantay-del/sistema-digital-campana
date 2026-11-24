@@ -1,3 +1,4 @@
+import { etiquetaEspecialidades, especialidadesDesdeCampo } from "./especialidades";
 import { etiquetaArea, etiquetaTurno, fecha, textoPrecio } from "./format";
 import { lineasHorarioLegacy, textoHorarioUnido } from "./horarioTexto";
 import { datosActualizadosRecientes, fechaMasReciente } from "./verificacion";
@@ -17,6 +18,7 @@ export type VistaLinea = LineaHorario & {
 export type VistaProfesional = {
   nombre: string;
   especialidad: string;
+  especialidades: string[];
   area: string;
   matricula: string;
   fotoUrl: string;
@@ -107,6 +109,7 @@ function bloques(lineas: VistaLinea[]) {
 export function armarVistaProfesional(input: {
   fullName: string;
   specialty: string;
+  specialties?: string | null;
   area: string;
   license: string;
   photoUrl?: string;
@@ -130,7 +133,15 @@ export function armarVistaProfesional(input: {
   }, null) ?? input.updatedAt;
   return {
     nombre,
-    especialidad: input.specialty.trim() || "Especialidad sin cargar",
+    especialidades: especialidadesDesdeCampo(input.specialties).length
+      ? especialidadesDesdeCampo(input.specialties)
+      : input.specialty.trim()
+        ? [input.specialty.trim()]
+        : [],
+    especialidad: etiquetaEspecialidades(
+      especialidadesDesdeCampo(input.specialties),
+      input.specialty,
+    ),
     area: etiquetaArea(input.area),
     matricula: input.license.trim(),
     fotoUrl: input.photoUrl?.trim() ?? "",

@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { bootstrapAdminDesdeSecrets } from "@/lib/adminBootstrap";
 import { ipCliente } from "@/lib/cliente";
-import { crearSesion, cuentasDisponibles, esAdmin } from "@/lib/auth";
+import { crearSesion, cuentasDisponibles, destinoPanelTrasLogin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { bloqueoAuthActivo, limpiarFallosAuth, registrarFalloAuth } from "@/lib/rateLimit";
 
@@ -46,5 +46,5 @@ export async function procesarEntrada(formData: FormData): Promise<ResultadoLogi
 
   const sesion = await crearSesion(user.id);
   if (!sesion) return { ok: false, error: "En este momento no se pueden usar las cuentas." };
-  return { ok: true, irA: esAdmin(user) ? "/panel/admin" : "/panel" };
+  return { ok: true, irA: destinoPanelTrasLogin(user) };
 }

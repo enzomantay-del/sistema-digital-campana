@@ -33,6 +33,9 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     update: {},
     create: { userId: editor.id, placeId },
   });
+  if (editor.role !== "admin") {
+    await prisma.user.update({ where: { id: editor.id }, data: { role: "secretaria" } });
+  }
   revalidatePath(`/panel/lugar/${placeId}`);
   return redirigirSolicitud(request, `/panel/lugar/${placeId}`);
 }

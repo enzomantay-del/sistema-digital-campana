@@ -24,6 +24,20 @@ export function esAdmin(usuario: { role: string } | null | undefined) {
   return usuario?.role === "admin";
 }
 
+export function esSecretaria(usuario: { role: string } | null | undefined) {
+  return usuario?.role === "secretaria";
+}
+
+export function esProfesional(usuario: { role: string } | null | undefined) {
+  return usuario?.role === "profesional";
+}
+
+export function destinoPanelTrasLogin(usuario: { role: string }) {
+  if (esAdmin(usuario)) return "/panel/admin";
+  if (esSecretaria(usuario)) return "/panel/cargas";
+  return "/panel/profesional";
+}
+
 export async function crearSesion(userId: string) {
   const clave = claveSesion();
   if (!clave) return false;

@@ -107,6 +107,7 @@ export default async function PaginaBuscar({
           const vista = armarVistaProfesional({
             fullName: persona.fullName,
             specialty: persona.specialty,
+            specialties: persona.specialties,
             area: persona.area,
             license: persona.license,
             photoUrl: persona.photoUrl,

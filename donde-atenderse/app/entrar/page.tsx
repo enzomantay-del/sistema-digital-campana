@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { FormularioEntrarWeb } from "@/components/FormularioEntrarWeb";
-import { esAdmin, usuarioActual } from "@/lib/auth";
+import { destinoPanelTrasLogin, usuarioActual } from "@/lib/auth";
 import { enlaceRecuperacionIngreso } from "@/lib/recuperacion";
 
 export default async function Entrar({
@@ -11,7 +11,7 @@ export default async function Entrar({
   const { error } = await searchParams;
   const usuario = await usuarioActual();
   if (usuario) {
-    const destino = esAdmin(usuario) ? "/panel/admin" : "/panel";
+    const destino = destinoPanelTrasLogin(usuario);
     return (
       <div className="grid max-w-xl gap-4">
         <h1 className="text-4xl font-bold tracking-tight">Ya entraste</h1>
@@ -26,12 +26,12 @@ export default async function Entrar({
     <div className="grid gap-6">
       <h1 className="text-4xl font-bold tracking-tight">Entrar</h1>
       <p className="max-w-xl text-muted">
-        Desde acá cargás tu ficha. El paciente no necesita una cuenta para buscar.
+        Ingreso para administración, secretarías y profesionales con cuenta asignada por Cercalud.
       </p>
       <FormularioEntrarWeb error={error} recuperacionHref={enlaceRecuperacionIngreso()} />
       <p className="flex flex-wrap gap-x-4 gap-y-2">
-        <Link href="/crear-cuenta" className="font-semibold text-link">
-          Crear una cuenta
+        <Link href="/crear-cuenta" className="text-sm text-muted">
+          ¿Necesitás cuenta? Pedila a la administración
         </Link>
         <a
           href={enlaceRecuperacionIngreso()}

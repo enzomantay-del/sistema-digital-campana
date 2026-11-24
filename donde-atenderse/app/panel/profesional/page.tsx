@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import { esAdmin, esProfesional, esSecretaria } from "@/lib/auth";
+import { especialidadesDesdeCampo } from "@/lib/especialidades";
 import { AvisoFotosHosting } from "@/components/AvisoFotosHosting";
 import { EditorProfesional } from "@/components/EditorProfesional";
 import { usuarioActual } from "@/lib/auth";
@@ -9,6 +11,9 @@ import { catalogoObras } from "@/lib/search";
 export default async function PaginaEditorProfesional() {
   const usuario = await usuarioActual();
   if (!usuario) redirect("/entrar");
+  if (esAdmin(usuario)) redirect("/panel/admin");
+  if (esSecretaria(usuario)) redirect("/panel/cargas");
+  if (!esProfesional(usuario) && !usuario.professional) redirect("/panel");
   const professional =
     usuario.professional ??
     (await prisma.professional.create({
@@ -50,6 +55,11 @@ export default async function PaginaEditorProfesional() {
         license: completo.license,
         area: completo.area,
         specialty: completo.specialty,
+        specialties: especialidadesDesdeCampo(completo.specialties).length
+          ? especialidadesDesdeCampo(completo.specialties)
+          : completo.specialty
+            ? [completo.specialty]
+            : [],
         photoUrl: completo.photoUrl,
         whatsapp: completo.whatsapp,
         phone: completo.phone,

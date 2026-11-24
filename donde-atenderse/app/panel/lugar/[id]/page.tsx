@@ -22,8 +22,8 @@ export default async function PaginaEditorLugar({
   const { error, ok } = await searchParams;
   const usuario = await usuarioActual();
   if (!usuario) redirect("/entrar");
-  const admin = esAdmin(usuario);
-  if (!admin && !usuario.places.some((item) => item.placeId === id)) notFound();
+  if (!esAdmin(usuario)) redirect("/panel");
+  const admin = true;
 
   const lugar = await prisma.place.findUnique({
     where: { id },

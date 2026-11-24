@@ -28,6 +28,7 @@ export type BorradorProfesional = {
   license: string;
   area: string;
   specialty: string;
+  specialties: string[];
   photoUrl: string;
   whatsapp: string;
   phone: string;
@@ -43,6 +44,7 @@ export type HorarioLugarBorrador = {
   professionalId?: string;
   professionalName: string;
   specialty: string;
+  specialties: string[];
   area: string;
   license: string;
   days: string[];

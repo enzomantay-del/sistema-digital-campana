@@ -1,23 +1,16 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { FormularioCuenta } from "@/components/FormularioCuenta";
-import { usuarioActual } from "@/lib/auth";
 
-export default async function CrearCuenta() {
-  if (await usuarioActual()) redirect("/panel");
+export default function CrearCuenta() {
   return (
-    <div className="grid gap-6">
-      <h1 className="text-4xl font-bold tracking-tight">Crear cuenta</h1>
-      <p className="max-w-xl text-muted">
-        Creás tu ficha de profesional. La primera vez la revisamos antes de publicarla. Los lugares del corredor los
-        carga Cercalud.
+    <div className="grid max-w-xl gap-6">
+      <h1 className="text-4xl font-bold tracking-tight">Alta de cuentas</h1>
+      <p className="text-muted">
+        Las cuentas las crea la administración de Cercalud. Si sos profesional o trabajás en la secretaría de un lugar,
+        pediles el correo y la contraseña y entrá por acá.
       </p>
-      <FormularioCuenta />
-      <p>
-        <Link href="/entrar" className="font-semibold text-link">
-          Ya tengo cuenta
-        </Link>
-      </p>
+      <Link href="/entrar" className="boton w-fit">
+        Ir a entrar
+      </Link>
     </div>
   );
 }

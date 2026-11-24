@@ -3,15 +3,19 @@
 import { guardarImagenEntidad, quitarImagenesEntidad } from "@/lib/almacenamientoImagen";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { esAdmin, usuarioActual } from "@/lib/auth";
-import { LOCALIDADES, TIPOS_LUGAR } from "@/lib/constants";
+import { esAdmin, esSecretaria, usuarioActual } from "@/lib/auth";
 import type { BorradorProfesional } from "@/lib/draft";
+import { campoDesdeEspecialidades } from "@/lib/especialidades";
+import { claveMatricula } from "@/lib/matricula";
 import { camposLegacyDesdeHorario } from "@/lib/professionalSchedule";
 import { horarioLugarParaGuardar, notaHorarioParaGuardar, validarHorarioLugar } from "@/lib/placeSchedule";
+import { validarBorradorProfesional } from "@/lib/validarProfesional";
 
 export type GuardadoProfesional =
-  | { ok: true; rows: { key: string; id: string; placeId: string }[] }
+  | { ok: true; rows: { key: string; id: string; placeId: string }[]; professionalId: string }
   | { ok: false; error: string };
+
+type ModoGuardado = "propio" | "admin" | "secretaria";
 
 async function obraId(nombre: string) {
   const name = nombre.trim();
@@ -24,10 +28,28 @@ async function obraId(nombre: string) {
   return obra.id;
 }
 
+export async function buscarProfesionalPorMatricula(
+  license: string,
+): Promise<{ ok: true; id: string; fullName: string } | { ok: false; error: string }> {
+  const user = await usuarioActual();
+  if (!user || (!esAdmin(user) && !esSecretaria(user))) {
+    return { ok: false, error: "Sin permiso." };
+  }
+  const clave = claveMatricula(license);
+  if (!clave) return { ok: false, error: "Escribí la matrícula completa." };
+  const persona = await prisma.professional.findFirst({
+    where: { licenseKey: clave },
+    select: { id: true, fullName: true },
+  });
+  if (!persona) return { ok: false, error: "No hay ninguna ficha con esa matrícula. Podés crear una nueva." };
+  return { ok: true, id: persona.id, fullName: persona.fullName };
+}
+
 export async function guardarProfesional(borrador: BorradorProfesional): Promise<GuardadoProfesional> {
   const user = await usuarioActual();
   if (!user) return { ok: false, error: "Tenés que entrar de nuevo." };
-  return guardarProfesionalInterno(user, borrador, null);
+  if (esSecretaria(user)) return { ok: false, error: "Las secretarias cargan desde el panel de su lugar." };
+  return guardarProfesionalInterno(user, borrador, null, "propio");
 }
 
 export async function guardarProfesionalAdmin(
@@ -36,42 +58,92 @@ export async function guardarProfesionalAdmin(
 ): Promise<GuardadoProfesional> {
   const user = await usuarioActual();
   if (!user || !esAdmin(user)) return { ok: false, error: "Solo administración puede editar otra ficha." };
-  return guardarProfesionalInterno(user, borrador, professionalId);
+  return guardarProfesionalInterno(user, borrador, professionalId, "admin");
+}
+
+export async function guardarProfesionalSecretaria(
+  professionalId: string | null,
+  borrador: BorradorProfesional,
+): Promise<GuardadoProfesional> {
+  const user = await usuarioActual();
+  if (!user || !esSecretaria(user)) return { ok: false, error: "Solo secretarias con lugar asignado." };
+  if (user.places.length === 0) return { ok: false, error: "No tenés un lugar asignado." };
+  return guardarProfesionalInterno(user, borrador, professionalId, "secretaria");
 }
 
 async function guardarProfesionalInterno(
   user: NonNullable<Awaited<ReturnType<typeof usuarioActual>>>,
   borrador: BorradorProfesional,
   professionalId: string | null,
+  modo: ModoGuardado,
 ): Promise<GuardadoProfesional> {
-  const modoAdmin = Boolean(professionalId && esAdmin(user));
-  let professional = modoAdmin
-    ? await prisma.professional.findUnique({ where: { id: professionalId! } })
-    : user.professional;
-  if (modoAdmin && !professional) return { ok: false, error: "Esa ficha ya no está." };
+  const modoAdmin = modo === "admin";
+  const modoSecretaria = modo === "secretaria";
+  const lugaresPermitidos = new Set(
+    modoSecretaria ? user.places.map((item) => item.placeId) : user.places.map((item) => item.placeId),
+  );
+
+  let professional =
+    modoAdmin || modoSecretaria
+      ? professionalId
+        ? await prisma.professional.findUnique({ where: { id: professionalId } })
+        : null
+      : user.professional;
+
+  const creando = !professional;
+  if ((modoAdmin || modoSecretaria) && professionalId && !professional) {
+    return { ok: false, error: "Esa ficha ya no está." };
+  }
   if (!professional) {
     professional = await prisma.professional.create({
       data: {
-        userId: user.id,
-        fullName: user.name,
+        userId: modo === "propio" ? user.id : null,
+        fullName: borrador.fullName.trim() || user.name,
         published: false,
         reviewed: false,
       },
     });
   }
 
-  const fullName = borrador.fullName.trim();
-  if (fullName.length < 2) return { ok: false, error: "Escribí el nombre." };
+  const errorValidacion = validarBorradorProfesional(borrador, {
+    exigeHorario: true,
+    tieneFoto: Boolean(borrador.photoUrl?.trim() || professional.photoUrl?.trim()),
+  });
+  if (errorValidacion) return { ok: false, error: errorValidacion };
+
+  const license = borrador.license.trim();
+  const licenseKey = claveMatricula(license);
+  if (licenseKey) {
+    const duplicado = await prisma.professional.findFirst({
+      where: { licenseKey, NOT: { id: professional.id } },
+      select: { id: true, fullName: true },
+    });
+    if (duplicado) {
+      return {
+        ok: false,
+        error: `Ya existe la ficha de ${duplicado.fullName} con esa matrícula. Buscá por matrícula y cargá solo el horario en tu lugar.`,
+      };
+    }
+  }
+
+  const listaEspecialidades = [
+    ...(borrador.specialties ?? []),
+    ...(borrador.specialty.trim() ? [borrador.specialty.trim()] : []),
+  ].filter(Boolean);
+  const specialtiesCampo = campoDesdeEspecialidades(listaEspecialidades);
+  const specialtyPrincipal = listaEspecialidades[0] ?? "";
 
   const price = borrador.price.trim();
   const precioCambio = price !== professional.price;
   await prisma.professional.update({
     where: { id: professional.id },
     data: {
-      fullName,
-      license: borrador.license.trim(),
+      fullName: borrador.fullName.trim(),
+      license,
+      licenseKey,
       area: borrador.area || "cuerpo",
-      specialty: borrador.specialty.trim(),
+      specialty: specialtyPrincipal,
+      specialties: specialtiesCampo,
       whatsapp: borrador.whatsapp.trim(),
       phone: borrador.phone.trim(),
       price,
@@ -89,79 +161,37 @@ async function guardarProfesionalInterno(
   }
 
   const actuales = await prisma.attendance.findMany({ where: { professionalId: professional.id } });
-  const editores = new Set(user.places.map((item) => item.placeId));
   const conservados = new Set<string>();
   const rows: { key: string; id: string; placeId: string }[] = [];
   const ahora = new Date();
 
   for (const horario of borrador.horarios) {
-    const existente = horario.id
-      ? actuales.find((item) => item.id === horario.id && item.professionalId === professional.id)
-      : undefined;
-    let placeId = existente?.placeId;
-
-    if (!placeId && horario.sugerido && !horario.placeId) {
-      if (horario.placeName.trim().length < 2) continue;
-      if (!LOCALIDADES.includes(horario.locality as (typeof LOCALIDADES)[number])) {
-        return { ok: false, error: "El lugar sugerido necesita una localidad del corredor." };
-      }
-      const kind = TIPOS_LUGAR.some((tipo) => tipo.id === horario.kind) ? horario.kind : "consultorio";
-      const place = await prisma.place.create({
-        data: {
-          name: horario.placeName.trim(),
-          kind,
-          locality: horario.locality,
-          address: horario.address.trim().slice(0, 200),
-          published: false,
-          suggestedById: user.id,
-          suggestionNote: "Sugerido desde la ficha del profesional.",
-        },
-      });
-      placeId = place.id;
-    } else if (!placeId && horario.placeId) {
-      const lugar = await prisma.place.findUnique({ where: { id: horario.placeId } });
-      if (!lugar) return { ok: false, error: "Ese lugar ya no está." };
-      const propio = lugar.suggestedById === user.id;
-      if (!modoAdmin && !lugar.published && !propio && !editores.has(lugar.id)) {
-        return { ok: false, error: "Ese lugar todavía no está publicado." };
-      }
-      placeId = lugar.id;
-    } else if (placeId && horario.placeId && horario.placeId !== placeId) {
-      const lugar = await prisma.place.findUnique({ where: { id: horario.placeId } });
-      if (
-        !lugar ||
-        (!modoAdmin && !lugar.published && lugar.suggestedById !== user.id && !editores.has(lugar.id))
-      ) {
-        return { ok: false, error: "No podés cambiar a ese lugar." };
-      }
-      placeId = lugar.id;
+    if (horario.sugerido) {
+      return { ok: false, error: "Los lugares los carga solo la administración. Elegí un lugar ya publicado." };
     }
 
+    let placeId = horario.placeId;
     if (!placeId) continue;
+
+    const lugar = await prisma.place.findUnique({ where: { id: placeId } });
+    if (!lugar) return { ok: false, error: "Ese lugar ya no está." };
+
+    if (modoSecretaria && !lugaresPermitidos.has(placeId)) {
+      return { ok: false, error: "Solo podés cargar horarios en los lugares que te asignó la administración." };
+    }
+    if (!modoAdmin && !lugar.published) {
+      return { ok: false, error: "Ese lugar todavía no está publicado." };
+    }
+
+    const existente = horario.id
+      ? actuales.find((item) => item.id === horario.id && item.professionalId === professional!.id)
+      : actuales.find((item) => item.placeId === placeId);
 
     const schedule = horarioLugarParaGuardar(horario.schedule);
     const errorHorario = validarHorarioLugar(schedule);
     if (errorHorario) return { ok: false, error: errorHorario };
 
-    if (horario.sugerido) {
-      const sugerido = await prisma.place.findUnique({ where: { id: placeId } });
-      if (sugerido && !sugerido.published && sugerido.suggestedById === user.id) {
-        const kind = TIPOS_LUGAR.some((tipo) => tipo.id === horario.kind) ? horario.kind : sugerido.kind;
-        await prisma.place.update({
-          where: { id: placeId },
-          data: {
-            name: horario.placeName.trim() || sugerido.name,
-            kind,
-            locality: LOCALIDADES.includes(horario.locality as (typeof LOCALIDADES)[number])
-              ? horario.locality
-              : sugerido.locality,
-            address: horario.address.trim().slice(0, 200),
-          },
-        });
-      }
-    }
-
-    const esEditor = editores.has(placeId);
+    const esEditorLugar = lugaresPermitidos.has(placeId);
     const nota = notaHorarioParaGuardar(schedule, horario.scheduleLegacy);
     const legacy = camposLegacyDesdeHorario(schedule);
 
@@ -172,7 +202,7 @@ async function guardarProfesionalInterno(
       professionalShift: legacy.shift,
       professionalScheduleNote: nota,
       professionalUpdatedAt: ahora,
-      ...(esEditor
+      ...(esEditorLugar
         ? {
             placeDays: legacy.days,
             placeTime: legacy.time.trim().slice(0, 80),
@@ -197,6 +227,7 @@ async function guardarProfesionalInterno(
 
   for (const item of actuales) {
     if (conservados.has(item.id)) continue;
+    if (modoSecretaria && !lugaresPermitidos.has(item.placeId)) continue;
     const lugarTieneDatos = Boolean(item.placeDays || item.placeTime || item.placeShift);
     if (lugarTieneDatos) {
       await prisma.attendance.update({
@@ -215,14 +246,20 @@ async function guardarProfesionalInterno(
   }
 
   revalidatePath("/panel/profesional");
+  revalidatePath("/panel/cargas");
   revalidatePath(`/profesional/${professional.id}`);
   revalidatePath("/buscar");
   if (modoAdmin) {
     revalidatePath("/panel/admin");
     revalidatePath(`/panel/admin/profesional/${professional.id}`);
   }
+  if (modoSecretaria) {
+    for (const lugar of user.places) {
+      revalidatePath(`/panel/cargas/${lugar.placeId}`);
+    }
+  }
 
-  return { ok: true, rows };
+  return { ok: true, rows, professionalId: professional.id };
 }
 
 const FOTO_MAX_BYTES = 2 * 1024 * 1024;
@@ -241,7 +278,25 @@ async function puedeEditarProfesional(
   professionalId: string,
 ) {
   if (esAdmin(user)) return true;
-  return user.professional?.id === professionalId;
+  if (user.professional?.id === professionalId) return true;
+  if (esSecretaria(user)) {
+    const atiende = await prisma.attendance.findFirst({
+      where: {
+        professionalId,
+        placeId: { in: user.places.map((item) => item.placeId) },
+      },
+    });
+    if (atiende) return true;
+    const recien = await prisma.professional.findUnique({
+      where: { id: professionalId },
+      select: { createdAt: true, attendances: { select: { placeId: true } } },
+    });
+    if (!recien) return false;
+    const sinAtenciones = recien.attendances.length === 0;
+    const hacePoco = Date.now() - recien.createdAt.getTime() < 2 * 60 * 60 * 1000;
+    return sinAtenciones && hacePoco;
+  }
+  return false;
 }
 
 export async function subirFotoProfesional(
@@ -281,6 +336,7 @@ export async function subirFotoProfesional(
   await prisma.professional.update({ where: { id: professionalId }, data: { photoUrl } });
   revalidatePath("/panel/profesional");
   revalidatePath(`/profesional/${professionalId}`);
+  revalidatePath("/panel/cargas");
   return { ok: true, photoUrl };
 }
 
