@@ -115,6 +115,8 @@ export default async function PaginaBuscar({
             priceUpdatedAt: persona.priceUpdatedAt,
             whatsapp: persona.whatsapp,
             phone: persona.phone,
+            agendaWhatsapp: persona.agendaWhatsapp,
+            agendaPhone: persona.agendaPhone,
             obras: persona.obras.map((item) => item.obra.name),
             updatedAt: persona.updatedAt,
             filas: asistenciasEnLugaresPublicados(persona.attendances).map(filaHorario),

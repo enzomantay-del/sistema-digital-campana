@@ -7,7 +7,7 @@ import { asistenciasEnLugaresPublicados, filtroLugarPublico, filtroProfesionalPu
 
 const profesionalConRelaciones = {
   obras: { include: { obra: true } },
-  attendances: { include: { place: true } },
+  attendances: { include: { place: true, obras: { include: { obra: true } } } },
 } as const;
 
 const lugarConRelaciones = {

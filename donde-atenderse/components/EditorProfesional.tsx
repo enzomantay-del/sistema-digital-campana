@@ -37,6 +37,8 @@ function horarioVacio(): HorarioBorrador {
     placeShift: "",
     placeTime: "",
     placeUpdatedAt: null,
+    obras: [],
+    otraObra: "",
   };
 }
 
@@ -54,7 +56,7 @@ export function EditorProfesional({
   ejemplo = false,
 }: {
   inicial: BorradorProfesional & { priceUpdatedAt: string | null };
-  lugares: { id: string; name: string; locality: string; kind: string }[];
+  lugares: { id: string; name: string; locality: string; kind: string; whatsapp?: string; phone?: string }[];
   obras: string[];
   revisada: boolean;
   publicada: boolean;
@@ -172,24 +174,30 @@ export function EditorProfesional({
 
   const filas: FilaHorario[] = borrador.horarios
     .filter((horario) => horario.placeName.trim() || horario.placeId)
-    .map((horario) => ({
-      id: horario.id || horario.key,
-      placeId: horario.placeId || horario.key,
-      placeName: horario.placeName || "Lugar",
-      locality: horario.locality,
-      professionalDays: horario.days.join(","),
-      professionalTime: horario.time,
-      professionalShift: horario.shift,
-      professionalScheduleNote: notaHorarioParaGuardar(
-        horarioLugarParaGuardar(horario.schedule),
-        horario.scheduleLegacy,
-      ),
-      professionalUpdatedAt: new Date(),
-      placeDays: horario.ownsPlace ? horario.days.join(",") : horario.placeDays.join(","),
-      placeTime: horario.ownsPlace ? horario.time : horario.placeTime,
-      placeShift: horario.ownsPlace ? horario.shift : horario.placeShift,
-      placeUpdatedAt: horario.placeUpdatedAt ? new Date(horario.placeUpdatedAt) : null,
-    }));
+    .map((horario) => {
+      const lugar = horario.placeId ? lugares.find((item) => item.id === horario.placeId) : null;
+      return {
+        id: horario.id || horario.key,
+        placeId: horario.placeId || horario.key,
+        placeName: horario.placeName || "Lugar",
+        locality: horario.locality,
+        professionalDays: horario.days.join(","),
+        professionalTime: horario.time,
+        professionalShift: horario.shift,
+        professionalScheduleNote: notaHorarioParaGuardar(
+          horarioLugarParaGuardar(horario.schedule),
+          horario.scheduleLegacy,
+        ),
+        professionalUpdatedAt: new Date(),
+        placeDays: horario.ownsPlace ? horario.days.join(",") : horario.placeDays.join(","),
+        placeTime: horario.ownsPlace ? horario.time : horario.placeTime,
+        placeShift: horario.ownsPlace ? horario.shift : horario.placeShift,
+        placeUpdatedAt: horario.placeUpdatedAt ? new Date(horario.placeUpdatedAt) : null,
+        placeWhatsapp: lugar?.whatsapp?.trim() ?? "",
+        placePhone: lugar?.phone?.trim() ?? "",
+        obrasEnLugar: [...(horario.obras ?? []), horario.otraObra?.trim() ?? ""].filter(Boolean),
+      };
+    });
 
   const vista = armarVistaProfesional({
     fullName: borrador.fullName,
@@ -207,7 +215,9 @@ export function EditorProfesional({
           : null,
     whatsapp: borrador.whatsapp,
     phone: borrador.phone,
-    obras: [...borrador.obras, borrador.otraObra].map((item) => item.trim()).filter(Boolean),
+    agendaWhatsapp: borrador.agendaWhatsapp,
+    agendaPhone: borrador.agendaPhone,
+    obras: borrador.horarios.flatMap((h) => [...(h.obras ?? []), h.otraObra].filter(Boolean)),
     updatedAt: new Date(),
     filas,
   });
@@ -284,45 +294,31 @@ export function EditorProfesional({
               })}
             </div>
           </fieldset>
-          <label className="grid gap-1">
-            WhatsApp
-            <input className="campo" value={borrador.whatsapp} onChange={(event) => cambiar({ whatsapp: event.target.value })} />
-          </label>
-          <label className="grid gap-1">
-            Teléfono fijo
-            <input className="campo" value={borrador.phone} onChange={(event) => cambiar({ phone: event.target.value })} />
-          </label>
-          <fieldset className="grid gap-3">
-            <legend className="font-semibold">Obra social</legend>
-            <div className="flex flex-wrap gap-2">
-              {catalogo.map((obra) => {
-                const activa = borrador.obras.includes(obra);
-                return (
-                  <label key={obra} className={activa ? "pastilla pastilla-activa" : "pastilla"}>
-                    <input
-                      className="sr-only"
-                      type="checkbox"
-                      checked={activa}
-                      onChange={(event) =>
-                        cambiar({
-                          obras: event.target.checked
-                            ? [...borrador.obras, obra]
-                            : borrador.obras.filter((item) => item !== obra),
-                        })
-                      }
-                    />
-                    {obra}
-                  </label>
-                );
-              })}
-            </div>
+          <fieldset className="grid gap-3 rounded-2xl border border-line bg-[#f8fafc] p-4">
+            <legend className="font-semibold">Secretaría / agenda del profesional (opcional)</legend>
+            <p className="text-sm text-muted">
+              Si el médico tiene secretaría propia para todos sus lugares, cargala acá. Para turnos en cada centro usá el
+              contacto del lugar (abajo en cada sede).
+            </p>
             <label className="grid gap-1">
-              Otra
-              <input className="campo" value={borrador.otraObra} onChange={(event) => cambiar({ otraObra: event.target.value })} />
+              WhatsApp de agenda
+              <input
+                className="campo"
+                value={borrador.agendaWhatsapp}
+                onChange={(event) => cambiar({ agendaWhatsapp: event.target.value })}
+              />
+            </label>
+            <label className="grid gap-1">
+              Teléfono de agenda
+              <input
+                className="campo"
+                value={borrador.agendaPhone}
+                onChange={(event) => cambiar({ agendaPhone: event.target.value })}
+              />
             </label>
           </fieldset>
           <label className="grid gap-1">
-            Precio de la consulta, si querés publicarlo
+            Precio de la consulta (opcional, sobre todo si atiende particular)
             <input className="campo" value={borrador.price} onChange={(event) => cambiar({ price: event.target.value })} />
           </label>
         </section>
@@ -382,6 +378,48 @@ export function EditorProfesional({
                   legacy={horario.scheduleLegacy}
                   onChange={(schedule) => cambiarHorario(horario.key, { schedule })}
                 />
+              ) : null}
+              {horario.placeId ? (
+                <fieldset className="grid gap-2">
+                  <legend className="text-sm font-semibold">Obra social en {horario.placeName || "este lugar"}</legend>
+                  <button
+                    type="button"
+                    className="boton-suave w-fit text-sm"
+                    onClick={() => cambiarHorario(horario.key, { obras: ["Particular"], otraObra: "" })}
+                  >
+                    Solo atiende particular
+                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    {catalogo.map((obra) => {
+                      const lista = horario.obras ?? [];
+                      const activa = lista.includes(obra);
+                      return (
+                        <label key={`${horario.key}-${obra}`} className={activa ? "pastilla pastilla-activa" : "pastilla"}>
+                          <input
+                            className="sr-only"
+                            type="checkbox"
+                            checked={activa}
+                            onChange={(event) => {
+                              const actual = horario.obras ?? [];
+                              cambiarHorario(horario.key, {
+                                obras: event.target.checked
+                                  ? [...actual, obra]
+                                  : actual.filter((item) => item !== obra),
+                              });
+                            }}
+                          />
+                          {obra}
+                        </label>
+                      );
+                    })}
+                  </div>
+                  <input
+                    className="campo"
+                    placeholder="Otra obra en este lugar"
+                    value={horario.otraObra ?? ""}
+                    onChange={(event) => cambiarHorario(horario.key, { otraObra: event.target.value })}
+                  />
+                </fieldset>
               ) : null}
               {!modoSecretaria ? (
                 <button

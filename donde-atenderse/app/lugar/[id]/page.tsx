@@ -15,7 +15,9 @@ export default async function PaginaLugar({ params }: { params: Promise<{ id: st
     include: {
       obras: { include: { obra: true } },
       studies: { orderBy: { name: "asc" } },
-      attendances: { include: { place: true, professional: true } },
+      attendances: {
+        include: { place: true, professional: true, obras: { include: { obra: true } } },
+      },
     },
   });
   if (!lugar || !lugar.published || lugar.kind === "farmacia" || (!mostrarDatosEjemplo() && lugar.example)) notFound();
@@ -34,6 +36,7 @@ export default async function PaginaLugar({ params }: { params: Promise<{ id: st
     obras: lugar.obras.map((item) => item.obra.name),
     cantidadProfesionales: equipo.cantidad,
     especialidades: equipo.especialidades,
+    specialtiesPlace: lugar.specialties,
     updatedAt: lugar.updatedAt,
     services: lugar.services,
     studies: lugar.studies,

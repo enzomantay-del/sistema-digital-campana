@@ -32,6 +32,8 @@ export function horarioBorradorParaLugar(lugar: {
     placeShift: "",
     placeTime: "",
     placeUpdatedAt: null,
+    obras: [],
+    otraObra: "",
   };
 }
 
@@ -45,14 +47,21 @@ export function borradorDesdeProfesional(
     photoUrl: string;
     whatsapp: string;
     phone: string;
+    agendaWhatsapp: string;
+    agendaPhone: string;
     price: string;
     priceUpdatedAt: Date | null;
     obras: { obra: { name: string } }[];
-    attendances: Array<Parameters<typeof horarioProfesional>[0]>;
+    attendances: Array<
+      Parameters<typeof horarioProfesional>[0] & {
+        obras?: { obra: { name: string } }[];
+      }
+    >;
   },
   opts: { placeIds?: string[]; editorEnLugar: (placeId: string) => boolean },
 ): BorradorProfesional & { priceUpdatedAt: string | null } {
   const especialidades = especialidadesDesdeCampo(completo.specialties);
+  const fallbackObras = completo.obras.map((item) => item.obra.name);
   const attendances = opts.placeIds
     ? completo.attendances.filter((item) => opts.placeIds!.includes(item.placeId))
     : completo.attendances;
@@ -66,10 +75,18 @@ export function borradorDesdeProfesional(
     photoUrl: completo.photoUrl,
     whatsapp: completo.whatsapp,
     phone: completo.phone,
+    agendaWhatsapp: completo.agendaWhatsapp,
+    agendaPhone: completo.agendaPhone,
     price: completo.price,
     priceUpdatedAt: completo.priceUpdatedAt ? completo.priceUpdatedAt.toISOString() : null,
-    obras: completo.obras.map((item) => item.obra.name),
+    obras: [],
     otraObra: "",
-    horarios: attendances.map((item) => horarioProfesional(item, opts.editorEnLugar(item.placeId))),
+    horarios: attendances.map((item) => {
+      const base = horarioProfesional(item, opts.editorEnLugar(item.placeId));
+      const obras =
+        item.obras?.map((fila) => fila.obra.name).filter(Boolean) ??
+        (base.obras.length ? base.obras : fallbackObras);
+      return { ...base, obras, otraObra: "" };
+    }),
   };
 }

@@ -21,6 +21,8 @@ export type HorarioBorrador = {
   placeShift: string;
   placeTime: string;
   placeUpdatedAt: string | null;
+  obras: string[];
+  otraObra: string;
 };
 
 export type BorradorProfesional = {
@@ -32,6 +34,8 @@ export type BorradorProfesional = {
   photoUrl: string;
   whatsapp: string;
   phone: string;
+  agendaWhatsapp: string;
+  agendaPhone: string;
   price: string;
   obras: string[];
   otraObra: string;

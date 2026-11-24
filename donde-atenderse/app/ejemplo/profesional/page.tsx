@@ -39,6 +39,8 @@ export default async function PaginaProfesionalEjemplo() {
     priceUpdatedAt: persona.priceUpdatedAt,
     whatsapp: persona.whatsapp,
     phone: persona.phone,
+    agendaWhatsapp: persona.agendaWhatsapp,
+    agendaPhone: persona.agendaPhone,
     obras: persona.obras.map((item) => item.obra.name),
     updatedAt: persona.updatedAt,
     filas: persona.attendances.map(filaHorario),

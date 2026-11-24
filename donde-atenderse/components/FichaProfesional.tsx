@@ -58,7 +58,7 @@ export function FichaProfesional({
                 <p className="text-base text-muted">Es una guardia, no un horario de consultorio.</p>
               ) : null}
               {bloque.lineas.map((linea) => (
-                <div key={linea.id} className="border-t border-line pt-4">
+                <div key={linea.id} className="grid gap-2 border-t border-line pt-4">
                   {enlazar ? (
                     <Link href={`/lugar/${linea.placeId}`} className="text-xl font-semibold text-link">
                       {linea.rotulo}
@@ -74,7 +74,35 @@ export function FichaProfesional({
                       />
                     </div>
                   ) : null}
-                  <p className="mt-2 text-xs text-muted">{linea.actualizacion}</p>
+                  {linea.obras.length > 0 ? (
+                    <p className="text-sm">
+                      <span className="text-muted">Obra social en este lugar: </span>
+                      {linea.obras.join(" · ")}
+                    </p>
+                  ) : null}
+                  {linea.placeWhatsapp || linea.placePhone ? (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      <span className="text-sm text-muted">Turnos en el lugar:</span>
+                      {linea.placeWhatsapp && !ejemplo ? (
+                        <a
+                          className="boton-suave gap-2 text-sm"
+                          href={enlaceWhatsApp(linea.placeWhatsapp, MENSAJE_WHATSAPP)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <IconoCercalud nombre="mensaje" size={16} className="text-link" />
+                          WhatsApp
+                        </a>
+                      ) : null}
+                      {linea.placePhone && !ejemplo ? (
+                        <a className="boton-suave gap-2 text-sm" href={enlaceTelefono(linea.placePhone)}>
+                          <IconoCercalud nombre="telefono" size={16} className="text-link" />
+                          Teléfono
+                        </a>
+                      ) : null}
+                    </div>
+                  ) : null}
+                  <p className="mt-1 text-xs text-muted">{linea.actualizacion}</p>
                   {linea.conflictoTexto ? <p className="mt-1 text-base text-warn">{linea.conflictoTexto}</p> : null}
                 </div>
               ))}
@@ -83,19 +111,6 @@ export function FichaProfesional({
         </div>
       )}
 
-      {vista.obras.length > 0 ? (
-        <section className="grid gap-2">
-          <h2 className="text-xl font-semibold">Obra social</h2>
-          <div className="flex flex-wrap gap-2">
-            {vista.obras.map((obra) => (
-              <span key={obra} className="pastilla pastilla-activa">
-                {obra}
-              </span>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
       {vista.precio ? (
         <p>
           Precio de la consulta: {vista.precio}.
@@ -103,44 +118,39 @@ export function FichaProfesional({
         </p>
       ) : null}
 
-      {vista.whatsapp || vista.telefono ? (
+      {vista.agendaWhatsapp || vista.agendaTelefono ? (
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold">Contacto</h2>
+          <h2 className="text-xl font-semibold">Agenda del profesional</h2>
+          <p className="text-sm text-muted">Contacto de secretaría del médico (válido para todas sus sedes).</p>
           <div className="flex flex-wrap gap-3">
-            {vista.whatsapp ? (
+            {vista.agendaWhatsapp ? (
               ejemplo ? (
-                <span className="boton w-fit cursor-default opacity-80">WhatsApp</span>
+                <span className="boton w-fit cursor-default opacity-80">WhatsApp agenda</span>
               ) : (
                 <a
                   className="boton w-fit gap-2"
-                  href={enlaceWhatsApp(vista.whatsapp, MENSAJE_WHATSAPP)}
+                  href={enlaceWhatsApp(vista.agendaWhatsapp, MENSAJE_WHATSAPP)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <IconoCercalud nombre="mensaje" size={18} className="text-white/95" />
-                  WhatsApp
+                  WhatsApp agenda
                 </a>
               )
             ) : null}
-            {vista.telefono ? (
+            {vista.agendaTelefono ? (
               ejemplo ? (
-                <span className="boton-suave w-fit cursor-default opacity-80">Teléfono fijo</span>
+                <span className="boton-suave w-fit cursor-default opacity-80">Teléfono agenda</span>
               ) : (
-                <a className="boton-suave w-fit gap-2" href={enlaceTelefono(vista.telefono)}>
+                <a className="boton-suave w-fit gap-2" href={enlaceTelefono(vista.agendaTelefono)}>
                   <IconoCercalud nombre="telefono" size={18} className="text-link" />
-                  Teléfono fijo
+                  Teléfono agenda
                 </a>
               )
             ) : null}
           </div>
         </section>
-      ) : (
-        <p className="text-muted">Todavía no hay datos de contacto cargados.</p>
-      )}
-      {ejemplo && vista.whatsapp ? (
-        <p className="text-base text-muted">En una ficha real, estos botones abren el chat o el teléfono.</p>
       ) : null}
-
       <p className="text-xs text-muted">{vista.actualizacion}</p>
     </article>
   );

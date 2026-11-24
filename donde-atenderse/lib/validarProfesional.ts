@@ -1,5 +1,9 @@
 import type { BorradorProfesional } from "@/lib/draft";
 
+function obrasDelHorario(horario: BorradorProfesional["horarios"][number]) {
+  return [...(horario.obras ?? []), horario.otraObra?.trim() ?? ""].filter(Boolean);
+}
+
 export function validarBorradorProfesional(
   borrador: BorradorProfesional,
   opts: { exigeHorario: boolean; tieneFoto: boolean },
@@ -12,9 +16,12 @@ export function validarBorradorProfesional(
   if (opts.exigeHorario) {
     const conLugar = borrador.horarios.filter((h) => h.placeId && !h.sugerido);
     if (conLugar.length === 0) return "Indicá al menos un lugar de atención con horario.";
-  }
-  if (borrador.obras.length === 0 && !borrador.otraObra.trim()) {
-    return "Marcá al menos una obra social que atiende.";
+    for (const horario of conLugar) {
+      const obras = obrasDelHorario(horario);
+      if (obras.length === 0) {
+        return `En ${horario.placeName || "el lugar"}, marcá las obras que atiende o «Solo particular».`;
+      }
+    }
   }
   return null;
 }

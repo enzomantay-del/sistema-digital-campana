@@ -32,6 +32,8 @@ model Professional {
   photoUrl       String             @default("")
   whatsapp       String             @default("")
   phone          String             @default("")
+  agendaWhatsapp String             @default("")
+  agendaPhone    String             @default("")
   price          String             @default("")
   priceUpdatedAt DateTime?
   example        Boolean            @default(false)
@@ -55,6 +57,7 @@ model Place {
   scheduleNote  String         @default("")
   // IDs de SERVICIOS_LUGAR separados por coma
   services      String         @default("")
+  specialties   String         @default("")
   obrasMode     String         @default("del_lugar")
   example       Boolean        @default(false)
   published     Boolean        @default(false)
@@ -85,6 +88,7 @@ model ObraSocial {
   name          String             @unique
   professionals ProfessionalObra[]
   places        PlaceObra[]
+  attendances   AttendanceObra[]
 }
 
 model ProfessionalObra {
@@ -120,6 +124,16 @@ model Attendance {
   placeUpdatedAt        DateTime?
   professional          Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
   place                 Place        @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  obras                 AttendanceObra[]
+}
+
+model AttendanceObra {
+  attendanceId String
+  obraId       String
+  attendance   Attendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
+  obra         ObraSocial @relation(fields: [obraId], references: [id], onDelete: Cascade)
+
+  @@id([attendanceId, obraId])
 }
 
 model Study {

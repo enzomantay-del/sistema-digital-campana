@@ -1,3 +1,4 @@
+import { especialidadesDesdeCampo } from "./especialidades";
 import { prisma } from "./prisma";
 import { filtroProfesionalPublico } from "./publico";
 import { lineasHorarioAtencion } from "./horarioTexto";
@@ -51,7 +52,7 @@ export function filaAProfesionalEnLugar(
   return {
     id: fila.professional.id,
     fullName: fila.professional.fullName,
-    specialty: fila.professional.specialty.trim() || "Especialidad sin cargar",
+    specialty: especialidadesDePersona(fila.professional).join(" · "),
     area: fila.professional.area,
     photoUrl: fila.professional.photoUrl.trim(),
     whatsapp: fila.professional.whatsapp.trim(),
@@ -63,12 +64,23 @@ export function filaAProfesionalEnLugar(
   };
 }
 
+function especialidadesDePersona(persona: { specialty: string; specialties?: string }) {
+  const lista = especialidadesDesdeCampo(persona.specialties);
+  if (lista.length) return lista;
+  return persona.specialty.trim() ? [persona.specialty.trim()] : ["Especialidad sin cargar"];
+}
+
 export function agruparPorEspecialidad(lista: ProfesionalEnLugar[]) {
   const mapa = new Map<string, ProfesionalEnLugar[]>();
   for (const persona of lista) {
-    const grupo = mapa.get(persona.specialty) ?? [];
-    grupo.push(persona);
-    mapa.set(persona.specialty, grupo);
+    const etiquetas = persona.specialty.includes("·")
+      ? persona.specialty.split("·").map((t) => t.trim())
+      : [persona.specialty];
+    for (const etiqueta of etiquetas) {
+      const grupo = mapa.get(etiqueta) ?? [];
+      if (!grupo.some((p) => p.id === persona.id)) grupo.push(persona);
+      mapa.set(etiqueta, grupo);
+    }
   }
   return [...mapa.entries()].sort(([a], [b]) => a.localeCompare(b, "es"));
 }
@@ -91,7 +103,14 @@ export async function equipoPublicadoEnLugar(placeId: string) {
     });
 
   const especialidades = Array.from(
-    new Set(profesionalesDetalle.map((persona) => persona.specialty)),
+    new Set(
+      filas.flatMap((fila) =>
+        especialidadesDePersona({
+          specialty: fila.professional.specialty,
+          specialties: fila.professional.specialties,
+        }),
+      ),
+    ),
   ).sort((a, b) => a.localeCompare(b, "es"));
 
   return { profesionales, profesionalesDetalle, especialidades, cantidad: profesionales.length };

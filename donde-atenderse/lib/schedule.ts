@@ -12,6 +12,9 @@ export type FilaHorario = {
   placeTime: string;
   placeShift: string;
   placeUpdatedAt: Date | null;
+  placeWhatsapp?: string;
+  placePhone?: string;
+  obrasEnLugar?: string[];
 };
 
 export type LineaHorario = {
@@ -31,6 +34,9 @@ export type LineaHorario = {
     time: string;
     updatedAt: Date | null;
   };
+  placeWhatsapp?: string;
+  placePhone?: string;
+  obrasLugar?: string[];
 };
 
 import { lineasHorarioAtencion, lineasHorarioLegacy } from "./horarioTexto";
@@ -43,6 +49,14 @@ function masReciente(a: Date | null, b: Date | null) {
   if (!a) return b;
   if (!b) return a;
   return a > b ? a : b;
+}
+
+function datosPublicosFila(fila: FilaHorario) {
+  return {
+    placeWhatsapp: fila.placeWhatsapp ?? "",
+    placePhone: fila.placePhone ?? "",
+    obrasLugar: fila.obrasEnLugar ?? [],
+  };
 }
 
 export function lineaHorario(fila: FilaHorario): LineaHorario | null {
@@ -82,6 +96,7 @@ export function lineaHorario(fila: FilaHorario): LineaHorario | null {
         : fila.professionalUpdatedAt,
       source: lugarMasNuevo ? "lugar" : profesional ? "profesional" : "lugar",
       conflict: null,
+      ...datosPublicosFila(fila),
     };
   }
 
@@ -99,6 +114,7 @@ export function lineaHorario(fila: FilaHorario): LineaHorario | null {
       updatedAt: fila.placeUpdatedAt,
       source: "lugar",
       conflict: null,
+      ...datosPublicosFila(fila),
     };
   }
 
@@ -119,6 +135,7 @@ export function lineaHorario(fila: FilaHorario): LineaHorario | null {
       time: fila.placeTime,
       updatedAt: fila.placeUpdatedAt,
     },
+    ...datosPublicosFila(fila),
   };
 }
 

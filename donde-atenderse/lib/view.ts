@@ -13,6 +13,7 @@ export type VistaLinea = LineaHorario & {
   conflictoTexto: string;
   rotulo: string;
   personaId?: string;
+  obras: string[];
 };
 
 export type VistaProfesional = {
@@ -26,6 +27,8 @@ export type VistaProfesional = {
   precioFecha: string;
   whatsapp: string;
   telefono: string;
+  agendaWhatsapp: string;
+  agendaTelefono: string;
   obras: string[];
   actualizacion: string;
   datosVerificados: boolean;
@@ -89,6 +92,7 @@ function decorar(linea: LineaHorario, nombreProfesional: string, rotulo: string,
     conflictoTexto: conflictoTexto(linea),
     rotulo,
     personaId,
+    obras: linea.obrasLugar ?? [],
   };
 }
 
@@ -117,7 +121,9 @@ export function armarVistaProfesional(input: {
   priceUpdatedAt: Date | null;
   whatsapp: string;
   phone: string;
-  obras: string[];
+  agendaWhatsapp?: string;
+  agendaPhone?: string;
+  obras?: string[];
   updatedAt: Date | null;
   filas: FilaHorario[];
 }): VistaProfesional {
@@ -149,7 +155,11 @@ export function armarVistaProfesional(input: {
     precioFecha: input.price.trim() ? fecha(input.priceUpdatedAt) : "",
     whatsapp: input.whatsapp.trim(),
     telefono: input.phone.trim(),
-    obras: input.obras,
+    agendaWhatsapp: input.agendaWhatsapp?.trim() ?? "",
+    agendaTelefono: input.agendaPhone?.trim() ?? "",
+    obras: input.obras?.length
+      ? input.obras
+      : [...new Set(lineas.flatMap((linea) => linea.obrasLugar ?? []))].sort((a, b) => a.localeCompare(b, "es")),
     actualizacion: frase(ultima, nombre),
     datosVerificados: datosActualizadosRecientes(
       fechaMasReciente(input.updatedAt, ...input.filas.map((fila) => fila.professionalUpdatedAt)),
@@ -172,6 +182,7 @@ export function armarVistaLugar(input: {
   obras: string[];
   cantidadProfesionales: number;
   especialidades: string[];
+  specialtiesPlace?: string | null;
   updatedAt: Date | null;
   services?: string | null;
   servicios?: string[];
@@ -202,7 +213,12 @@ export function armarVistaLugar(input: {
     mostrarObrasLista: obrasPresentacion.mostrarLista,
     placeId: input.placeId,
     cantidadProfesionales: input.cantidadProfesionales,
-    especialidades: input.especialidades,
+    especialidades: [
+      ...new Set([
+        ...especialidadesDesdeCampo(input.specialtiesPlace),
+        ...input.especialidades,
+      ]),
+    ].sort((a, b) => a.localeCompare(b, "es")),
     actualizacion: frase(input.updatedAt, input.name),
     datosVerificados: datosActualizadosRecientes(
       fechaMasReciente(input.updatedAt, ...input.filas.map((fila) => fila.placeUpdatedAt)),

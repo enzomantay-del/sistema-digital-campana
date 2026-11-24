@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { BuscarMatriculaProfesional } from "@/components/BuscarMatriculaProfesional";
+import { EspecialidadesLugarEditor } from "@/components/EspecialidadesLugarEditor";
 import { esSecretaria, usuarioActual } from "@/lib/auth";
+import { especialidadesDesdeCampo } from "@/lib/especialidades";
 import { prisma } from "@/lib/prisma";
 
 export default async function CargasPorLugar({ params }: { params: Promise<{ placeId: string }> }) {
@@ -29,6 +31,8 @@ export default async function CargasPorLugar({ params }: { params: Promise<{ pla
         <h1 className="text-3xl font-bold tracking-tight">{lugar.name}</h1>
         <p className="text-muted">{lugar.locality} · Cargá fichas y horarios de los profesionales que atienden acá.</p>
       </header>
+
+      <EspecialidadesLugarEditor placeId={placeId} iniciales={especialidadesDesdeCampo(lugar.specialties)} />
 
       <BuscarMatriculaProfesional placeId={placeId} />
 

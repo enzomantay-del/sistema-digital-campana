@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 import { EditorProfesional } from "@/components/EditorProfesional";
 import { AccionesAdmin } from "@/components/AccionesAdmin";
 import { requiereAdmin } from "@/lib/auth";
-import { especialidadesDesdeCampo } from "@/lib/especialidades";
-import { horarioProfesional } from "@/lib/map";
+import { borradorDesdeProfesional } from "@/lib/cargarBorradorProfesional";
 import { prisma } from "@/lib/prisma";
 import { catalogoObras } from "@/lib/search";
 
@@ -22,7 +21,7 @@ export default async function EditarProfesionalAdmin({
     where: { id },
     include: {
       obras: { include: { obra: true } },
-      attendances: { include: { place: true } },
+      attendances: { include: { place: true, obras: { include: { obra: true } } } },
       user: true,
     },
   });
@@ -31,7 +30,7 @@ export default async function EditarProfesionalAdmin({
   const [lugares, obras] = await Promise.all([
     prisma.place.findMany({
       where: { published: true, kind: { not: "farmacia" } },
-      select: { id: true, name: true, locality: true, kind: true },
+      select: { id: true, name: true, locality: true, kind: true, whatsapp: true, phone: true },
       orderBy: [{ locality: "asc" }, { name: "asc" }],
     }),
     catalogoObras(),
@@ -95,25 +94,7 @@ export default async function EditarProfesionalAdmin({
         lugares={lugares}
         revisada={persona.reviewed}
         publicada={persona.published}
-        inicial={{
-          fullName: persona.fullName,
-          license: persona.license,
-          area: persona.area,
-          specialty: persona.specialty,
-          specialties: especialidadesDesdeCampo(persona.specialties).length
-            ? especialidadesDesdeCampo(persona.specialties)
-            : persona.specialty
-              ? [persona.specialty]
-              : [],
-          photoUrl: persona.photoUrl,
-          whatsapp: persona.whatsapp,
-          phone: persona.phone,
-          price: persona.price,
-          priceUpdatedAt: persona.priceUpdatedAt ? persona.priceUpdatedAt.toISOString() : null,
-          obras: persona.obras.map((item) => item.obra.name),
-          otraObra: "",
-          horarios: persona.attendances.map((item) => horarioProfesional(item, false)),
-        }}
+        inicial={borradorDesdeProfesional(persona, { editorEnLugar: () => false })}
       />
     </div>
   );

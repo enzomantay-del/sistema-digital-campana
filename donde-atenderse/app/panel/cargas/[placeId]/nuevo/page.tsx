@@ -42,6 +42,8 @@ export default async function NuevaFichaEnLugar({ params }: { params: Promise<{ 
           photoUrl: "",
           whatsapp: "",
           phone: "",
+          agendaWhatsapp: "",
+          agendaPhone: "",
           price: "",
           priceUpdatedAt: null,
           obras: [],

@@ -11,7 +11,10 @@ export default async function PaginaProfesional({ params }: { params: Promise<{ 
   const { id } = await params;
   const persona = await prisma.professional.findUnique({
     where: { id },
-    include: { obras: { include: { obra: true } }, attendances: { include: { place: true } } },
+    include: {
+      obras: { include: { obra: true } },
+      attendances: { include: { place: true, obras: { include: { obra: true } } } },
+    },
   });
   if (!persona || !persona.published || (!mostrarDatosEjemplo() && persona.example)) notFound();
   const vista = armarVistaProfesional({
@@ -25,6 +28,8 @@ export default async function PaginaProfesional({ params }: { params: Promise<{ 
     priceUpdatedAt: persona.priceUpdatedAt,
     whatsapp: persona.whatsapp,
     phone: persona.phone,
+    agendaWhatsapp: persona.agendaWhatsapp,
+    agendaPhone: persona.agendaPhone,
     obras: persona.obras.map((item) => item.obra.name),
     updatedAt: persona.updatedAt,
     filas: asistenciasEnLugaresPublicados(persona.attendances).map(filaHorario),

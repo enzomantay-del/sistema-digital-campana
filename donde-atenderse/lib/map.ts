@@ -15,8 +15,9 @@ export function filaHorario(item: {
   placeTime: string;
   placeShift: string;
   placeUpdatedAt: Date | null;
-  place: { name: string; locality: string };
+  place: { name: string; locality: string; whatsapp?: string; phone?: string };
   professional?: { fullName: string };
+  obras?: { obra: { name: string } }[];
 }): FilaHorario & { professionalId: string; professionalName: string } {
   return {
     id: item.id,
@@ -34,6 +35,9 @@ export function filaHorario(item: {
     placeUpdatedAt: item.placeUpdatedAt,
     professionalId: item.professionalId ?? "",
     professionalName: item.professional?.fullName ?? "",
+    placeWhatsapp: item.place.whatsapp ?? "",
+    placePhone: item.place.phone ?? "",
+    obrasEnLugar: item.obras?.map((fila) => fila.obra.name) ?? [],
   };
 }
 
@@ -56,7 +60,10 @@ export function horarioProfesional(
       kind: string;
       published: boolean;
       suggestedById: string | null;
+      whatsapp?: string;
+      phone?: string;
     };
+    obras?: { obra: { name: string } }[];
   },
   ownsPlace: boolean,
 ) {
@@ -86,6 +93,8 @@ export function horarioProfesional(
     placeShift: item.placeShift,
     placeTime: item.placeTime,
     placeUpdatedAt: item.placeUpdatedAt ? item.placeUpdatedAt.toISOString() : null,
+    obras: item.obras?.map((fila) => fila.obra.name) ?? [],
+    otraObra: "",
   };
 }
 

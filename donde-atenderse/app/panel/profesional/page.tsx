@@ -1,10 +1,9 @@
 import { redirect } from "next/navigation";
 import { esAdmin, esProfesional, esSecretaria } from "@/lib/auth";
-import { especialidadesDesdeCampo } from "@/lib/especialidades";
 import { AvisoFotosHosting } from "@/components/AvisoFotosHosting";
 import { EditorProfesional } from "@/components/EditorProfesional";
 import { usuarioActual } from "@/lib/auth";
-import { horarioProfesional } from "@/lib/map";
+import { borradorDesdeProfesional } from "@/lib/cargarBorradorProfesional";
 import { prisma } from "@/lib/prisma";
 import { catalogoObras } from "@/lib/search";
 
@@ -28,13 +27,13 @@ export default async function PaginaEditorProfesional() {
     where: { id: professional.id },
     include: {
       obras: { include: { obra: true } },
-      attendances: { include: { place: true } },
+      attendances: { include: { place: true, obras: { include: { obra: true } } } },
     },
   });
   const [lugares, obras] = await Promise.all([
     prisma.place.findMany({
       where: { published: true, kind: { not: "farmacia" } },
-      select: { id: true, name: true, locality: true, kind: true },
+      select: { id: true, name: true, locality: true, kind: true, whatsapp: true, phone: true },
       orderBy: [{ locality: "asc" }, { name: "asc" }],
     }),
     catalogoObras(),
@@ -50,25 +49,9 @@ export default async function PaginaEditorProfesional() {
       lugares={lugares}
       revisada={completo.reviewed}
       publicada={completo.published}
-      inicial={{
-        fullName: completo.fullName,
-        license: completo.license,
-        area: completo.area,
-        specialty: completo.specialty,
-        specialties: especialidadesDesdeCampo(completo.specialties).length
-          ? especialidadesDesdeCampo(completo.specialties)
-          : completo.specialty
-            ? [completo.specialty]
-            : [],
-        photoUrl: completo.photoUrl,
-        whatsapp: completo.whatsapp,
-        phone: completo.phone,
-        price: completo.price,
-        priceUpdatedAt: completo.priceUpdatedAt ? completo.priceUpdatedAt.toISOString() : null,
-        obras: completo.obras.map((item) => item.obra.name),
-        otraObra: "",
-        horarios: completo.attendances.map((item) => horarioProfesional(item, propios.has(item.placeId))),
-      }}
+      inicial={borradorDesdeProfesional(completo, {
+        editorEnLugar: (placeId) => propios.has(placeId),
+      })}
       />
     </div>
   );

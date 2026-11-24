@@ -24,7 +24,7 @@ export default async function EditarFichaEnLugar({
     where: { id: professionalId },
     include: {
       obras: { include: { obra: true } },
-      attendances: { include: { place: true } },
+      attendances: { include: { place: true, obras: { include: { obra: true } } } },
     },
   });
   if (!completo) notFound();

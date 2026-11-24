@@ -146,21 +146,18 @@ async function guardarProfesionalInterno(
       specialties: specialtiesCampo,
       whatsapp: borrador.whatsapp.trim(),
       phone: borrador.phone.trim(),
+      agendaWhatsapp: borrador.agendaWhatsapp.trim(),
+      agendaPhone: borrador.agendaPhone.trim(),
       price,
       priceUpdatedAt: precioCambio ? new Date() : professional.priceUpdatedAt,
     },
   });
 
-  const nombres = [...borrador.obras, borrador.otraObra].map((item) => item.trim()).filter(Boolean);
-  const ids = (await Promise.all(nombres.map(obraId))).filter((id): id is string => Boolean(id));
-  await prisma.professionalObra.deleteMany({ where: { professionalId: professional.id } });
-  if (ids.length) {
-    await prisma.professionalObra.createMany({
-      data: ids.map((id) => ({ professionalId: professional.id, obraId: id })),
-    });
-  }
-
-  const actuales = await prisma.attendance.findMany({ where: { professionalId: professional.id } });
+  const actuales = await prisma.attendance.findMany({
+    where: { professionalId: professional.id },
+    include: { obras: true },
+  });
+  const obrasProfesional = new Set<string>();
   const conservados = new Set<string>();
   const rows: { key: string; id: string; placeId: string }[] = [];
   const ahora = new Date();
@@ -212,17 +209,38 @@ async function guardarProfesionalInterno(
         : {}),
     };
 
+    const attendanceId = existente
+      ? existente.id
+      : (
+          await prisma.attendance.create({
+            data: { professionalId: professional.id, ...dataProfesional },
+          })
+        ).id;
+
     if (existente) {
-      await prisma.attendance.update({ where: { id: existente.id }, data: dataProfesional });
-      conservados.add(existente.id);
-      rows.push({ key: horario.key, id: existente.id, placeId });
-    } else {
-      const creado = await prisma.attendance.create({
-        data: { professionalId: professional.id, ...dataProfesional },
-      });
-      conservados.add(creado.id);
-      rows.push({ key: horario.key, id: creado.id, placeId });
+      await prisma.attendance.update({ where: { id: attendanceId }, data: dataProfesional });
     }
+
+    const nombresObra = [...(horario.obras ?? []), horario.otraObra ?? ""].map((item) => item.trim()).filter(Boolean);
+    const idsObra = (await Promise.all(nombresObra.map(obraId))).filter((id): id is string => Boolean(id));
+    nombresObra.forEach((nombre) => obrasProfesional.add(nombre));
+    await prisma.attendanceObra.deleteMany({ where: { attendanceId } });
+    if (idsObra.length) {
+      await prisma.attendanceObra.createMany({
+        data: idsObra.map((obraIdItem) => ({ attendanceId, obraId: obraIdItem })),
+      });
+    }
+
+    conservados.add(attendanceId);
+    rows.push({ key: horario.key, id: attendanceId, placeId });
+  }
+
+  const idsUnion = (await Promise.all([...obrasProfesional].map(obraId))).filter((id): id is string => Boolean(id));
+  await prisma.professionalObra.deleteMany({ where: { professionalId: professional.id } });
+  if (idsUnion.length) {
+    await prisma.professionalObra.createMany({
+      data: idsUnion.map((id) => ({ professionalId: professional.id, obraId: id })),
+    });
   }
 
   for (const item of actuales) {

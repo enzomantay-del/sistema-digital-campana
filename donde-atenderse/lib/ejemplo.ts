@@ -9,13 +9,19 @@ export const RUTA_PROFESIONAL_EJEMPLO = "/ejemplo/profesional";
 export async function profesionalEjemploModelo() {
   const modelo = await prisma.professional.findFirst({
     where: { example: true, fullName: PROFESIONAL_EJEMPLO_MODELO, published: true },
-    include: { obras: { include: { obra: true } }, attendances: { include: { place: true } } },
+    include: {
+      obras: { include: { obra: true } },
+      attendances: { include: { place: true, obras: { include: { obra: true } } } },
+    },
   });
   if (modelo) return modelo;
 
   return prisma.professional.findFirst({
     where: { example: true, published: true },
     orderBy: { fullName: "asc" },
-    include: { obras: { include: { obra: true } }, attendances: { include: { place: true } } },
+    include: {
+      obras: { include: { obra: true } },
+      attendances: { include: { place: true, obras: { include: { obra: true } } } },
+    },
   });
 }
