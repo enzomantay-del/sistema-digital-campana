@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Buscador } from "@/components/Buscador";
 import { EspacioPublicitario } from "@/components/EspacioPublicitario";
+import { PublicidadCreatividad } from "@/components/PublicidadCreatividad";
 import { LayoutListadoConPublicidad } from "@/components/LayoutListadoConPublicidad";
 import { IconoCercalud, type NombreIconoCercalud } from "@/components/iconos/IconoCercalud";
 import { TarjetaListadoLugar } from "@/components/TarjetaListadoLugar";
@@ -118,7 +119,7 @@ export default async function PaginaBuscar({
         }
       />
       <div className="w-full py-0.5">
-        <EspacioPublicitario formato="banner" anchoFila />
+        <PublicidadCreatividad formato="banner" anchoFila />
       </div>
       <p className="text-muted">
         {centrosSalud && !q ? (

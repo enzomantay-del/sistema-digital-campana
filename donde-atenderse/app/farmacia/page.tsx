@@ -1,5 +1,6 @@
 import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { EspacioPublicitario } from "@/components/EspacioPublicitario";
+import { PublicidadCreatividad } from "@/components/PublicidadCreatividad";
 import { FarmaciaTurnoPagina, type FarmaciaTurnoPorLocalidad } from "@/components/FarmaciaTurnoPagina";
 import { LayoutFarmaciaConPublicidad } from "@/components/LayoutFarmaciaConPublicidad";
 import { LOCALIDADES } from "@/lib/constants";
@@ -48,7 +49,7 @@ export default async function PaginaFarmacia() {
           otras localidades del corredor si lo necesitás.
         </p>
       </header>
-      <EspacioPublicitario formato="banner" anchoFila descripcion="Banda a todo el ancho · ideal para cadenas de farmacia." />
+      <PublicidadCreatividad formato="banner" anchoFila />
       <div className="w-full max-w-3xl">
         <FarmaciaTurnoPagina porLocalidad={porLocalidad} />
       </div>

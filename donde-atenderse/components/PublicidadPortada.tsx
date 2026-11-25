@@ -1,9 +1,6 @@
-import { EspacioPublicitario } from "@/components/EspacioPublicitario";
-import { PublicidadPruebaInicio } from "@/components/PublicidadPruebaInicio";
-import { mostrarDatosEjemplo } from "@/lib/config";
+import { PublicidadCreatividad } from "@/components/PublicidadCreatividad";
 
 /** Banda principal bajo el buscador en inicio. */
 export function PublicidadPortada() {
-  if (mostrarDatosEjemplo()) return <PublicidadPruebaInicio />;
-  return <EspacioPublicitario formato="leaderboard" />;
+  return <PublicidadCreatividad formato="leaderboard" anchoFila />;
 }

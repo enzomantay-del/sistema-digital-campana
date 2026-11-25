@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EspacioPublicitario } from "@/components/EspacioPublicitario";
 import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { contactoEmail, contactoWhatsApp } from "@/lib/config";
 import { enlaceWhatsApp } from "@/lib/format";
@@ -37,6 +38,7 @@ export default function PaginaContacto() {
           Los turnos no se gestionan desde Cercalud: contactá al profesional o al lugar desde su ficha publicada.
         </p>
       </section>
+      <EspacioPublicitario formato="mpu" descripcion="Espacio disponible para anunciantes del corredor." />
       <p className="text-sm">
         <Link href="/privacidad" className="text-link hover:underline">
           Privacidad

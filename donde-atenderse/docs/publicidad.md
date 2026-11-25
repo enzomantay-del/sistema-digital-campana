@@ -42,10 +42,20 @@ Referencia visual: portales de noticias — aviso **dentro del flujo**, etiqueta
 | activo | Creatividades de muestra donde corresponda, respetando el tope de 2 por página |
 | desactivado (real) | Huecos `EspacioPublicitario` en esos mismos lugares |
 
+## Creatividades en video (`public/patrocinios/`)
+
+| Archivo | Slot actual |
+|---------|-------------|
+| `leaderboard-970x250.mp4` | Inicio (bajo buscador) |
+| `banner-728x90.mp4` | Búsqueda y farmacia (banda superior) |
+| `vertical-300x400.mp4` | Columna en fichas de profesional/lugar |
+
+En cada página pública queda al menos un `EspacioPublicitario` vacío para mostrar disponibilidad comercial.
+
 ## Contratar espacio
 
-1. Enviar creatividad en el tamaño de la variante.
-2. Reemplazar el `EspacioPublicitario` del slot (o futuro panel admin).
+1. Enviar creatividad en el tamaño de la variante (MP4, JPG o PNG).
+2. Reemplazar ruta en `lib/patrocinios.ts` o el `EspacioPublicitario` del slot.
 3. Publicar.
 
 Contacto: `contacto@cercalud.com.ar` — asunto: *Publicidad en Cercalud*.
