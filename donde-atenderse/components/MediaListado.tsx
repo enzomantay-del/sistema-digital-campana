@@ -19,7 +19,7 @@ export function AvatarProfesionalListado({
   tamano?: "chico" | "lista" | "mediano";
 }) {
   const px =
-    tamano === "chico" ? "h-9 w-9 text-xs" : tamano === "lista" ? "h-12 w-12 text-sm" : "h-14 w-14 text-base";
+    tamano === "chico" ? "h-11 w-11 text-xs" : tamano === "lista" ? "h-14 w-14 text-sm" : "h-16 w-16 text-base";
   const foto = photoUrl.trim();
 
   if (foto) {
@@ -30,7 +30,7 @@ export function AvatarProfesionalListado({
           alt=""
           fill
           className="object-cover"
-          sizes={tamano === "chico" ? "36px" : tamano === "lista" ? "48px" : "56px"}
+          sizes={tamano === "chico" ? "44px" : tamano === "lista" ? "56px" : "64px"}
           unoptimized
         />
       </div>
@@ -55,7 +55,7 @@ export function LogoLugarListado({
   tamano?: "chico" | "lista" | "mediano";
 }) {
   const px =
-    tamano === "chico" ? "h-9 w-9 text-xs" : tamano === "lista" ? "h-12 w-12 text-sm" : "h-14 w-14 text-sm";
+    tamano === "chico" ? "h-11 w-11 text-xs" : tamano === "lista" ? "h-14 w-14 text-sm" : "h-16 w-16 text-sm";
   const logo = logoUrl.trim();
 
   if (logo) {
@@ -66,7 +66,7 @@ export function LogoLugarListado({
           alt=""
           fill
           className="object-contain p-1"
-          sizes={tamano === "chico" ? "36px" : tamano === "lista" ? "48px" : "56px"}
+          sizes={tamano === "chico" ? "44px" : tamano === "lista" ? "56px" : "64px"}
           unoptimized
         />
       </div>

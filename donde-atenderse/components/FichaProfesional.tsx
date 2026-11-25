@@ -25,13 +25,13 @@ export function FichaProfesional({
       <header className="grid gap-2">
         <div className="flex flex-wrap items-start gap-4">
           {vista.fotoUrl ? (
-            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border border-line bg-white shadow-sm">
+            <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border border-line bg-white shadow-sm sm:h-32 sm:w-32">
               <Image
                 src={vista.fotoUrl}
                 alt={`Foto de ${vista.nombre}`}
                 fill
                 className="object-cover"
-                sizes="96px"
+                sizes="(max-width: 640px) 112px, 128px"
                 unoptimized
               />
             </div>

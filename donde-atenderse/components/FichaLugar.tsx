@@ -26,13 +26,13 @@ export function FichaLugar({
       <header className="grid gap-2">
         <div className="flex flex-wrap items-start gap-4">
           {vista.logoUrl ? (
-            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
+            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-line bg-white shadow-sm sm:h-28 sm:w-28">
               <Image
                 src={vista.logoUrl}
                 alt={`Logo de ${vista.nombre}`}
                 fill
                 className="object-contain p-1.5"
-                sizes="80px"
+                sizes="(max-width: 640px) 96px, 112px"
                 unoptimized
               />
             </div>

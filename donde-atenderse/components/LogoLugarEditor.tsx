@@ -56,11 +56,11 @@ export function LogoLugarEditor({
       <p className="text-sm text-muted">Aparece en la ficha pública. JPG, JFIF, PNG, WebP o GIF, hasta 2 MB.</p>
       <div className="flex flex-wrap items-center gap-4">
         {logoUrl ? (
-          <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-line bg-white">
-            <Image src={logoUrl} alt="Logo del lugar" fill className="object-contain p-1" sizes="80px" unoptimized />
+          <div className="relative h-24 w-24 overflow-hidden rounded-2xl border border-line bg-white">
+            <Image src={logoUrl} alt="Logo del lugar" fill className="object-contain p-1" sizes="96px" unoptimized />
           </div>
         ) : (
-          <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-dashed border-line bg-[#f8fafc] text-xs text-muted">
+          <div className="flex h-24 w-24 items-center justify-center rounded-2xl border border-dashed border-line bg-[#f8fafc] text-xs text-muted">
             Sin logo
           </div>
         )}

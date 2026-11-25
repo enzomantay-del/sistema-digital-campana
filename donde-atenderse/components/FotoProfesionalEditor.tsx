@@ -87,11 +87,11 @@ export function FotoProfesionalEditor({
       </p>
       <div className="flex flex-wrap items-center gap-4">
         {photoUrl ? (
-          <div className="relative h-24 w-24 overflow-hidden rounded-full border border-line bg-white">
-            <Image src={photoUrl} alt="Foto del profesional" fill className="object-cover" sizes="96px" unoptimized />
+          <div className="relative h-28 w-28 overflow-hidden rounded-full border border-line bg-white">
+            <Image src={photoUrl} alt="Foto del profesional" fill className="object-cover" sizes="112px" unoptimized />
           </div>
         ) : (
-          <div className="flex h-24 w-24 items-center justify-center rounded-full border border-dashed border-line bg-[#f8fafc] text-xs text-muted">
+          <div className="flex h-28 w-28 items-center justify-center rounded-full border border-dashed border-line bg-[#f8fafc] text-xs text-muted">
             Sin foto
           </div>
         )}
