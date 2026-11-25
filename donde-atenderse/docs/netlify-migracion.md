@@ -42,7 +42,7 @@ Sitio actual (referencia): **https://donde-atenderse.apps.grok.bot**
    npm run db:restaurar-respaldo -- ~/Descargas/cercalud-respaldo-YYYY-MM-DD.json.gz
    ```
 
-   Si no usás terminal, adjuntá el `.json.gz` en el chat del agente y cargá la URL de Neon como secret personal **`MIGRACION_DATABASE_URL`** (Cursor → configuración → Secrets).
+   Si no usás terminal, adjuntá el `.json.gz` en el chat del agente y cargá la URL de Neon en **Cloud Agents → My Secrets** como **`MIGRACION_DATABASE_URL`** (Runtime Secret, personal). Luego avisá al agente.
 
    Alternativa técnica con `pg_dump`: `scripts/exportar-postgres.sh` solo si tenés la `DATABASE_URL` de origen.
 
