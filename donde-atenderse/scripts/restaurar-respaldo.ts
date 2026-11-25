@@ -10,11 +10,15 @@ async function main() {
     console.error("Uso: DATABASE_URL=postgresql://... npm run db:restaurar-respaldo -- ./cercalud-respaldo.json.gz");
     process.exit(1);
   }
-  const url = process.env.DATABASE_URL?.trim() ?? "";
+  const url =
+    process.env.DATABASE_URL?.trim() ||
+    process.env.MIGRACION_DATABASE_URL?.trim() ||
+    "";
   if (!url.startsWith("postgres://") && !url.startsWith("postgresql://")) {
-    console.error("Definí DATABASE_URL apuntando a Neon (Postgres).");
+    console.error("Definí DATABASE_URL o MIGRACION_DATABASE_URL apuntando a Neon.");
     process.exit(1);
   }
+  process.env.DATABASE_URL = url;
 
   const absoluta = resolve(ruta);
   const buf = await readFile(absoluta);
