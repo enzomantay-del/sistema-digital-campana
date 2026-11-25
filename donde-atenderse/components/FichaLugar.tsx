@@ -4,9 +4,9 @@ import { IconoCercalud, iconoLugar } from "@/components/iconos/IconoCercalud";
 import { HorarioLugarPublico } from "@/components/HorarioLugarPublico";
 import { ListaHorarioTexto } from "@/components/ListaHorarioTexto";
 import { ListaObrasCompacta } from "@/components/ListaObrasCompacta";
+import { EnlacesContactoLugar } from "@/components/EnlacesContactoLugar";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
-import { MENSAJE_WHATSAPP } from "@/lib/constants";
-import { enlaceMaps, enlaceTelefono, enlaceWhatsApp, etiquetaLugar } from "@/lib/format";
+import { enlaceMaps, etiquetaLugar } from "@/lib/format";
 import type { VistaLugar } from "@/lib/view";
 
 export function FichaLugar({
@@ -169,33 +169,12 @@ export function FichaLugar({
             <IconoCercalud nombre="contacto-directo" size={22} className="shrink-0 text-menta" />
             Contacto
           </h2>
-          <div className="flex flex-wrap gap-3">
-            {vista.whatsapp ? (
-              ejemplo ? (
-                <span className="boton w-fit cursor-default opacity-80">WhatsApp</span>
-              ) : (
-                <a
-                  className="boton w-fit gap-2"
-                  href={enlaceWhatsApp(vista.whatsapp, MENSAJE_WHATSAPP)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <IconoCercalud nombre="mensaje" size={18} className="text-white/95" />
-                  WhatsApp
-                </a>
-              )
-            ) : null}
-            {vista.telefono ? (
-              ejemplo ? (
-                <span className="boton-suave w-fit cursor-default opacity-80">Teléfono fijo</span>
-              ) : (
-                <a className="boton-suave w-fit gap-2" href={enlaceTelefono(vista.telefono)}>
-                  <IconoCercalud nombre="telefono" size={18} className="text-link" />
-                  Teléfono fijo
-                </a>
-              )
-            ) : null}
-          </div>
+          <EnlacesContactoLugar
+            whatsapp={vista.whatsapp}
+            telefono={vista.telefono}
+            ejemplo={ejemplo}
+            anchoCompletoMovil={false}
+          />
         </section>
       ) : null}
       <p className="text-xs text-muted">{vista.actualizacion}</p>

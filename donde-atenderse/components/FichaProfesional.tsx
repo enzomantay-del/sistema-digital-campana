@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { IconoCercalud, iconoArea } from "@/components/iconos/IconoCercalud";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
+import { EnlacesContactoLugar } from "@/components/EnlacesContactoLugar";
 import { ListaHorarioTexto } from "@/components/ListaHorarioTexto";
 import { ListaObrasCompacta } from "@/components/ListaObrasCompacta";
 import { MENSAJE_WHATSAPP } from "@/lib/constants";
@@ -141,27 +142,12 @@ export function FichaProfesional({
                       <ListaObrasCompacta obras={linea.obras} etiqueta="Obras sociales en este lugar" />
                     ) : null}
                     {linea.placeWhatsapp || linea.placePhone ? (
-                      <div className="flex flex-wrap items-center gap-2">
-                        {linea.placeWhatsapp && !ejemplo ? (
-                          <a
-                            className="enlace-icono text-xs font-semibold text-link hover:underline"
-                            href={enlaceWhatsApp(linea.placeWhatsapp, MENSAJE_WHATSAPP)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <IconoCercalud nombre="mensaje" size={14} className="text-menta" />
-                            WhatsApp lugar
-                          </a>
-                        ) : null}
-                        {linea.placePhone && !ejemplo ? (
-                          <a
-                            className="enlace-icono text-xs font-semibold text-link hover:underline"
-                            href={enlaceTelefono(linea.placePhone)}
-                          >
-                            <IconoCercalud nombre="telefono" size={14} className="text-menta" />
-                            Tel. lugar
-                          </a>
-                        ) : null}
+                      <div className={fichaDensa ? "pt-0.5" : "pt-1"}>
+                        <EnlacesContactoLugar
+                          whatsapp={linea.placeWhatsapp}
+                          telefono={linea.placePhone}
+                          ejemplo={ejemplo}
+                        />
                       </div>
                     ) : null}
                     {!fichaDensa ? (
