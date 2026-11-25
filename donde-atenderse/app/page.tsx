@@ -132,8 +132,8 @@ export default async function Inicio() {
       </section>
 
       <section aria-label="Publicidad" className="border-t border-line bg-white px-1 py-1">
-        <div className="mx-auto max-w-[300px]">
-          <EspacioPublicitario formato="mpu" />
+        <div className="mx-auto w-full max-w-page">
+          <EspacioPublicitario formato="banner" anchoFila descripcion="Franja disponible antes de las preguntas frecuentes." />
         </div>
       </section>
 

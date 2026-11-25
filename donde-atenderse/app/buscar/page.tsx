@@ -53,6 +53,7 @@ export default async function PaginaBuscar({
   const buscaFarmacia = q.toLowerCase().includes("farmacia");
   const encabezado = encabezadoBuscar(Boolean(estudios), Boolean(centrosSalud));
   const lugaresPrimero = estudios || centrosSalud;
+  const soloProfesionales = !estudios && !centrosSalud;
 
   const filasProfesionales = personas.map((persona) => {
     const vista = armarVistaProfesional({
@@ -130,6 +131,10 @@ export default async function PaginaBuscar({
           <>
             {centros.length} {centros.length === 1 ? "lugar" : "lugares"} de laboratorios e imágenes
           </>
+        ) : soloProfesionales ? (
+          <>
+            {personas.length} {personas.length === 1 ? "profesional" : "profesionales"}
+          </>
         ) : (
           <>
             {personas.length} {personas.length === 1 ? "profesional" : "profesionales"} y {centros.length}{" "}
@@ -143,11 +148,13 @@ export default async function PaginaBuscar({
           La farmacia de turno está en su propia página.
         </Link>
       ) : null}
-      {personas.length === 0 && centros.length === 0 ? (
+      {(soloProfesionales ? personas.length === 0 : personas.length === 0 && centros.length === 0) ? (
         <p>No hay fichas con esos datos. Probá con otra palabra o con otra localidad.</p>
       ) : null}
       <section className={`grid gap-3 ${lugaresPrimero ? "order-2" : ""}`}>{filasProfesionales}</section>
-      <section className={`grid gap-3 ${lugaresPrimero ? "order-1" : ""}`}>{filasLugares}</section>
+      {!soloProfesionales ? (
+        <section className={`grid gap-3 ${lugaresPrimero ? "order-1" : ""}`}>{filasLugares}</section>
+      ) : null}
       <div className="py-0.5 xl:hidden">
         <EspacioPublicitario formato="mpu" />
       </div>

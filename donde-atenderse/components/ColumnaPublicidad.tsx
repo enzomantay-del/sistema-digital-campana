@@ -16,7 +16,7 @@ export function ColumnaPublicidad({ perfil = "ficha" }: { perfil?: Perfil }) {
   if (perfil === "farmacia") {
     return (
       <aside className="grid w-full gap-1" aria-label="Espacios publicitarios">
-        <EspacioPublicitario formato="vertical-alto" descripcion="Ideal para farmacias del corredor." />
+        <EspacioPublicitario formato="skyscraper" descripcion="Formato 300×600 · ideal para farmacias del corredor." />
       </aside>
     );
   }
