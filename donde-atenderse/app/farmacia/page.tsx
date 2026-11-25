@@ -1,6 +1,7 @@
 import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { EspacioPublicitario } from "@/components/EspacioPublicitario";
 import { FarmaciaTurnoPagina, type FarmaciaTurnoPorLocalidad } from "@/components/FarmaciaTurnoPagina";
+import { LayoutFarmaciaConPublicidad } from "@/components/LayoutFarmaciaConPublicidad";
 import { LOCALIDADES } from "@/lib/constants";
 import { farmaciasDeTurno } from "@/lib/search";
 
@@ -36,8 +37,8 @@ export default async function PaginaFarmacia() {
   });
 
   return (
-    <div className="grid max-w-3xl gap-8">
-      <header className="grid gap-3">
+    <LayoutFarmaciaConPublicidad>
+      <header className="grid max-w-3xl gap-3">
         <h1 className="enlace-icono text-4xl font-bold tracking-tight">
           <IconoCercalud nombre="farmacia" size={36} className="text-menta" />
           Farmacia de turno
@@ -47,9 +48,17 @@ export default async function PaginaFarmacia() {
           otras localidades del corredor si lo necesitás.
         </p>
       </header>
-      <EspacioPublicitario formato="banner" />
-      <FarmaciaTurnoPagina porLocalidad={porLocalidad} />
-      <EspacioPublicitario formato="mpu" descripcion="Ideal para farmacias del corredor." />
-    </div>
+      <EspacioPublicitario formato="banner" anchoFila descripcion="Banda a todo el ancho · ideal para cadenas de farmacia." />
+      <div className="w-full max-w-3xl">
+        <FarmaciaTurnoPagina porLocalidad={porLocalidad} />
+      </div>
+      <div className="w-full xl:hidden">
+        <EspacioPublicitario
+          formato="leaderboard"
+          anchoFila
+          descripcion="Banda amplia al cierre de la página en celular y tablet."
+        />
+      </div>
+    </LayoutFarmaciaConPublicidad>
   );
 }

@@ -11,20 +11,28 @@ type Props = {
   formato: Exclude<VariantePublicidad, "contenido">;
   /** Texto breve bajo “Espacio comercial”. */
   descripcion?: string;
+  anchoFila?: boolean;
 };
 
+const FORMATO_ANCHO_FILA = new Set<Exclude<VariantePublicidad, "contenido">>(["banner", "leaderboard"]);
+
 /** Hueco a la venta: silueta del formato + contacto. */
-export function EspacioPublicitario({ formato, descripcion }: Props) {
+export function EspacioPublicitario({ formato, descripcion, anchoFila = false }: Props) {
   const medida = MEDIDA_PUBLICIDAD[formato];
   const aspecto = claseAspectoVariante(formato);
   const mail = contactoEmail();
+  const fila = anchoFila || FORMATO_ANCHO_FILA.has(formato);
 
   return (
-    <TarjetaPublicidad variante={formato} compacto>
+    <TarjetaPublicidad variante={formato} compacto anchoFila={fila}>
       <div
-        className={`flex flex-col items-center justify-center border border-dashed border-line/80 bg-white p-1 text-center ${aspecto ?? ""}`}
+        className={`flex flex-col items-center justify-center border border-dashed border-line/80 bg-white p-1 text-center ${aspecto ?? ""} ${
+          fila ? "px-3 sm:flex-row sm:justify-center sm:gap-4 sm:py-2" : ""
+        }`}
       >
-        <div className="flex max-w-[16rem] flex-col items-center gap-0.5 px-1 py-1">
+        <div
+          className={`flex flex-col items-center gap-0.5 px-1 py-1 ${fila ? "max-w-full sm:flex-row sm:items-center sm:gap-3 sm:text-left" : "max-w-[16rem]"}`}
+        >
           <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-line bg-paper text-link">
             <IconoCercalud nombre="ficha" size={22} />
           </div>

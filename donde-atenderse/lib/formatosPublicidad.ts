@@ -19,7 +19,10 @@ export const MEDIDA_PUBLICIDAD: Record<Exclude<VariantePublicidad, "contenido">,
   "vertical-alto": { ancho: 300, alto: 400, nombre: "Vertical" },
 };
 
-export function claseAnchoVariante(variante: VariantePublicidad): string {
+export function claseAnchoVariante(variante: VariantePublicidad, anchoFila = false): string {
+  if (anchoFila && (variante === "leaderboard" || variante === "banner")) {
+    return "w-full max-w-full";
+  }
   switch (variante) {
     case "leaderboard":
       return "mx-auto w-full max-w-[970px]";

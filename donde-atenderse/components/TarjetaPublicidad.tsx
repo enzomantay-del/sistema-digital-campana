@@ -7,15 +7,18 @@ export function TarjetaPublicidad({
   variante = "contenido",
   ejemplo = false,
   compacto = false,
+  anchoFila = false,
 }: {
   children: ReactNode;
   variante?: VariantePublicidad;
   ejemplo?: boolean;
   /** Menos aire entre rótulo y creatividad (listados y columnas). */
   compacto?: boolean;
+  /** Banner / leaderboard ocupan todo el ancho del contenedor (sin bandas vacías a los lados). */
+  anchoFila?: boolean;
 }) {
   const rotulo = ejemplo ? "Publicidad · ejemplo" : "Publicidad";
-  const ancho = claseAnchoVariante(variante);
+  const ancho = claseAnchoVariante(variante, anchoFila);
   const gap = compacto ? "gap-0.5" : "gap-1";
   const rotuloClass = compacto
     ? "text-[10px] font-semibold uppercase tracking-[0.14em] text-muted"

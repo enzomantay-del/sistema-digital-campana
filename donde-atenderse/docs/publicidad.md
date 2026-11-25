@@ -33,7 +33,7 @@ Referencia visual: portales de noticias — aviso **dentro del flujo**, etiqueta
 | **Buscar** | Banner bajo filtros | Skyscraper en columna (XL) **o** MPU al pie en móvil |
 | **Ficha** prof./lugar | Skyscraper en columna (producción) | — (solo uno) |
 | **Ficha** (demo) | Ejemplo farmacia | Ejemplo profesional |
-| **Farmacia** | Banner bajo título | MPU al final |
+| **Farmacia** | Banner a todo el ancho bajo título | Columna vertical en pantalla grande **o** leaderboard ancho al pie en móvil |
 
 ## Ejemplo vs producción
 

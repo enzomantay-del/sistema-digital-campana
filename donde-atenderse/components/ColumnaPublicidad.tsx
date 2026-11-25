@@ -7,12 +7,14 @@ import type { VariantePublicidad } from "@/lib/formatosPublicidad";
 /** Máximo dos avisos por página; la columna aporta como mucho uno (el otro va en el flujo principal). */
 const SLOT_FICHA: Exclude<VariantePublicidad, "contenido"> = "skyscraper";
 const SLOT_LISTADO: Exclude<VariantePublicidad, "contenido"> = "skyscraper";
+const SLOT_FARMACIA: Exclude<VariantePublicidad, "contenido"> = "vertical-alto";
 
-type Perfil = "ficha" | "listado";
+type Perfil = "ficha" | "listado" | "farmacia";
 
 export async function ColumnaPublicidad({ perfil = "ficha" }: { perfil?: Perfil }) {
   const demo = mostrarDatosEjemplo();
-  const formato = perfil === "ficha" ? SLOT_FICHA : SLOT_LISTADO;
+  const formato =
+    perfil === "ficha" ? SLOT_FICHA : perfil === "farmacia" ? SLOT_FARMACIA : SLOT_LISTADO;
 
   if (demo && perfil === "ficha") {
     return (
@@ -27,6 +29,22 @@ export async function ColumnaPublicidad({ perfil = "ficha" }: { perfil?: Perfil 
     return (
       <aside className="grid w-full gap-1" aria-label="Espacios publicitarios">
         <PublicidadFarmaciaEjemplo />
+      </aside>
+    );
+  }
+
+  if (demo && perfil === "farmacia") {
+    return (
+      <aside className="grid w-full gap-1" aria-label="Espacios publicitarios">
+        <PublicidadFarmaciaEjemplo />
+      </aside>
+    );
+  }
+
+  if (perfil === "farmacia") {
+    return (
+      <aside className="grid w-full gap-1" aria-label="Espacios publicitarios">
+        <EspacioPublicitario formato={formato} descripcion="Ideal para farmacias del corredor." />
       </aside>
     );
   }

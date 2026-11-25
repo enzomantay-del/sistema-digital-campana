@@ -117,8 +117,8 @@ export default async function PaginaBuscar({
               : undefined
         }
       />
-      <div className="py-0.5">
-        <EspacioPublicitario formato="banner" />
+      <div className="w-full py-0.5">
+        <EspacioPublicitario formato="banner" anchoFila />
       </div>
       <p className="text-muted">
         {centrosSalud && !q ? (
