@@ -91,22 +91,14 @@ button {
   transform: translateZ(0);
 }
 
-.publicidad-video-marco video.video-publicidad {
+/* Recorta solo el borde inferior del <video> donde el navegador dibuja la barra de avance. */
+.publicidad-video-recorte .video-publicidad {
   display: block;
+  height: calc(100% + 14px);
+  max-height: none;
   pointer-events: none;
-}
-
-/* Tapa la barra nativa del navegador sin cubrir el aviso (1 px en móvil). */
-.publicidad-tapa-barra {
-  height: 1px;
-  max-height: 1px;
-}
-
-@media (min-width: 768px) {
-  .publicidad-tapa-barra {
-    height: 2px;
-    max-height: 2px;
-  }
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .video-publicidad::-webkit-media-controls {
@@ -121,6 +113,8 @@ button {
   display: none !important;
 }
 
+.video-publicidad::-webkit-media-controls-start-playback-button,
+.video-publicidad::-webkit-media-controls-overlay-enclosure,
 .video-publicidad::-webkit-media-controls-play-button,
 .video-publicidad::-webkit-media-controls-timeline,
 .video-publicidad::-webkit-media-controls-current-time-display,

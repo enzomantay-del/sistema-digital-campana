@@ -7,13 +7,10 @@ export function PublicidadVideo({
   src,
   etiquetaAccesible,
   ajuste = "contain",
-  taparBarraInferior = true,
 }: {
   src: string;
   etiquetaAccesible: string;
-  /** contain en bandas horizontales evita cortar texto; cover en columnas verticales. */
   ajuste?: "contain" | "cover";
-  taparBarraInferior?: boolean;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
 
@@ -29,20 +26,22 @@ export function PublicidadVideo({
     sinControles();
     video.addEventListener("loadedmetadata", sinControles);
     video.addEventListener("play", sinControles);
+    video.addEventListener("playing", sinControles);
 
     return () => {
       video.removeEventListener("loadedmetadata", sinControles);
       video.removeEventListener("play", sinControles);
+      video.removeEventListener("playing", sinControles);
     };
   }, [src]);
 
-  const objectClass = ajuste === "contain" ? "object-contain" : "object-cover";
+  const objectClass = ajuste === "contain" ? "object-contain object-top" : "object-cover object-center";
 
   return (
-    <>
+    <div className="publicidad-video-recorte absolute inset-0 overflow-hidden">
       <video
         ref={ref}
-        className={`video-publicidad block h-full w-full ${objectClass}`}
+        className={`video-publicidad block w-full ${objectClass}`}
         src={src}
         autoPlay
         muted
@@ -50,14 +49,12 @@ export function PublicidadVideo({
         playsInline
         preload="auto"
         controls={false}
+        controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"
         disablePictureInPicture
         disableRemotePlayback
         tabIndex={-1}
         aria-label={etiquetaAccesible}
       />
-      {taparBarraInferior ? (
-        <div className="publicidad-tapa-barra pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-[#0f1f33]" aria-hidden />
-      ) : null}
-    </>
+    </div>
   );
 }
