@@ -1,4 +1,5 @@
 import { OBRAS_MISIONES, TIPOS_CENTRO_SALUD } from "./constants";
+import { ESPECIALIDADES_CATALOGO, especialidadesDesdeCampo } from "./especialidades";
 import { lugarAtiendeObra, obrasModoEfectivo } from "./placeObras";
 import { incluye } from "./format";
 import { distanciaALocalidad } from "./geo";
@@ -17,6 +18,33 @@ const lugarConRelaciones = {
   duties: true,
 } as const;
 
+export async function catalogoEspecialidades() {
+  const professionals = await prisma.professional.findMany({
+    where: filtroProfesionalPublico(),
+    select: { specialty: true, specialties: true },
+  });
+  const nombres = new Set<string>(ESPECIALIDADES_CATALOGO);
+  for (const persona of professionals) {
+    for (const item of especialidadesDesdeCampo(persona.specialties)) nombres.add(item);
+    if (persona.specialty.trim()) nombres.add(persona.specialty.trim());
+  }
+  return Array.from(nombres).sort((a, b) => a.localeCompare(b, "es"));
+}
+
+function especialidadesDePersona(persona: { specialty: string; specialties: string | null }) {
+  const lista = especialidadesDesdeCampo(persona.specialties);
+  if (persona.specialty.trim() && !lista.includes(persona.specialty.trim())) {
+    lista.push(persona.specialty.trim());
+  }
+  return lista;
+}
+
+function coincideEspecialidad(persona: { specialty: string; specialties: string | null }, filtro: string) {
+  const buscada = filtro.trim();
+  if (!buscada) return true;
+  return especialidadesDePersona(persona).some((item) => item === buscada || incluye(item, buscada));
+}
+
 export async function catalogoObras() {
   const obras = await prisma.obraSocial.findMany({ orderBy: { name: "asc" } });
   return Array.from(new Set<string>([...OBRAS_MISIONES, ...obras.map((obra) => obra.name)])).sort((a, b) => {
@@ -29,6 +57,7 @@ export async function catalogoObras() {
 export async function buscar(filtros: {
   q?: string;
   localidad?: string;
+  especialidad?: string;
   area?: string;
   obra?: string;
   estudios?: string;
@@ -38,6 +67,7 @@ export async function buscar(filtros: {
 }) {
   const q = filtros.q?.trim() ?? "";
   const localidad = filtros.localidad?.trim() ?? "";
+  const especialidad = filtros.especialidad?.trim() ?? "";
   const area = filtros.area?.trim() ?? "";
   const obra = filtros.obra?.trim() ?? "";
   const estudios = filtros.estudios === "1";
@@ -67,6 +97,7 @@ export async function buscar(filtros: {
       " ",
     );
     if (q && !incluye(texto, q)) return false;
+    if (especialidad && !coincideEspecialidad(persona, especialidad)) return false;
     if (area && persona.area !== area) return false;
     if (localidad && !lugares.some((lugar) => lugar.locality === localidad)) return false;
     if (obra && !obras.includes(obra)) {
@@ -101,6 +132,13 @@ export async function buscar(filtros: {
     const texto = [lugar.name, lugar.address, ...lugar.studies.map((estudio) => estudio.name)].join(" ");
     if (q && !incluye(texto, q)) return false;
     if (localidad && lugar.locality !== localidad) return false;
+    if (especialidad) {
+      const enProfesionales = lugar.attendances.some(
+        (item) => item.professional.published && coincideEspecialidad(item.professional, especialidad),
+      );
+      const enEstudios = lugar.studies.some((estudio) => estudio.name === especialidad || incluye(estudio.name, especialidad));
+      if (!enProfesionales && !enEstudios) return false;
+    }
     if (obra && !lugarAtiendeObra(modoObras, obras, obra, obrasEnProfesionales)) return false;
     if (area) {
       const coincide = lugar.attendances.some((item) => item.professional.area === area);
@@ -131,6 +169,7 @@ export async function buscar(filtros: {
     centros: porCercania(centros, (lugar) => km(lugar.locality)),
     q,
     localidad,
+    especialidad,
     area,
     obra,
     estudios,

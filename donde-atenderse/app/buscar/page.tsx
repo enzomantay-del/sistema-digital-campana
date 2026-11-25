@@ -8,7 +8,7 @@ import { TarjetaListadoLugar } from "@/components/TarjetaListadoLugar";
 import { TarjetaListadoProfesional } from "@/components/TarjetaListadoProfesional";
 import { filaHorario } from "@/lib/map";
 import { asistenciasEnLugaresPublicados } from "@/lib/publico";
-import { catalogoObras, buscar } from "@/lib/search";
+import { buscar, catalogoEspecialidades, catalogoObras } from "@/lib/search";
 import { armarVistaProfesional } from "@/lib/view";
 
 function encabezadoBuscar(estudios: boolean, centrosSalud: boolean) {
@@ -39,6 +39,7 @@ export default async function PaginaBuscar({
   searchParams: Promise<{
     q?: string;
     localidad?: string;
+    especialidad?: string;
     area?: string;
     obra?: string;
     estudios?: string;
@@ -48,8 +49,8 @@ export default async function PaginaBuscar({
   }>;
 }) {
   const filtros = await searchParams;
-  const [{ personas, centros, q, localidad, area, obra, estudios, centrosSalud, conUbicacion }, obras] =
-    await Promise.all([buscar(filtros), catalogoObras()]);
+  const [{ personas, centros, q, localidad, especialidad, obra, estudios, centrosSalud, conUbicacion }, obras, especialidades] =
+    await Promise.all([buscar(filtros), catalogoObras(), catalogoEspecialidades()]);
   const buscaFarmacia = q.toLowerCase().includes("farmacia");
   const encabezado = encabezadoBuscar(Boolean(estudios), Boolean(centrosSalud));
   const lugaresPrimero = estudios || centrosSalud;
@@ -105,12 +106,12 @@ export default async function PaginaBuscar({
       <Buscador
         q={q}
         localidad={localidad}
-        area={area}
+        especialidad={especialidad}
         obra={obra}
         obras={obras}
+        especialidades={especialidades}
         estudios={Boolean(estudios)}
         centrosSalud={Boolean(centrosSalud)}
-        mostrarArea
         placeholder={
           centrosSalud
             ? "Nombre del hospital, sanatorio o consultorio"

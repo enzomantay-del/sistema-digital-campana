@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { AvatarProfesionalListado, LogoLugarListado } from "@/components/MediaListado";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
 import { IconoCercalud } from "@/components/iconos/IconoCercalud";
-import { AREAS, LOCALIDADES } from "@/lib/constants";
+import { LOCALIDADES } from "@/lib/constants";
 import { puebloMasCercano } from "@/lib/geo";
 
 const MINIMO_BUSQUEDA = 3;
@@ -29,22 +29,22 @@ type SugerenciaLugar = {
 export function Buscador({
   q = "",
   localidad = "",
-  area = "",
+  especialidad = "",
   obra = "",
   obras = [],
+  especialidades = [],
   estudios = false,
   centrosSalud = false,
-  mostrarArea = false,
-  placeholder = "Nombre del profesional, especialidad o centro de salud",
+  placeholder = "Nombre del profesional, centro de salud o especialidad",
 }: {
   q?: string;
   localidad?: string;
-  area?: string;
+  especialidad?: string;
   obra?: string;
   obras?: string[];
+  especialidades?: string[];
   estudios?: boolean;
   centrosSalud?: boolean;
-  mostrarArea?: boolean;
   placeholder?: string;
 }) {
   const router = useRouter();
@@ -52,33 +52,23 @@ export function Buscador({
   const caja = useRef<HTMLDivElement>(null);
   const [texto, setTexto] = useState(q);
   const [personas, setPersonas] = useState<SugerenciaPersona[]>([]);
-  const [especialidades, setEspecialidades] = useState<string[]>([]);
+  const [especialidadesSugeridas, setEspecialidadesSugeridas] = useState<string[]>([]);
   const [lugares, setLugares] = useState<SugerenciaLugar[]>([]);
   const [cargandoSugerencias, setCargandoSugerencias] = useState(false);
   const [abierto, setAbierto] = useState(false);
-  const [ubicacion, setUbicacion] = useState<"pidiendo" | "cerca" | "manual">("pidiendo");
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [pueblo, setPueblo] = useState("");
 
-  const haySugerencias = personas.length > 0 || especialidades.length > 0 || lugares.length > 0;
+  const haySugerencias = personas.length > 0 || especialidadesSugeridas.length > 0 || lugares.length > 0;
 
   useEffect(() => {
-    if (!navigator.geolocation) {
-      setUbicacion("manual");
-      return;
-    }
+    if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
       (posicion) => {
         const cerca = puebloMasCercano(posicion.coords.latitude, posicion.coords.longitude);
-        if (!cerca || cerca.km > 120) {
-          setUbicacion("manual");
-          return;
-        }
+        if (!cerca || cerca.km > 120) return;
         setCoords({ lat: posicion.coords.latitude, lng: posicion.coords.longitude });
-        setPueblo(cerca.nombre);
-        setUbicacion("cerca");
       },
-      () => setUbicacion("manual"),
+      () => {},
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 },
     );
   }, []);
@@ -87,7 +77,7 @@ export function Buscador({
     const consulta = texto.trim();
     if (consulta.length < MINIMO_BUSQUEDA) {
       setPersonas([]);
-      setEspecialidades([]);
+      setEspecialidadesSugeridas([]);
       setLugares([]);
       setAbierto(false);
       setCargandoSugerencias(false);
@@ -105,7 +95,7 @@ export function Buscador({
           lugares: SugerenciaLugar[];
         };
         setPersonas(datos.personas);
-        setEspecialidades(datos.especialidades);
+        setEspecialidadesSugeridas(datos.especialidades);
         setLugares(datos.lugares ?? []);
         setAbierto(datos.personas.length > 0 || datos.especialidades.length > 0 || (datos.lugares?.length ?? 0) > 0);
       } catch {
@@ -128,12 +118,16 @@ export function Buscador({
     return () => document.removeEventListener("mousedown", cerrar);
   }, []);
 
-  function irABuscar(consulta: string) {
-    const params = new URLSearchParams({ q: consulta });
+  function irABuscar(consulta: string, especialidadElegida?: string) {
+    const params = new URLSearchParams();
+    if (consulta.trim()) params.set("q", consulta.trim());
     if (obra) params.set("obra", obra);
+    if (localidad) params.set("localidad", localidad);
+    const esp = especialidadElegida ?? especialidad;
+    if (esp) params.set("especialidad", esp);
     if (estudios) params.set("estudios", "1");
     if (centrosSalud) params.set("centros", "1");
-    if (coords && ubicacion === "cerca") {
+    if (coords) {
       params.set("lat", String(coords.lat));
       params.set("lng", String(coords.lng));
     }
@@ -144,7 +138,7 @@ export function Buscador({
     <form action="/buscar" className="grid gap-3 text-left">
       {estudios ? <input type="hidden" name="estudios" value="1" /> : null}
       {centrosSalud ? <input type="hidden" name="centros" value="1" /> : null}
-      {ubicacion === "cerca" && coords ? (
+      {coords ? (
         <>
           <input type="hidden" name="lat" value={coords.lat} />
           <input type="hidden" name="lng" value={coords.lng} />
@@ -216,20 +210,20 @@ export function Buscador({
                   </button>
                 </li>
               ))}
-              {especialidades.map((especialidad) => (
-                <li key={especialidad}>
+              {especialidadesSugeridas.map((item) => (
+                <li key={item}>
                   <button
                     type="button"
                     className="block w-full px-4 py-2 text-left hover:bg-paper"
                     onMouseDown={(evento) => evento.preventDefault()}
                     onClick={() => {
-                      setTexto(especialidad);
+                      setTexto(item);
                       setAbierto(false);
-                      irABuscar(especialidad);
+                      irABuscar(item, item);
                     }}
                   >
                     <span className="block text-xs font-bold uppercase tracking-[0.06em] text-menta">Especialidad</span>
-                    {especialidad}
+                    {item}
                   </button>
                 </li>
               ))}
@@ -264,7 +258,18 @@ export function Buscador({
           Buscar
         </button>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <label className="grid gap-1 text-sm text-muted">
+          Especialidad
+          <select name="especialidad" defaultValue={especialidad} className="campo">
+            <option value="">Todas</option>
+            {especialidades.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </label>
         <label className="grid gap-1 text-sm text-muted">
           Obra social
           <select name="obra" defaultValue={obra} className="campo">
@@ -276,40 +281,18 @@ export function Buscador({
             ))}
           </select>
         </label>
-        {ubicacion === "cerca" ? (
-          <p className="self-end text-sm text-muted">
-            Ordenado desde donde estás, cerca de {pueblo}. La ubicación no se guarda.
-          </p>
-        ) : (
-          <label className="grid gap-1 text-sm text-muted">
-            {ubicacion === "pidiendo" ? "Buscando tu ubicación" : "Localidad"}
-            <select name="localidad" defaultValue={localidad} className="campo" disabled={ubicacion === "pidiendo"}>
-              <option value="">{ubicacion === "pidiendo" ? "Un momento" : "Todas"}</option>
-              {LOCALIDADES.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-      </div>
-      {ubicacion === "manual" ? (
-        <p className="text-sm text-muted">Sin la ubicación activada, podés elegir el pueblo.</p>
-      ) : null}
-      {mostrarArea ? (
-        <label className="grid max-w-sm gap-1 text-sm text-muted">
-          Área
-          <select name="area" defaultValue={area} className="campo">
+        <label className="grid gap-1 text-sm text-muted">
+          Ciudad
+          <select name="localidad" defaultValue={localidad} className="campo">
             <option value="">Todas</option>
-            {AREAS.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.label}
+            {LOCALIDADES.map((item) => (
+              <option key={item} value={item}>
+                {item}
               </option>
             ))}
           </select>
         </label>
-      ) : null}
+      </div>
     </form>
   );
 }

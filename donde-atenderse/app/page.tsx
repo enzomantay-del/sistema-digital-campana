@@ -5,7 +5,7 @@ import { EspacioPublicitario } from "@/components/EspacioPublicitario";
 import { IconoCercalud, iconoArea, type NombreIconoCercalud } from "@/components/iconos/IconoCercalud";
 import { mostrarDatosEjemplo } from "@/lib/config";
 import { AREAS } from "@/lib/constants";
-import { catalogoObras } from "@/lib/search";
+import { catalogoEspecialidades, catalogoObras } from "@/lib/search";
 
 const BENEFICIOS: { titulo: string; texto: string; icono: NombreIconoCercalud }[] = [
   {
@@ -76,7 +76,7 @@ function faqVisibles(demo: boolean) {
 }
 
 export default async function Inicio() {
-  const obras = await catalogoObras();
+  const [obras, especialidades] = await Promise.all([catalogoObras(), catalogoEspecialidades()]);
   const demo = mostrarDatosEjemplo();
   return (
     <div className="inicio-bandas relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 -my-8">
@@ -90,7 +90,7 @@ export default async function Inicio() {
               Santo Pipó, Hipólito Yrigoyen, Jardín América, Ruiz de Montoya, Puerto Rico y Capioví.
             </p>
           </div>
-          <Buscador obras={obras} />
+          <Buscador obras={obras} especialidades={especialidades} />
           <div className="flex flex-wrap justify-center gap-2">
             {AREAS.map((area) => (
               <Link key={area.id} href={`/buscar?area=${area.id}`} className="pastilla enlace-icono gap-2">
