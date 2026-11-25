@@ -2,41 +2,45 @@
 
 Referencia visual: portales de noticias — aviso **dentro del flujo**, etiqueta **Publicidad** arriba, padding mínimo.
 
+## Regla de experiencia
+
+**Como máximo 2 avisos por página** (creatividad real, hueco a la venta o ejemplo). Sin intercalados en listados ni columnas con tres formatos apilados.
+
 ## Formatos (`lib/formatosPublicidad.ts`)
 
-| Variante | Medida orientativa | Uso |
-|---------|-------------------|-----|
-| `leaderboard` | 970×250 | Portada, pie de búsqueda |
-| `banner` | 728×90 | Franja fina entre secciones |
-| `mpu` | 300×250 | Columnas, bloques, listados |
-| `cuadrado` | 300×300 | Variación visual en columnas |
-| `skyscraper` | 300×600 | Columna lateral en fichas |
-| `vertical-alto` | 300×400 | Columna e intercalado móvil |
+| Variante | Medida orientativa | Uso habitual |
+|---------|-------------------|--------------|
+| `leaderboard` | 970×250 | Portada (bajo el buscador) |
+| `banner` | 728×90 | Búsqueda, farmacia |
+| `mpu` | 300×250 | Segundo slot en portada / móvil |
+| `cuadrado` | 300×300 | Reserva para campañas puntuales |
+| `skyscraper` | 300×600 | Columna en búsqueda (XL) y fichas |
+| `vertical-alto` | 300×400 | Reserva |
 | `contenido` | Flexible | Creatividades rich (demo) |
 
 ## Componentes
 
 - **`TarjetaPublicidad`**: marco + rótulo. Prop `compacto` para menos aire.
 - **`EspacioPublicitario`**: hueco a la venta con silueta del formato y mail de contacto.
-- **`PublicidadPortada`**: leaderboard (ejemplo en demo, hueco en producción).
-- **`ColumnaPublicidad`**: perfil `ficha` (3 formatos) o `listado` (2 formatos).
-- **`intercalarPublicidadEnListado`**: cada 4 resultados en `/buscar`.
+- **`PublicidadPortada`**: leaderboard en inicio (ejemplo en demo, hueco en producción).
+- **`ColumnaPublicidad`**: un solo slot en producción (skyscraper); en demo de ficha, hasta dos ejemplos.
 
-## Dónde hay espacios hoy
+## Dos avisos por página (implementación actual)
 
-| Página | Ubicaciones |
-|--------|-------------|
-| **Inicio** | Leaderboard bajo buscador; banner antes de beneficios; MPU + cuadrado antes del FAQ |
-| **Buscar** | Banner bajo filtros; inserciones en listas; columna XL; vertical en móvil; leaderboard al cierre |
-| **Ficha** prof./lugar | Columna sticky: skyscraper + vertical + MPU (prod) |
-| **Farmacia** | Banner superior; MPU + cuadrado al pie |
+| Página | Aviso 1 | Aviso 2 |
+|--------|---------|---------|
+| **Inicio** | Leaderboard bajo el buscador | MPU antes del FAQ |
+| **Buscar** | Banner bajo filtros | Skyscraper en columna (XL) **o** MPU al pie en móvil |
+| **Ficha** prof./lugar | Skyscraper en columna (producción) | — (solo uno) |
+| **Ficha** (demo) | Ejemplo farmacia | Ejemplo profesional |
+| **Farmacia** | Banner bajo título | MPU al final |
 
 ## Ejemplo vs producción
 
 | `CERCALUD_MOSTRAR_EJEMPLOS` | Comportamiento |
 |---------------------------|----------------|
-| activo | Creatividades Farma-Tu, farmacia y Ortiz donde corresponde + algunos huecos |
-| desactivado (real) | Todos los huecos = `EspacioPublicitario` |
+| activo | Creatividades de muestra donde corresponda, respetando el tope de 2 por página |
+| desactivado (real) | Huecos `EspacioPublicitario` en esos mismos lugares |
 
 ## Contratar espacio
 

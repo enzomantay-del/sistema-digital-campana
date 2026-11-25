@@ -8,7 +8,6 @@ import { TarjetaListadoProfesional } from "@/components/TarjetaListadoProfesiona
 import { filaHorario } from "@/lib/map";
 import { asistenciasEnLugaresPublicados } from "@/lib/publico";
 import { catalogoObras, buscar } from "@/lib/search";
-import { intercalarPublicidadEnListado } from "@/lib/intercalarPublicidad";
 import { armarVistaProfesional } from "@/lib/view";
 
 function encabezadoBuscar(estudios: boolean, centrosSalud: boolean) {
@@ -146,17 +145,10 @@ export default async function PaginaBuscar({
       {personas.length === 0 && centros.length === 0 ? (
         <p>No hay fichas con esos datos. Probá con otra palabra o con otra localidad.</p>
       ) : null}
-      <section className={`grid gap-3 ${lugaresPrimero ? "order-2" : ""}`}>
-        {intercalarPublicidadEnListado(filasProfesionales)}
-      </section>
-      <section className={`grid gap-3 ${lugaresPrimero ? "order-1" : ""}`}>
-        {intercalarPublicidadEnListado(filasLugares)}
-      </section>
+      <section className={`grid gap-3 ${lugaresPrimero ? "order-2" : ""}`}>{filasProfesionales}</section>
+      <section className={`grid gap-3 ${lugaresPrimero ? "order-1" : ""}`}>{filasLugares}</section>
       <div className="py-0.5 xl:hidden">
-        <EspacioPublicitario formato="vertical-alto" />
-      </div>
-      <div className="py-0.5">
-        <EspacioPublicitario formato="leaderboard" />
+        <EspacioPublicitario formato="mpu" />
       </div>
     </LayoutListadoConPublicidad>
   );

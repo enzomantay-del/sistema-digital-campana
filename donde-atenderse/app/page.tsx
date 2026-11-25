@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Buscador } from "@/components/Buscador";
-import { PublicidadBloqueInicio } from "@/components/PublicidadBloqueInicio";
 import { PublicidadPortada } from "@/components/PublicidadPortada";
 import { EspacioPublicitario } from "@/components/EspacioPublicitario";
 import { IconoCercalud, iconoArea, type NombreIconoCercalud } from "@/components/iconos/IconoCercalud";
@@ -113,10 +112,6 @@ export default async function Inicio() {
         </div>
       </section>
 
-      <section aria-label="Publicidad" className="bg-white px-1 py-1">
-        <EspacioPublicitario formato="banner" />
-      </section>
-
       <section id="como-funciona" className="scroll-mt-28 bg-[#d9e1e8]">
         <div className="mx-auto grid max-w-page gap-5 px-4 py-14 sm:py-16">
           <h2 className="text-3xl font-bold tracking-tight">Por qué buscar en Cercalud</h2>
@@ -136,8 +131,10 @@ export default async function Inicio() {
         </div>
       </section>
 
-      <section className="border-t border-line bg-white px-1 py-1">
-        <PublicidadBloqueInicio />
+      <section aria-label="Publicidad" className="border-t border-line bg-white px-1 py-1">
+        <div className="mx-auto max-w-[300px]">
+          <EspacioPublicitario formato="mpu" />
+        </div>
       </section>
 
       <section className="bg-[#eef1f4]">

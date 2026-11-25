@@ -4,20 +4,21 @@ import { PublicidadProfesionalOrtiz } from "@/components/PublicidadProfesionalOr
 import { mostrarDatosEjemplo } from "@/lib/config";
 import type { VariantePublicidad } from "@/lib/formatosPublicidad";
 
-const SLOTS_FICHA: Exclude<VariantePublicidad, "contenido">[] = ["skyscraper", "vertical-alto", "mpu"];
-const SLOTS_LISTADO: Exclude<VariantePublicidad, "contenido">[] = ["skyscraper", "cuadrado"];
+/** Máximo dos avisos por página; la columna aporta como mucho uno (el otro va en el flujo principal). */
+const SLOT_FICHA: Exclude<VariantePublicidad, "contenido"> = "skyscraper";
+const SLOT_LISTADO: Exclude<VariantePublicidad, "contenido"> = "skyscraper";
 
 type Perfil = "ficha" | "listado";
 
 export async function ColumnaPublicidad({ perfil = "ficha" }: { perfil?: Perfil }) {
   const demo = mostrarDatosEjemplo();
+  const formato = perfil === "ficha" ? SLOT_FICHA : SLOT_LISTADO;
 
   if (demo && perfil === "ficha") {
     return (
       <aside className="grid w-full gap-1" aria-label="Espacios publicitarios">
         <PublicidadFarmaciaEjemplo />
         <PublicidadProfesionalOrtiz />
-        <EspacioPublicitario formato="cuadrado" />
       </aside>
     );
   }
@@ -26,18 +27,13 @@ export async function ColumnaPublicidad({ perfil = "ficha" }: { perfil?: Perfil 
     return (
       <aside className="grid w-full gap-1" aria-label="Espacios publicitarios">
         <PublicidadFarmaciaEjemplo />
-        <EspacioPublicitario formato="mpu" />
       </aside>
     );
   }
 
-  const slots = perfil === "ficha" ? SLOTS_FICHA : SLOTS_LISTADO;
-
   return (
     <aside className="grid w-full gap-1" aria-label="Espacios publicitarios">
-      {slots.map((formato) => (
-        <EspacioPublicitario key={formato} formato={formato} />
-      ))}
+      <EspacioPublicitario formato={formato} />
     </aside>
   );
 }

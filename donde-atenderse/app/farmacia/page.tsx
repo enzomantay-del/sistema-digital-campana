@@ -49,10 +49,7 @@ export default async function PaginaFarmacia() {
       </header>
       <EspacioPublicitario formato="banner" />
       <FarmaciaTurnoPagina porLocalidad={porLocalidad} />
-      <div className="grid gap-1 sm:grid-cols-2">
-        <EspacioPublicitario formato="mpu" descripcion="Ideal para farmacias del corredor." />
-        <EspacioPublicitario formato="cuadrado" />
-      </div>
+      <EspacioPublicitario formato="mpu" descripcion="Ideal para farmacias del corredor." />
     </div>
   );
 }
