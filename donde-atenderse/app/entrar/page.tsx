@@ -1,4 +1,6 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
+import { EspacioPublicitario } from "@/components/EspacioPublicitario";
 import { FormularioEntrarWeb } from "@/components/FormularioEntrarWeb";
 import { destinoPanelTrasLogin, esSecretaria, usuarioActual } from "@/lib/auth";
 import { enlaceRecuperacionIngreso } from "@/lib/recuperacion";
@@ -14,7 +16,7 @@ export default async function Entrar({
     const destino = destinoPanelTrasLogin(usuario);
     const rol = esSecretaria(usuario) ? "secretaría" : usuario.role === "admin" ? "administración" : "profesional";
     return (
-      <div className="grid max-w-xl gap-4">
+      <LayoutEntrarConPublicidad>
         <h1 className="text-4xl font-bold tracking-tight">Ya entraste</h1>
         <p className="text-muted">
           Sesión abierta como <strong>{usuario.name}</strong> ({rol}). Podés seguir en el panel o cerrar sesión para
@@ -30,11 +32,11 @@ export default async function Entrar({
             </button>
           </form>
         </div>
-      </div>
+      </LayoutEntrarConPublicidad>
     );
   }
   return (
-    <div className="grid gap-6">
+    <LayoutEntrarConPublicidad>
       <h1 className="text-4xl font-bold tracking-tight">Entrar</h1>
       <p className="max-w-xl text-muted">
         Ingreso para administración, secretarías y profesionales con cuenta asignada por Cercalud.
@@ -53,6 +55,25 @@ export default async function Entrar({
           Olvidé mis datos — WhatsApp
         </a>
       </p>
+    </LayoutEntrarConPublicidad>
+  );
+}
+
+function LayoutEntrarConPublicidad({ children }: { children: ReactNode }) {
+  return (
+    <div className="mx-auto grid w-full max-w-5xl gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(260px,300px)] lg:items-start lg:gap-10">
+      <div className="grid min-w-0 gap-6">{children}</div>
+      <aside className="lg:sticky lg:top-24">
+        <div className="hidden lg:block">
+          <EspacioPublicitario
+            formato="skyscraper"
+            descripcion="Columna lateral en ingreso de profesionales y secretarías."
+          />
+        </div>
+        <div className="lg:hidden">
+          <EspacioPublicitario formato="banner" anchoFila descripcion="Franja en la página de ingreso." />
+        </div>
+      </aside>
     </div>
   );
 }
