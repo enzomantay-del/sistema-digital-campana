@@ -106,7 +106,8 @@ export async function restaurarRespaldoBase(respaldo: RespaldoCercalud) {
   }
   const { data } = respaldo;
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(
+    async (tx) => {
     await vaciarTablasEnTx(tx);
 
     if (data.users.length) await tx.user.createMany({ data: data.users });
@@ -124,7 +125,9 @@ export async function restaurarRespaldoBase(respaldo: RespaldoCercalud) {
     if (data.imagenes.length) {
       await tx.imagenAlmacenada.createMany({ data: data.imagenes.map(imagenDesdeJson) });
     }
-  });
+  },
+    { maxWait: 60_000, timeout: 120_000 },
+  );
 }
 
 async function vaciarTablasEnTx(tx: Prisma.TransactionClient) {
