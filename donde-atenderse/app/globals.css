@@ -79,6 +79,36 @@ button {
   @apply rounded-3xl border border-line bg-white p-6 shadow-[0_10px_30px_rgba(16,36,62,0.06)];
 }
 
+/* Avisos en video: sin barra de progreso ni controles nativos */
+.publicidad-video-marco video.video-publicidad {
+  display: block;
+  pointer-events: none;
+}
+
+.video-publicidad::-webkit-media-controls {
+  display: none !important;
+}
+
+.video-publicidad::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+
+.video-publicidad::-webkit-media-controls-panel {
+  display: none !important;
+}
+
+.video-publicidad::-webkit-media-controls-play-button,
+.video-publicidad::-webkit-media-controls-timeline,
+.video-publicidad::-webkit-media-controls-current-time-display,
+.video-publicidad::-webkit-media-controls-time-remaining-display,
+.video-publicidad::-webkit-media-controls-mute-button,
+.video-publicidad::-webkit-media-controls-volume-slider,
+.video-publicidad::-webkit-media-controls-fullscreen-button,
+.video-publicidad::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+  appearance: none;
+}
+
 .fila-profesional {
   @apply rounded-2xl border border-line bg-white px-3 py-2.5 shadow-[0_4px_14px_rgba(16,36,62,0.04)] transition hover:border-link/40;
 }

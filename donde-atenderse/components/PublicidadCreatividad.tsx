@@ -21,15 +21,19 @@ export function PublicidadCreatividad({
 
   return (
     <TarjetaPublicidad variante={formato} compacto anchoFila={fila}>
-      <div className={`relative overflow-hidden bg-[#0f1f33] ${aspecto ?? "w-full"}`}>
+      <div className={`publicidad-video-marco relative overflow-hidden bg-[#0f1f33] ${aspecto ?? "w-full"}`}>
         <video
-          className="h-full w-full object-cover"
+          className="video-publicidad h-full w-full object-cover"
           src={src}
           autoPlay
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="auto"
+          controls={false}
+          disablePictureInPicture
+          disableRemotePlayback
+          tabIndex={-1}
           aria-label={etiquetaAccesible}
         />
       </div>
