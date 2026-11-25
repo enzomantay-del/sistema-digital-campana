@@ -63,4 +63,34 @@ assert.equal(
 
 assert.equal(mensajeSolapamientoEntreSedes([sede("A", horarioLugarVacio())]), null);
 
+const franjaVieSemanal = franjaHorarioVacia(["jue", "vie"]);
+franjaVieSemanal.tarde = { activo: true, desde: "16:00", hasta: "20:00" };
+
+const franjaFechaVie = franjaHorarioVacia([]);
+franjaFechaVie.periodicidad = {
+  tipo: "fechas",
+  fechas: ["2026-12-11"],
+};
+franjaFechaVie.manana = { activo: true, desde: "08:00", hasta: "12:00" };
+franjaFechaVie.tarde = { activo: true, desde: "16:00", hasta: "20:00" };
+
+const solapaSemanalFecha = mensajeSolapamientoEntreSedes([
+  sede("IMSA", { v: 2, franjas: [franjaVieSemanal] }),
+  sede("Clínica Vecchia", { v: 2, franjas: [franjaFechaVie] }),
+]);
+assert.ok(solapaSemanalFecha?.includes("Superposición"));
+assert.ok(solapaSemanalFecha?.includes("11/12/2026"));
+
+const franjaFechaOtroDia = franjaHorarioVacia([]);
+franjaFechaOtroDia.periodicidad = { tipo: "fechas", fechas: ["2026-12-07"] };
+franjaFechaOtroDia.tarde = { activo: true, desde: "16:00", hasta: "20:00" };
+
+assert.equal(
+  mensajeSolapamientoEntreSedes([
+    sede("IMSA", { v: 2, franjas: [franjaVieSemanal] }),
+    sede("Otro", { v: 2, franjas: [franjaFechaOtroDia] }),
+  ]),
+  null,
+);
+
 console.log("solapamientoHorarios ok");
