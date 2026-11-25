@@ -30,25 +30,29 @@ export function TarjetaListadoProfesional({
             </span>
           </p>
           <ul className="mt-2 grid gap-2 text-sm">
-            {vista.bloques.flatMap((bloque) =>
-              bloque.lineas.map((linea) => (
-                <li key={linea.id} className="flex gap-2">
+            {vista.sedes.map((sede) => {
+              const detalle = sede.turnos
+                .flatMap((turno) => turno.lineas.map((linea) => linea.detalle))
+                .filter(Boolean)
+                .join(" · ");
+              return (
+                <li key={sede.placeId} className="flex gap-2">
                   <IconoCercalud nombre="centro-salud" size={16} className="mt-0.5 shrink-0 text-menta" />
                   <div className="min-w-0">
                     <span className="font-semibold text-ink">
-                      {linea.rotulo}
-                      {linea.locality ? ` · ${linea.locality}` : ""}
+                      {sede.placeName}
+                      {sede.locality ? ` · ${sede.locality}` : ""}
                     </span>
-                    {linea.detalle ? (
+                    {detalle ? (
                       <p className="enlace-icono mt-0.5 text-muted">
                         <IconoCercalud nombre="reloj" size={13} className="shrink-0 text-menta/90" />
-                        <span>{linea.detalle}</span>
+                        <span>{detalle}</span>
                       </p>
                     ) : null}
                   </div>
                 </li>
-              )),
-            )}
+              );
+            })}
           </ul>
         </div>
       </div>

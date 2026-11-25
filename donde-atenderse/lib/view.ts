@@ -16,6 +16,18 @@ export type VistaLinea = LineaHorario & {
   obras: string[];
 };
 
+export type VistaTurnoEnSede = { shift: string; titulo: string; lineas: VistaLinea[] };
+
+export type VistaSedeProfesional = {
+  placeId: string;
+  placeName: string;
+  locality: string;
+  placeWhatsapp?: string;
+  placePhone?: string;
+  obras: string[];
+  turnos: VistaTurnoEnSede[];
+};
+
 export type VistaProfesional = {
   nombre: string;
   especialidad: string;
@@ -34,7 +46,10 @@ export type VistaProfesional = {
   obras: string[];
   actualizacion: string;
   datosVerificados: boolean;
-  bloques: { shift: string; titulo: string; lineas: VistaLinea[] }[];
+  /** Agrupado por sede (ficha pública). */
+  sedes: VistaSedeProfesional[];
+  /** Agrupado por turno (listados y compatibilidad). */
+  bloques: VistaTurnoEnSede[];
 };
 
 export type VistaLugar = {
@@ -112,6 +127,31 @@ function bloques(lineas: VistaLinea[]) {
   }));
 }
 
+function sedesPorLugar(lineas: VistaLinea[]): VistaSedeProfesional[] {
+  const porLugar = new Map<string, VistaLinea[]>();
+  const ordenLugares: string[] = [];
+  for (const linea of lineas) {
+    if (!porLugar.has(linea.placeId)) ordenLugares.push(linea.placeId);
+    const lista = porLugar.get(linea.placeId) ?? [];
+    lista.push(linea);
+    porLugar.set(linea.placeId, lista);
+  }
+  return ordenLugares.map((placeId) => {
+    const items = porLugar.get(placeId) ?? [];
+    const ref = items[0];
+    const obras = [...new Set(items.flatMap((item) => item.obras))].sort((a, b) => a.localeCompare(b, "es"));
+    return {
+      placeId,
+      placeName: ref.placeName,
+      locality: ref.locality,
+      placeWhatsapp: ref.placeWhatsapp,
+      placePhone: ref.placePhone,
+      obras,
+      turnos: bloques(items),
+    };
+  });
+}
+
 export function armarVistaProfesional(input: {
   fullName: string;
   specialty: string;
@@ -167,6 +207,7 @@ export function armarVistaProfesional(input: {
     datosVerificados: datosActualizadosRecientes(
       fechaMasReciente(input.updatedAt, ...input.filas.map((fila) => fila.professionalUpdatedAt)),
     ),
+    sedes: sedesPorLugar(lineas),
     bloques: bloques(lineas),
   };
 }
