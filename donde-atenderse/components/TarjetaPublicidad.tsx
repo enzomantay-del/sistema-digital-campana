@@ -8,6 +8,7 @@ export function TarjetaPublicidad({
   ejemplo = false,
   compacto = false,
   anchoFila = false,
+  creatividadVideo = false,
 }: {
   children: ReactNode;
   variante?: VariantePublicidad;
@@ -16,6 +17,8 @@ export function TarjetaPublicidad({
   compacto?: boolean;
   /** Banner / leaderboard ocupan todo el ancho del contenedor (sin bandas vacías a los lados). */
   anchoFila?: boolean;
+  /** Sin borde gris: el video lleva el mismo fondo y esquinas en un solo recorte. */
+  creatividadVideo?: boolean;
 }) {
   const rotulo = ejemplo ? "Publicidad ejemplo" : "Publicidad";
   const ancho = claseAnchoVariante(variante, anchoFila);
@@ -31,7 +34,15 @@ export function TarjetaPublicidad({
       data-publicidad-ejemplo={ejemplo ? "1" : undefined}
     >
       <p className={rotuloClass}>{rotulo}</p>
-      <div className="overflow-hidden rounded-md border border-line/80 bg-[#f8fafc] p-0">{children}</div>
+      <div
+        className={
+          creatividadVideo
+            ? "tarjeta-publicidad-video overflow-hidden rounded-lg bg-[#0f1f33] p-0"
+            : "overflow-hidden rounded-md border border-line/80 bg-[#f8fafc] p-0"
+        }
+      >
+        {children}
+      </div>
     </div>
   );
 }

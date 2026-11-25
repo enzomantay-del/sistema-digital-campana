@@ -21,9 +21,9 @@ export function PublicidadCreatividad({
   const fila = anchoFila || formato === "banner" || formato === "leaderboard";
 
   return (
-    <TarjetaPublicidad variante={formato} compacto anchoFila={fila} ejemplo>
+    <TarjetaPublicidad variante={formato} compacto anchoFila={fila} ejemplo creatividadVideo>
       <div
-        className={`publicidad-video-marco relative overflow-hidden bg-[#0f1f33] leading-[0] ${aspecto ?? "w-full"}`}
+        className={`publicidad-video-marco relative size-full overflow-hidden bg-[#0f1f33] leading-[0] ${aspecto ?? "w-full"}`}
       >
         <PublicidadVideo
           src={src}
