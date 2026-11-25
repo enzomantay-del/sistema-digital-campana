@@ -80,9 +80,15 @@ button {
 }
 
 /* Avisos en video: sin barra de progreso ni controles nativos */
+.publicidad-video-marco {
+  overflow: hidden;
+  line-height: 0;
+}
+
 .publicidad-video-marco video.video-publicidad {
   display: block;
   pointer-events: none;
+  margin-bottom: -14px;
 }
 
 .video-publicidad::-webkit-media-controls {

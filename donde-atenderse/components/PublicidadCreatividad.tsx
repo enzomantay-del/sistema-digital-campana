@@ -1,3 +1,4 @@
+import { PublicidadVideo } from "@/components/PublicidadVideo";
 import { TarjetaPublicidad } from "@/components/TarjetaPublicidad";
 import { claseAspectoVariante, type VariantePublicidad } from "@/lib/formatosPublicidad";
 import { videoPatrocinio } from "@/lib/patrocinios";
@@ -21,21 +22,10 @@ export function PublicidadCreatividad({
 
   return (
     <TarjetaPublicidad variante={formato} compacto anchoFila={fila} ejemplo>
-      <div className={`publicidad-video-marco relative overflow-hidden bg-[#0f1f33] ${aspecto ?? "w-full"}`}>
-        <video
-          className="video-publicidad h-full w-full object-cover"
-          src={src}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          controls={false}
-          disablePictureInPicture
-          disableRemotePlayback
-          tabIndex={-1}
-          aria-label={etiquetaAccesible}
-        />
+      <div
+        className={`publicidad-video-marco relative overflow-hidden bg-[#0f1f33] leading-[0] ${aspecto ?? "w-full"}`}
+      >
+        <PublicidadVideo src={src} etiquetaAccesible={etiquetaAccesible} />
       </div>
     </TarjetaPublicidad>
   );
