@@ -88,7 +88,6 @@ button {
 .publicidad-video-marco video.video-publicidad {
   display: block;
   pointer-events: none;
-  margin-bottom: -14px;
 }
 
 .video-publicidad::-webkit-media-controls {
