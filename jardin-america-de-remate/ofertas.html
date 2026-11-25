@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ofertas y eventos del fin de semana en Jardín Sale Week. Descubri promos aprobadas y actividades.">
+  <title>Ofertas y Eventos | Jardín Sale Week</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=deploy-share-20260213">
+</head>
+<body>
+  <header class="hero-wrap hero-with-photo hero-public-photo text-white" id="inicio">
+    <div class="hero-bg"></div>
+    <div class="hero-glow"></div>
+    <nav class="navbar navbar-expand-lg navbar-dark py-3">
+      <div class="container">
+        <a class="navbar-brand" href="#inicio"><img src="logo-jardin-sale-week.png" alt="Logo Jardín Sale Week" class="logo-on-white"></a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+          <ul class="navbar-nav ms-auto mt-3 mt-lg-0">
+            <li class="nav-item"><a class="nav-link" href="#ofertas">🏷 Ofertas</a></li>
+            <li class="nav-item"><a class="nav-link" href="#eventos">🎉 Eventos</a></li>
+            <li class="nav-item"><a class="nav-link" href="#programa">🗓 Programa</a></li>
+            <li class="nav-item"><a class="nav-link" href="#inscripcion-circuitos">🧭 Inscripcion circuitos</a></li>
+            <li class="nav-item"><a class="nav-link" href="#informe-incumplimiento">📩 Informe</a></li>
+            <li class="nav-item"><a class="nav-link" href="comerciantes.html">🏪 Soy comerciante</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <section class="container py-5">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+          <p class="hero-kicker mb-3">🎊 Jardín Sale Week | Fin de semana largo</p>
+          <h1 class="display-4 fw-bold mb-3">Ofertas y actividades para vivir Jardín Sale Week <small class="d-block fs-5 fw-semibold mt-1">(del 22 al 25 de mayo)</small></h1>
+          <p class="lead hero-copy mb-4">Consulta promociones vigentes y la agenda completa de actividades turisticas, culturales y de feria artesanal.</p>
+          <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-cta-ofertas btn-lg" href="#ofertas">🔥 Ver ofertas</a>
+            <a class="btn btn-outline-light btn-lg" href="#eventos">🎉 Ver eventos</a>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="hero-info-card p-4">
+            <div class="text-center mb-3">
+              <img src="logo-jardin-sale-week.png" alt="Jardín Sale Week" class="hero-logo">
+            </div>
+            <p class="mb-2 text-secondary">🌿 Disfruta Jardín América</p>
+            <p class="metric mb-1">4 días</p>
+            <p class="mb-3 text-secondary">de promociones, cultura y turismo local</p>
+            <p class="metric mb-1">1 agenda</p>
+            <p class="mb-0 text-secondary">con todas las actividades oficiales en un solo lugar</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </header>
+
+  <main class="py-4">
+    <section class="py-5 bg-white" id="ofertas">
+      <div class="container">
+        <div class="mb-4">
+          <p class="text-uppercase fw-semibold small text-primary mb-2">🏷 Ofertas publicadas</p>
+          <h2 class="h2 mb-3">Estas son las promociones que tenemos para vos!</h2>
+        </div>
+        <div class="alert alert-light border border-2 border-primary-subtle small mb-4" role="note">
+          <p class="mb-0"><strong>Stock y disponibilidad:</strong> las promociones son válidas en el marco de Jardín Sale Week y <strong>hasta agotar stock, cupos o capacidad</strong> que defina cada prestador en su comercio o servicio. Si un producto ya no está disponible, eso es <strong>responsabilidad del prestador adherido</strong>, no de la organización del evento, que no controla inventarios ni disponibilidad local.</p>
+        </div>
+        <p class="small text-secondary mb-3">Si una promoción incumple lo publicado, podés informar a la organización desde la sección <a class="link-secondary" href="#informe-incumplimiento">Informar un incumplimiento</a> al final de esta página. <span class="text-muted">No es una vía judicial.</span></p>
+        <div id="offer-filters" class="offer-filters mb-3" role="group" aria-label="Filtrar promociones por rubro">
+          <button class="btn btn-offer-filter is-active" type="button" data-rubro="all">✨ Todas</button>
+          <button class="btn btn-offer-filter" type="button" data-rubro="alojamiento">🛏 Alojamiento</button>
+          <button class="btn btn-offer-filter" type="button" data-rubro="gastronomico">🍽 Gastronomia</button>
+          <button class="btn btn-offer-filter" type="button" data-rubro="comercio">🛒 Comercio</button>
+        </div>
+        <div class="mb-3">
+          <input id="offer-search" type="search" class="form-control offer-search-input" placeholder="Buscar por comercio, título, beneficio o ubicación..." aria-label="Buscar ofertas">
+        </div>
+        <div id="offers-loading" class="text-center py-4" aria-live="polite">
+          <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+          <p class="small text-secondary mb-0 mt-2">Cargando ofertas...</p>
+        </div>
+        <p id="offers-background-loading" class="small text-secondary d-none mt-2">Cargando más ofertas...</p>
+        <div id="ofertas-publicas" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3"></div>
+        <div class="text-center mt-3">
+          <button id="offers-load-more" type="button" class="btn btn-outline-primary d-none">Ver más ofertas</button>
+        </div>
+        <p id="ofertas-publicas-empty" class="text-secondary mb-0 mt-3 d-none">Aun no hay ofertas publicadas. Las ofertas aprobadas apareceran automaticamente aqui.</p>
+      </div>
+    </section>
+
+    <section class="py-5 bg-body-secondary" id="eventos">
+      <div class="container">
+        <div class="mb-4">
+            <p class="text-uppercase fw-semibold small text-primary mb-2">🎟 Agenda oficial</p>
+            <h2 class="h2 mb-0">🎉 Eventos del fin de semana</h2>
+        </div>
+        <div id="events-loading" class="text-center py-4" aria-live="polite">
+          <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando eventos...</span></div>
+        </div>
+        <div id="eventos-publicos" class="row row-cols-1 row-cols-lg-2 g-3" style="display: none;"></div>
+        <p id="eventos-publicos-empty" class="text-secondary text-center mb-0 mt-3">Cargando eventos...</p>
+      </div>
+    </section>
+
+    <section class="py-5 bg-white" id="programa">
+      <div class="container">
+        <p class="text-uppercase fw-semibold small text-primary mb-2">🗓 Programa oficial</p>
+        <h2 class="h2 mb-2">📅 Cronograma de actividades (22 al 25 de mayo)</h2>
+        <p class="text-secondary mb-4">Toda la agenda oficial de Jardin de Remate para planificar cada jornada con horario, actividad y detalle.</p>
+
+        <div class="program-highlight mb-4">
+          <div class="program-highlight-day">Viernes 22</div>
+          <div>
+            <h3 class="h5 mb-1">🚀 Arranque de promociones</h3>
+            <p class="mb-0 text-secondary">Inicio oficial de promociones en comercios, alojamientos y gastronomicos adheridos. Sin actividades al aire libre; foco en comunicacion digital y activacion de la plataforma web.</p>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-12 col-xl-6">
+            <article class="program-day-card h-100">
+              <div class="program-day-header">
+                <p class="program-day-kicker mb-1">Sabado 23 de mayo</p>
+                <h3 class="h4 mb-0">Jornada central I</h3>
+              </div>
+              <div class="program-day-body">
+                <div class="program-item">
+                  <span class="program-time">10:00 hs</span>
+                  <div><strong>🌿 Circuito natural</strong><p class="mb-0">Saltos del Tabay con guias locales certificados. Cupos limitados e inscripcion previa via web.</p><a class="btn btn-sm btn-outline-primary mt-2 js-prefill-circuit" href="#inscripcion-circuitos" data-circuito="circuito_natural" data-dia="sabado_23_mayo">🧭 Inscribirme a este circuito</a></div>
+                </div>
+                <div class="program-item">
+                  <span class="program-time">17:00 hs</span>
+                  <div><strong>🏛 Circuito cultural</strong><p class="mb-0">Recorrido guiado por iglesias centricas de Jardin America, con enfoque historico y patrimonial.</p><a class="btn btn-sm btn-outline-primary mt-2 js-prefill-circuit" href="#inscripcion-circuitos" data-circuito="circuito_cultural" data-dia="sabado_23_mayo">🧭 Inscribirme a este circuito</a></div>
+                </div>
+                <div class="program-item">
+                  <span class="program-time">18:00 hs</span>
+                  <div><strong>🧵 Apertura de feria artesanal</strong><p class="mb-0">Inicio de la feria artesanal frente a Plaza Central con puestos de artesania local.</p></div>
+                </div>
+                <div class="program-item">
+                  <span class="program-time">19:00 hs</span>
+                  <div><strong>🎨 Talleres artesanales y sector artistico</strong><p class="mb-0">Talleres en vivo y exposicion de artistas locales dentro de la feria.</p></div>
+                </div>
+                <div class="program-item">
+                  <span class="program-time">19:00 hs</span>
+                  <div><strong>🎵 Musica en vivo y DJs</strong><p class="mb-0">Shows en el escenario central con artistas locales y sets de DJs durante la noche.</p></div>
+                </div>
+                <div class="program-item">
+                  <span class="program-time">00:00 hs</span>
+                  <div><strong>🌙 Cierre de la feria</strong><p class="mb-0">Cierre del primer dia de feria.</p></div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-12 col-xl-6">
+            <article class="program-day-card h-100">
+              <div class="program-day-header">
+                <p class="program-day-kicker mb-1">Domingo 24 de mayo</p>
+                <h3 class="h4 mb-0">Jornada central II</h3>
+              </div>
+              <div class="program-day-body">
+                <div class="program-item">
+                  <span class="program-time">10:00 hs</span>
+                  <div><strong>🌿 Circuito natural</strong><p class="mb-0">Segunda fecha del circuito guiado por Saltos del Tabay (inscripcion previa via web).</p><a class="btn btn-sm btn-outline-primary mt-2 js-prefill-circuit" href="#inscripcion-circuitos" data-circuito="circuito_natural" data-dia="domingo_24_mayo">🧭 Inscribirme a este circuito</a></div>
+                </div>
+                <div class="program-item">
+                  <span class="program-time">17:00 hs</span>
+                  <div><strong>🏛 Circuito cultural</strong><p class="mb-0">Segunda fecha del recorrido guiado por iglesias centricas.</p><a class="btn btn-sm btn-outline-primary mt-2 js-prefill-circuit" href="#inscripcion-circuitos" data-circuito="circuito_cultural" data-dia="domingo_24_mayo">🧭 Inscribirme a este circuito</a></div>
+                </div>
+                <div class="program-item">
+                  <span class="program-time">18:00 hs</span>
+                  <div><strong>🧵 Apertura de feria artesanal</strong><p class="mb-0">Segunda noche de feria artesanal frente a Plaza Central.</p></div>
+                </div>
+                <div class="program-item">
+                  <span class="program-time">19:00 hs</span>
+                  <div><strong>🎨 Talleres artesanales y sector artistico</strong><p class="mb-0">Nuevos talleres en vivo y exposicion de artistas locales para todo el publico.</p></div>
+                </div>
+                <div class="program-item">
+                  <span class="program-time">19:00 hs</span>
+                  <div><strong>🎵 Musica en vivo y DJs</strong><p class="mb-0">Segunda noche con artistas en vivo y DJs durante toda la feria.</p></div>
+                </div>
+                <div class="program-item">
+                  <span class="program-time">00:00 hs</span>
+                  <div><strong>🌙 Cierre de la feria</strong><p class="mb-0">Cierre oficial de la edicion 2025.</p></div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="program-highlight mt-4">
+          <div class="program-highlight-day">Lunes 25</div>
+          <div>
+            <h3 class="h5 mb-1">✅ Cierre del evento</h3>
+            <p class="mb-0 text-secondary">Ultimo dia de vigencia de promociones comerciales. Se recomienda a los alojamientos ofrecer check-out tardio para estadias extendidas.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-5 bg-body-secondary" id="inscripcion-circuitos">
+      <div class="container">
+        <div class="mb-4">
+          <p class="text-uppercase fw-semibold small text-primary mb-2">🧭 Inscripcion</p>
+          <h2 class="h2 mb-2">📝 Inscripcion a circuitos guiados</h2>
+          <p class="text-secondary mb-0">Completá tus datos para reservar lugar en el circuito seleccionado. Tenés que indicar a cuál circuito y en qué día querés participar.</p>
+        </div>
+
+        <div id="signup-alert" class="alert d-none" role="alert"></div>
+
+        <form id="circuit-signup-form" class="card p-3 p-md-4">
+          <p id="signup-window-hint" class="small text-secondary mb-3">
+            ⏳ La inscripcion cierra 2 horas antes de la salida de cada circuito.
+          </p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">🌿/🏛 Circuito</label>
+              <select class="form-select" name="circuito" required>
+                <option value="">Seleccionar circuito</option>
+                <option value="circuito_natural">Circuito natural - Saltos del Tabay</option>
+                <option value="circuito_cultural">Circuito cultural - Iglesias centricas</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">📅 Dia de participacion</label>
+              <select class="form-select" name="dia_actividad" required>
+                <option value="">Seleccionar dia</option>
+                <option value="sabado_23_mayo">Sabado 23 de mayo</option>
+                <option value="domingo_24_mayo">Domingo 24 de mayo</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">👤 Nombre completo</label>
+              <input class="form-control" name="nombre_completo" placeholder="Ej: Juan Perez" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">🪪 DNI</label>
+              <input class="form-control" name="dni" inputmode="numeric" placeholder="Ej: 35123456" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">🎂 Fecha de nacimiento</label>
+              <input type="date" class="form-control" name="fecha_nacimiento" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">📞 Contacto (telefono o email)</label>
+              <input class="form-control" name="contacto" placeholder="Ej: +54 9 3743 123456 o correo@ejemplo.com" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">📍 Procedencia</label>
+              <input class="form-control" name="procedencia" placeholder="Ej: Posadas, Misiones" required>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-primary" type="submit">✅ Confirmar inscripcion</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="py-5 offer-informe-section" id="informe-incumplimiento" aria-labelledby="informe-incumplimiento-heading">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-10 col-xl-8">
+            <div class="card border-0 shadow-sm overflow-hidden">
+              <div class="card-body p-4 p-md-5">
+                <p class="text-uppercase fw-semibold small text-primary mb-2">📩 Atención al público</p>
+                <h2 class="h3 mb-3" id="informe-incumplimiento-heading">Informar un incumplimiento por parte de un prestador</h2>
+                <p class="text-secondary mb-3">
+                  Si considerás que una promoción publicada en esta web no se cumplió, podés enviar un <strong>informe a la organización de Jardín Sale Week</strong> (Dirección de Turismo / Municipalidad de Jardín América). <strong>No es una denuncia judicial</strong>: es un canal interno para que analicemos la situación según el reglamento del evento.
+                </p>
+                <p class="small text-muted mb-4">
+                  Si los hechos se confirman, pueden aplicarse medidas hacia el prestador (por ejemplo, suspensión en futuras ediciones). No hay garantía de respuesta ni de plazos. Vas a poder completar los datos en el formulario y enviarlos desde acá, sin depender de tu programa de correo.
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                  <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modal-reportar-infraccion" data-offer-id="">
+                    Completar formulario de informe
+                  </button>
+                  <a class="btn btn-outline-secondary btn-lg" href="#ofertas">⬆ Volver a las ofertas</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal fade" id="modal-reportar-infraccion" tabindex="-1" aria-labelledby="modal-reportar-infraccion-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title h5 mb-0" id="modal-reportar-infraccion-label">Informe a la organización</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p class="small text-muted mb-3" id="modal-report-context"></p>
+          <div class="alert alert-light border small mb-3" role="note">
+            <p class="mb-2"><strong>No es una denuncia judicial.</strong> Este canal sirve únicamente para dirigir un informe a la organización de <strong>Jardín Sale Week</strong> (Municipalidad de Jardín América / Dirección de Turismo) sobre un posible incumplimiento de una promoción difundida en el marco del evento. <strong>No sustituye</strong> denuncias penales, civiles ni reclamos ante organismos de defensa del consumidor.</p>
+            <p class="mb-0"><strong>Análisis y consecuencias:</strong> la organización <strong>analizará</strong> la comunicación. Si, tras la revisión, <strong>se constata</strong> que los hechos corresponden a un incumplimiento, ello podrá <strong>derivar en la suspensión del prestador</strong> para <strong>próximas ediciones</strong> de Jardín Sale Week, según el reglamento de participación y criterios internos. No hay garantía de respuesta ni de plazos.</p>
+          </div>
+
+          <div id="report-form-success" class="alert alert-success small d-none" role="status"></div>
+          <div id="report-form-error" class="alert alert-danger small d-none" role="alert"></div>
+
+          <form id="form-provider-report" novalidate>
+            <input type="hidden" name="offer_id" id="report-offer-id" value="">
+            <div class="mb-3">
+              <label class="form-label" for="report-comercio-indicado">Comercio / prestador afectado</label>
+              <input type="text" class="form-control" id="report-comercio-indicado" name="comercio_indicado" required minlength="2" placeholder="Nombre como figura en la publicación" autocomplete="organization">
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="report-titulo-promocion">Título de la promoción <span class="text-muted fw-normal">(opcional)</span></label>
+              <input type="text" class="form-control" id="report-titulo-promocion" name="titulo_promocion" placeholder="Ej: 20% off en alojamiento" autocomplete="off">
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="report-nombre-informante">Tu nombre</label>
+              <input type="text" class="form-control" id="report-nombre-informante" name="nombre_informante" required minlength="2" placeholder="Nombre y apellido" autocomplete="name">
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="report-contacto-informante">Contacto (email o teléfono)</label>
+              <input type="text" class="form-control" id="report-contacto-informante" name="contacto_informante" required minlength="3" placeholder="Para que la organización pueda comunicarse si lo necesita" autocomplete="email">
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="report-detalle">Qué ocurrió</label>
+              <textarea class="form-control" id="report-detalle" name="detalle" rows="5" required minlength="20" maxlength="8000" placeholder="Contá con el mayor detalle posible (fecha, lugar, qué prometía la oferta y qué pasó). Mínimo 20 caracteres."></textarea>
+              <div class="form-text">Máximo 8000 caracteres.</div>
+            </div>
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="report-acepto-terminos" name="acepto_terminos" value="1" required>
+              <label class="form-check-label small" for="report-acepto-terminos">Leí y comprendo que esto no es una vía judicial, que el informe es para la organización del evento y que puede derivar en medidas internas (incluida suspensión del prestador en futuras ediciones si se constata el incumplimiento).</label>
+            </div>
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary" id="report-form-submit">Enviar informe a la organización</button>
+            </div>
+          </form>
+          <p class="small text-muted mt-3 mb-0" id="report-mailto-fallback-wrap">¿Preferís usar tu correo? <a id="modal-report-mailto" href="#">Abrir mensaje en tu aplicación de correo</a> <span id="modal-report-email-missing" class="d-none text-danger">(configurá el correo en <code>js/public-report-config.js</code>)</span></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modal-public-media" tabindex="-1" aria-labelledby="modal-public-media-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered public-media-modal-dialog">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header border-0 py-2 px-3">
+          <h2 class="modal-title h6 mb-0 text-truncate pe-2" id="modal-public-media-title">Imágenes</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body pt-0 px-3 pb-3" id="modal-public-media-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer-dark text-light py-5">
+    <div class="container">
+      <div class="row g-4 align-items-start">
+        <div class="col-lg-5">
+          <img src="logo-municipalidad-jardin-america.png" alt="Municipalidad de Jardín América" class="footer-muni-logo mb-3">
+          <p class="text-white-50 mb-0">Jardín Sale Week. Dirección de Turismo de la Municipalidad de Jardín América.</p>
+        </div>
+        <div class="col-lg-3">
+          <h3 class="h6 text-white">🧭 Navegacion</h3>
+          <ul class="list-unstyled mb-0">
+            <li><a href="#ofertas">🏷 Ofertas</a></li>
+            <li><a href="#eventos">🎉 Eventos</a></li>
+            <li><a href="#programa">🗓 Programa</a></li>
+            <li><a href="#informe-incumplimiento">📩 Informar incumplimiento</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-4">
+          <h3 class="h6 text-white">🏪 Para comerciantes</h3>
+          <a class="btn btn-primary" href="comerciantes.html">🛍 Ingresar al portal</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/analytics-config.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/public-report-config.js"></script>
+  <script src="js/offer-image-order.js"></script>
+  <script src="js/public-media-modal.js?v=deploy-share-20260213"></script>
+  <script src="js/public-offers.js?v=deploy-share-20260213"></script>
+  <script src="js/public-events.js?v=deploy-share-20260213"></script>
+  <script src="js/circuit-signups.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.local
+.netlify/
+
+js/supabase-config.js
+js/admin-access.js
+
+_chrome-dump*.html
+_soraya-babel.js
+_*.txt
+.cursor/
+
+presentacion-generica-campana.html

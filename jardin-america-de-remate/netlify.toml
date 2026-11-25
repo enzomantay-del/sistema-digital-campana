@@ -1,0 +1,9 @@
+# Sitio estático: carpeta del proyecto = publicación
+[build]
+  publish = "."
+
+# Que al compartir el link siempre se pida de nuevo el HTML (evita ver ofertas.html viejo en caché)
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

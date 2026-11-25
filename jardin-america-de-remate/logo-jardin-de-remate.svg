@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 220" role="img" aria-labelledby="title desc">
+  <title id="title">Logo Jardin de Remate</title>
+  <desc id="desc">Logo textual basado en la identidad azul, rojo y dorado del proyecto oficial.</desc>
+  <rect width="560" height="220" rx="20" fill="#0f2346"/>
+  <circle cx="84" cy="110" r="54" fill="#c1272d"/>
+  <circle cx="84" cy="110" r="28" fill="#d4a82f"/>
+  <path d="M50 110h68M84 76v68" stroke="#0f2346" stroke-width="10" stroke-linecap="round"/>
+  <text x="160" y="92" fill="#ffffff" font-size="44" font-family="Montserrat, Arial, sans-serif" font-weight="800">JARDIN</text>
+  <text x="160" y="142" fill="#d4a82f" font-size="44" font-family="Montserrat, Arial, sans-serif" font-weight="800">DE REMATE</text>
+  <text x="160" y="178" fill="#d9e3fa" font-size="16" font-family="Montserrat, Arial, sans-serif" font-weight="700">Fin de semana largo - Jardin America</text>
+</svg>
