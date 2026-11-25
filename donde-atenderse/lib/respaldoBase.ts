@@ -115,7 +115,7 @@ export async function restaurarRespaldoBase(respaldo: RespaldoCercalud) {
     if (data.places.length) await tx.place.createMany({ data: data.places });
     if (data.placeEditors.length) await tx.placeEditor.createMany({ data: data.placeEditors });
     if (data.professionalObras.length) await tx.professionalObra.createMany({ data: data.professionalObras });
-    if (data.placeObras.length) await tx.placeObras.createMany({ data: data.placeObras });
+    if (data.placeObras.length) await tx.placeObra.createMany({ data: data.placeObras });
     if (data.attendances.length) await tx.attendance.createMany({ data: data.attendances });
     if (data.attendanceObras.length) await tx.attendanceObra.createMany({ data: data.attendanceObras });
     if (data.studies.length) await tx.study.createMany({ data: data.studies });
