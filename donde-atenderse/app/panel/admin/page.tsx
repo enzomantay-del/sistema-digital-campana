@@ -10,6 +10,7 @@ import {
 import { GestionAdminLista, type FilaAdmin } from "@/components/GestionAdminLista";
 import { ImportarTurneroFarmacia } from "@/components/ImportarTurneroFarmacia";
 import { CrearUsuarioAdmin } from "@/components/CrearUsuarioAdmin";
+import { PanelAdminSeccion } from "@/components/PanelAdminSeccion";
 import { RespaldoBaseAdmin } from "@/components/RespaldoBaseAdmin";
 import { requiereAdmin } from "@/lib/auth";
 import { etiquetaArea, etiquetaLugar, fecha } from "@/lib/format";
@@ -179,42 +180,58 @@ export default async function PanelAdmin({
     ),
   );
 
+  const hayAvisos = ok === "usuario" || error === "usuario" || error === "correo" || error === "lugares";
+
   return (
-    <div className="panel-admin mx-auto grid w-full max-w-4xl gap-7">
-      <header className="mx-auto grid w-full max-w-2xl gap-2 text-center">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Administración</h1>
-        <p className="text-sm text-muted">
-          Hola, {admin.name}. Filtrá, seleccioná varios y publicá, bajá o eliminá de una vez.
-        </p>
-        <div className="flex flex-wrap justify-center gap-2">
-          <Link href="/panel/lugar/nuevo" className="boton">
-            Cargar un lugar
-          </Link>
-          <form method="POST" action="/api/salir">
-            <button className="boton-suave" type="submit">
-              Salir
-            </button>
-          </form>
+    <div className="panel-admin mx-auto grid w-full max-w-4xl gap-5 px-1 sm:gap-6 sm:px-0">
+      <header className="panel-admin-bloque grid gap-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="grid min-w-0 flex-1 gap-1">
+            <h1 className="text-2xl font-bold tracking-tight sm:text-[1.65rem]">Administración</h1>
+            <p className="text-sm text-muted">
+              Hola, {admin.name}. Filtrá, seleccioná varios y publicá, bajá o eliminá de una vez.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/panel/lugar/nuevo" className="boton">
+              Cargar un lugar
+            </Link>
+            <form method="POST" action="/api/salir">
+              <button className="boton-suave" type="submit">
+                Salir
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 
-      {ok === "usuario" ? (
-        <p className="rounded-xl border border-menta bg-[#e8f7f3] px-3 py-2 text-sm text-menta">
-          Usuario creado. Pasale el link de ingreso, el correo y la contraseña que definiste.
-        </p>
+      {hayAvisos ? (
+        <div className="panel-admin-bloque grid gap-2">
+          {ok === "usuario" ? (
+            <p className="rounded-xl border border-menta bg-[#e8f7f3] px-3 py-2 text-sm text-menta">
+              Usuario creado. Pasale el link de ingreso, el correo y la contraseña que definiste.
+            </p>
+          ) : null}
+          {error === "usuario" ? <p className="text-sm text-warn">Revisá nombre, correo, contraseña y rol.</p> : null}
+          {error === "correo" ? <p className="text-sm text-warn">Ya existe una cuenta con ese correo.</p> : null}
+          {error === "lugares" ? (
+            <p className="text-sm text-warn">Las secretarias necesitan al menos un lugar asignado.</p>
+          ) : null}
+        </div>
       ) : null}
-      {error === "usuario" ? <p className="text-sm text-warn">Revisá nombre, correo, contraseña y rol.</p> : null}
-      {error === "correo" ? <p className="text-sm text-warn">Ya existe una cuenta con ese correo.</p> : null}
-      {error === "lugares" ? (
-        <p className="text-sm text-warn">Las secretarias necesitan al menos un lugar asignado.</p>
-      ) : null}
 
-      <CrearUsuarioAdmin lugares={lugares.filter((lugar) => lugarPermiteCargaSecretaria(lugar.kind))} />
+      <PanelAdminSeccion
+        titulo="Crear usuario"
+        descripcion="Cuentas para secretarias (cargan profesionales del lugar) o profesionales (solo su ficha)."
+      >
+        <CrearUsuarioAdmin lugares={lugares.filter((lugar) => lugarPermiteCargaSecretaria(lugar.kind))} />
+      </PanelAdminSeccion>
 
-      <RespaldoBaseAdmin />
+      <PanelAdminSeccion titulo="Respaldo para migrar">
+        <RespaldoBaseAdmin />
+      </PanelAdminSeccion>
 
-      <section className="grid gap-2">
-        <h2 className="text-center text-lg font-semibold">Fichas a revisar</h2>
+      <PanelAdminSeccion titulo="Fichas a revisar" descripcion="Pendientes de revisión antes de publicar.">
         <GestionAdminLista
           filas={filasPendientes}
           vacio="No hay fichas pendientes."
@@ -222,10 +239,9 @@ export default async function PanelAdmin({
           acciones={accionesProfesional}
           filtros="profesional"
         />
-      </section>
+      </PanelAdminSeccion>
 
-      <section className="grid gap-2">
-        <h2 className="text-center text-lg font-semibold">Lugares sugeridos</h2>
+      <PanelAdminSeccion titulo="Lugares sugeridos" descripcion="Propuestas enviadas por usuarios, sin publicar.">
         <GestionAdminLista
           filas={filasSugeridos}
           vacio="No hay sugerencias."
@@ -233,10 +249,9 @@ export default async function PanelAdmin({
           acciones={accionesLugar}
           filtros="lugar"
         />
-      </section>
+      </PanelAdminSeccion>
 
-      <section className="grid gap-2">
-        <h2 className="text-center text-lg font-semibold">Profesionales</h2>
+      <PanelAdminSeccion titulo="Profesionales" descripcion="Todas las fichas de personas.">
         <GestionAdminLista
           filas={profesionales.map((persona) => filaProfesional(persona))}
           vacio="Todavía no hay fichas."
@@ -244,9 +259,9 @@ export default async function PanelAdmin({
           acciones={accionesProfesional}
           filtros="profesional"
         />
-      </section>
+      </PanelAdminSeccion>
 
-      <section className="flex justify-center">
+      <PanelAdminSeccion titulo="Turnero de farmacias">
         <ImportarTurneroFarmacia
           turneroOk={turneroOk === "1"}
           cargados={Number.isFinite(cargadosN) ? cargadosN : undefined}
@@ -254,15 +269,17 @@ export default async function PanelAdmin({
           turneroInvalidas={turneroInvalidas}
           turneroError={turneroError}
         />
-      </section>
+      </PanelAdminSeccion>
 
-      <section className="grid gap-2">
-        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center">
-          <h2 className="text-lg font-semibold">Lugares</h2>
+      <PanelAdminSeccion
+        titulo="Lugares"
+        descripcion="Centros, consultorios, laboratorios e imágenes del corredor."
+        accion={
           <Link href="/panel/lugar/nuevo" className="text-sm font-semibold text-link">
             Cargar otro
           </Link>
-        </div>
+        }
+      >
         <GestionAdminLista
           filas={lugares.map((lugar) => filaLugar(lugar))}
           vacio="Todavía no hay lugares."
@@ -270,7 +287,7 @@ export default async function PanelAdmin({
           acciones={accionesLugar}
           filtros="lugar"
         />
-      </section>
+      </PanelAdminSeccion>
     </div>
   );
 }

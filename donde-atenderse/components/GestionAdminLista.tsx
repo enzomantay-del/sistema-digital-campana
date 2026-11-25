@@ -153,8 +153,8 @@ export function GestionAdminLista({
   }
 
   return (
-    <div className="grid gap-2.5">
-      <div className="grid gap-2 rounded-2xl border border-line bg-white p-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-3">
+      <div className="grid gap-2 rounded-xl border border-line bg-paper/50 p-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
         <label className="grid gap-0.5 sm:col-span-2 lg:col-span-2">
           Buscar
           <input
@@ -255,13 +255,17 @@ export function GestionAdminLista({
       </div>
 
       {visibles.length === 0 ? (
-        <p className="text-sm text-muted">{filas.length === 0 ? vacio : "Ningún resultado con estos filtros."}</p>
+        <p className="rounded-xl border border-dashed border-line bg-paper/40 px-3 py-4 text-sm text-muted">
+          {filas.length === 0 ? vacio : "Ningún resultado con estos filtros."}
+        </p>
       ) : (
-        <ul className="grid gap-0">
-          {visibles.map((fila) => (
+        <ul className="overflow-hidden rounded-xl border border-line bg-white">
+          {visibles.map((fila, indice) => (
             <li
               key={fila.id}
-              className="grid gap-2 border-t border-line py-2 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:gap-3"
+              className={`grid gap-2 px-3 py-2.5 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:gap-3 ${
+                indice > 0 ? "border-t border-line" : ""
+              }`}
             >
               <label className="flex items-center">
                 <input

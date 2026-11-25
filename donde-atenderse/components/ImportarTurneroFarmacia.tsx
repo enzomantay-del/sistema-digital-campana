@@ -29,15 +29,12 @@ export function ImportarTurneroFarmacia({
       action="/api/admin/turnero"
       method="post"
       encType="multipart/form-data"
-      className="tarjeta grid max-w-2xl gap-4 text-left"
+      className="grid gap-4 text-left"
     >
-      <div className="grid gap-1">
-        <h2 className="text-lg font-semibold">Turnero de farmacias</h2>
-        <p className="text-sm text-muted">
-          Los turnos los carga Cercalud desde la planilla oficial. Vos publicás las farmacias; acá importamos inicio y fin con
-          hora exacta (hora de Misiones). Formato por fila: localidad; nombre; inicio; fin; fuente.
-        </p>
-      </div>
+      <p className="text-sm text-muted">
+        Los turnos los carga Cercalud desde la planilla oficial. Vos publicás las farmacias; acá importamos inicio y fin con
+        hora exacta (hora de Misiones). Formato por fila: localidad; nombre; inicio; fin; fuente.
+      </p>
       {turneroOk && typeof cargados === "number" ? (
         <div className="rounded-xl border border-menta bg-[#e8f7f3] px-3 py-2 text-sm" role="status">
           <p className="font-semibold text-menta">
