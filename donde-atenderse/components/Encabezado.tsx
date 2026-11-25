@@ -22,7 +22,7 @@ export async function Encabezado({ ejemplo }: { ejemplo: boolean }) {
   }
   const admin = esAdmin(usuario);
   const secretaria = esSecretaria(usuario);
-  const enlacePanel = usuario ? destinoPanelTrasLogin(usuario) : "/entrar";
+  const enlacePanel = usuario ? destinoPanelTrasLogin(usuario) : "/soy-profesional";
   const textoPanel = usuario ? (admin ? "Administración" : secretaria ? "Mis cargas" : "Mi ficha") : "Soy profesional";
   const demo = mostrarDatosEjemplo();
   return (

@@ -3,6 +3,7 @@ import { IconoCercalud, iconoLugar } from "@/components/iconos/IconoCercalud";
 import { LogoLugarListado } from "@/components/MediaListado";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
 import { etiquetaLugar } from "@/lib/format";
+import { resumenEstudios } from "@/lib/resumenEstudios";
 import { lugarVerificadoEnListado } from "@/lib/verificacion";
 
 export function TarjetaListadoLugar({
@@ -41,7 +42,7 @@ export function TarjetaListadoLugar({
           {lugar.studies.length > 0 ? (
             <p className="enlace-icono mt-1 text-sm">
               <IconoCercalud nombre="estudios" size={14} className="shrink-0 text-menta" />
-              <span>{lugar.studies.map((estudio) => estudio.name).join(" · ")}</span>
+              <span>{resumenEstudios(lugar.studies.map((estudio) => estudio.name))}</span>
             </p>
           ) : null}
         </div>

@@ -31,7 +31,7 @@ export function Pie({ ejemplo }: { ejemplo: boolean }) {
           <Link href="/contacto">Contacto</Link>
           <Link href="/privacidad">Privacidad</Link>
           <Link href="/terminos">Términos</Link>
-          <Link href="/entrar">Soy profesional</Link>
+          <Link href="/soy-profesional">Soy profesional</Link>
         </nav>
       </div>
     </footer>

@@ -12,21 +12,28 @@ type Props = {
   /** Texto breve bajo “Espacio comercial disponible”. */
   descripcion?: string;
   anchoFila?: boolean;
+  /** Columna de fichas: el hueco ocupa alto visible (skyscraper / vertical). */
+  rellenoVertical?: boolean;
 };
 
 const FORMATO_ANCHO_FILA = new Set<Exclude<VariantePublicidad, "contenido">>(["banner", "leaderboard"]);
 
 /** Hueco a la venta: silueta del formato + contacto. */
-export function EspacioPublicitario({ formato, descripcion, anchoFila = false }: Props) {
+export function EspacioPublicitario({
+  formato,
+  descripcion,
+  anchoFila = false,
+  rellenoVertical = false,
+}: Props) {
   const medida = MEDIDA_PUBLICIDAD[formato];
-  const aspecto = claseAspectoVariante(formato);
+  const aspecto = rellenoVertical ? "h-full w-full min-h-[220px]" : (claseAspectoVariante(formato) ?? "");
   const mail = contactoEmail();
   const fila = anchoFila || FORMATO_ANCHO_FILA.has(formato);
 
   return (
-    <TarjetaPublicidad variante={formato} compacto anchoFila={fila}>
+    <TarjetaPublicidad variante={formato} compacto anchoFila={fila || rellenoVertical}>
       <div
-        className={`flex flex-col items-center justify-center border border-dashed border-line/80 bg-white p-1 text-center ${aspecto ?? ""} ${
+        className={`flex h-full min-h-[inherit] flex-col items-center justify-center border border-dashed border-line/80 bg-white p-3 text-center ${aspecto} ${
           fila ? "px-3 sm:flex-row sm:justify-center sm:gap-4 sm:py-2" : ""
         }`}
       >
