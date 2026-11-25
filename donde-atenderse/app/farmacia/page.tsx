@@ -1,4 +1,5 @@
 import { IconoCercalud } from "@/components/iconos/IconoCercalud";
+import { EspacioPublicitario } from "@/components/EspacioPublicitario";
 import { FarmaciaTurnoPagina, type FarmaciaTurnoPorLocalidad } from "@/components/FarmaciaTurnoPagina";
 import { LOCALIDADES } from "@/lib/constants";
 import { farmaciasDeTurno } from "@/lib/search";
@@ -46,7 +47,12 @@ export default async function PaginaFarmacia() {
           otras localidades del corredor si lo necesitás.
         </p>
       </header>
+      <EspacioPublicitario formato="banner" />
       <FarmaciaTurnoPagina porLocalidad={porLocalidad} />
+      <div className="grid gap-1 sm:grid-cols-2">
+        <EspacioPublicitario formato="mpu" descripcion="Ideal para farmacias del corredor." />
+        <EspacioPublicitario formato="cuadrado" />
+      </div>
     </div>
   );
 }

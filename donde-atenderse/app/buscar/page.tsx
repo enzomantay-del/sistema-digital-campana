@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { Buscador } from "@/components/Buscador";
+import { EspacioPublicitario } from "@/components/EspacioPublicitario";
+import { LayoutListadoConPublicidad } from "@/components/LayoutListadoConPublicidad";
 import { IconoCercalud, type NombreIconoCercalud } from "@/components/iconos/IconoCercalud";
 import { TarjetaListadoLugar } from "@/components/TarjetaListadoLugar";
 import { TarjetaListadoProfesional } from "@/components/TarjetaListadoProfesional";
 import { filaHorario } from "@/lib/map";
 import { asistenciasEnLugaresPublicados } from "@/lib/publico";
 import { catalogoObras, buscar } from "@/lib/search";
+import { intercalarPublicidadEnListado } from "@/lib/intercalarPublicidad";
 import { armarVistaProfesional } from "@/lib/view";
 
 function encabezadoBuscar(estudios: boolean, centrosSalud: boolean) {
@@ -51,8 +54,46 @@ export default async function PaginaBuscar({
   const encabezado = encabezadoBuscar(Boolean(estudios), Boolean(centrosSalud));
   const lugaresPrimero = estudios || centrosSalud;
 
+  const filasProfesionales = personas.map((persona) => {
+    const vista = armarVistaProfesional({
+      fullName: persona.fullName,
+      specialty: persona.specialty,
+      specialties: persona.specialties,
+      area: persona.area,
+      license: persona.license,
+      photoUrl: persona.photoUrl,
+      price: persona.price,
+      priceUpdatedAt: persona.priceUpdatedAt,
+      whatsapp: persona.whatsapp,
+      phone: persona.phone,
+      agendaWhatsapp: persona.agendaWhatsapp,
+      agendaPhone: persona.agendaPhone,
+      obras: persona.obras.map((item) => item.obra.name),
+      updatedAt: persona.updatedAt,
+      filas: asistenciasEnLugaresPublicados(persona.attendances).map(filaHorario),
+    });
+    return <TarjetaListadoProfesional key={persona.id} id={persona.id} vista={vista} ejemplo={persona.example} />;
+  });
+
+  const filasLugares = centros.map((lugar) => (
+    <TarjetaListadoLugar
+      key={lugar.id}
+      lugar={{
+        id: lugar.id,
+        name: lugar.name,
+        kind: lugar.kind,
+        locality: lugar.locality,
+        logoUrl: lugar.logoUrl,
+        example: lugar.example,
+        updatedAt: lugar.updatedAt,
+        attendances: lugar.attendances,
+        studies: lugar.studies,
+      }}
+    />
+  ));
+
   return (
-    <div className="grid gap-8">
+    <LayoutListadoConPublicidad>
       <header className="grid max-w-3xl gap-2">
         <h1 className="enlace-icono text-4xl font-bold tracking-tight">
           <IconoCercalud nombre={encabezado.icono} size={34} className="text-menta" />
@@ -77,6 +118,9 @@ export default async function PaginaBuscar({
               : undefined
         }
       />
+      <div className="py-0.5">
+        <EspacioPublicitario formato="banner" />
+      </div>
       <p className="text-muted">
         {centrosSalud && !q ? (
           <>
@@ -103,45 +147,17 @@ export default async function PaginaBuscar({
         <p>No hay fichas con esos datos. Probá con otra palabra o con otra localidad.</p>
       ) : null}
       <section className={`grid gap-3 ${lugaresPrimero ? "order-2" : ""}`}>
-        {personas.map((persona) => {
-          const vista = armarVistaProfesional({
-            fullName: persona.fullName,
-            specialty: persona.specialty,
-            specialties: persona.specialties,
-            area: persona.area,
-            license: persona.license,
-            photoUrl: persona.photoUrl,
-            price: persona.price,
-            priceUpdatedAt: persona.priceUpdatedAt,
-            whatsapp: persona.whatsapp,
-            phone: persona.phone,
-            agendaWhatsapp: persona.agendaWhatsapp,
-            agendaPhone: persona.agendaPhone,
-            obras: persona.obras.map((item) => item.obra.name),
-            updatedAt: persona.updatedAt,
-            filas: asistenciasEnLugaresPublicados(persona.attendances).map(filaHorario),
-          });
-          return <TarjetaListadoProfesional key={persona.id} id={persona.id} vista={vista} ejemplo={persona.example} />;
-        })}
+        {intercalarPublicidadEnListado(filasProfesionales)}
       </section>
       <section className={`grid gap-3 ${lugaresPrimero ? "order-1" : ""}`}>
-        {centros.map((lugar) => (
-          <TarjetaListadoLugar
-            key={lugar.id}
-            lugar={{
-              id: lugar.id,
-              name: lugar.name,
-              kind: lugar.kind,
-              locality: lugar.locality,
-              logoUrl: lugar.logoUrl,
-              example: lugar.example,
-              updatedAt: lugar.updatedAt,
-              attendances: lugar.attendances,
-              studies: lugar.studies,
-            }}
-          />
-        ))}
+        {intercalarPublicidadEnListado(filasLugares)}
       </section>
-    </div>
+      <div className="py-0.5 xl:hidden">
+        <EspacioPublicitario formato="vertical-alto" />
+      </div>
+      <div className="py-0.5">
+        <EspacioPublicitario formato="leaderboard" />
+      </div>
+    </LayoutListadoConPublicidad>
   );
 }

@@ -1,29 +1,34 @@
 import type { ReactNode } from "react";
+import { claseAnchoVariante, type VariantePublicidad } from "@/lib/formatosPublicidad";
 
-/** Presentación de avisos al estilo portal de noticias (ej. banda horizontal + columna tipo 300×600). */
+/** Presentación de avisos al estilo portal de noticias (etiqueta discreta, marco fino). */
 export function TarjetaPublicidad({
   children,
   variante = "contenido",
   ejemplo = false,
+  compacto = false,
 }: {
   children: ReactNode;
-  /** leaderboard = banda bajo el buscador; skyscraper = columna lateral ~300px. */
-  variante?: "leaderboard" | "skyscraper" | "contenido";
-  /** Muestra “Publicidad · ejemplo” hasta tener anunciante real. */
+  variante?: VariantePublicidad;
   ejemplo?: boolean;
+  /** Menos aire entre rótulo y creatividad (listados y columnas). */
+  compacto?: boolean;
 }) {
   const rotulo = ejemplo ? "Publicidad · ejemplo" : "Publicidad";
-  const ancho =
-    variante === "skyscraper" ? "w-full max-w-[300px] mx-auto lg:mx-0" : "w-full max-w-[970px] mx-auto";
+  const ancho = claseAnchoVariante(variante);
+  const gap = compacto ? "gap-0.5" : "gap-1";
+  const rotuloClass = compacto
+    ? "text-[10px] font-semibold uppercase tracking-[0.14em] text-muted"
+    : "text-[11px] font-semibold uppercase tracking-[0.12em] text-muted";
 
   return (
     <div
-      className={`grid gap-2 ${ancho}`}
+      className={`grid ${gap} ${ancho}`}
       data-publicidad-variante={variante}
       data-publicidad-ejemplo={ejemplo ? "1" : undefined}
     >
-      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">{rotulo}</p>
-      <div className="overflow-hidden rounded-lg border border-line/90 bg-[#f8fafc]">{children}</div>
+      <p className={rotuloClass}>{rotulo}</p>
+      <div className="overflow-hidden rounded-md border border-line/80 bg-[#f8fafc] p-0">{children}</div>
     </div>
   );
 }

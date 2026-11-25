@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Buscador } from "@/components/Buscador";
-import { PublicidadPruebaInicio } from "@/components/PublicidadPruebaInicio";
+import { PublicidadBloqueInicio } from "@/components/PublicidadBloqueInicio";
+import { PublicidadPortada } from "@/components/PublicidadPortada";
+import { EspacioPublicitario } from "@/components/EspacioPublicitario";
 import { IconoCercalud, iconoArea, type NombreIconoCercalud } from "@/components/iconos/IconoCercalud";
 import { mostrarDatosEjemplo } from "@/lib/config";
 import { AREAS } from "@/lib/constants";
@@ -105,10 +107,14 @@ export default async function Inicio() {
         </div>
       </section>
 
-      <section aria-label="Publicidad" className="border-y border-line bg-white px-4 py-6 sm:py-10">
+      <section aria-label="Publicidad" className="border-y border-line bg-white px-1 py-1 sm:py-2">
         <div className="mx-auto w-full max-w-page">
-          <PublicidadPruebaInicio />
+          <PublicidadPortada />
         </div>
+      </section>
+
+      <section aria-label="Publicidad" className="bg-white px-1 py-1">
+        <EspacioPublicitario formato="banner" />
       </section>
 
       <section id="como-funciona" className="scroll-mt-28 bg-[#d9e1e8]">
@@ -128,6 +134,10 @@ export default async function Inicio() {
             ))}
           </div>
         </div>
+      </section>
+
+      <section className="border-t border-line bg-white px-1 py-1">
+        <PublicidadBloqueInicio />
       </section>
 
       <section className="bg-[#eef1f4]">

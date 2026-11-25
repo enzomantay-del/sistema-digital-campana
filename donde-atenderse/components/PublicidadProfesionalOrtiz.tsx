@@ -28,7 +28,7 @@ export async function PublicidadProfesionalOrtiz() {
   const lugar = primerLugar ? `${primerLugar.place.name} · ${primerLugar.place.locality}` : etiquetaArea(persona.area);
 
   return (
-    <TarjetaPublicidad variante="skyscraper" ejemplo>
+    <TarjetaPublicidad variante="vertical-alto" ejemplo compacto>
       <div className="relative aspect-[2/1] overflow-hidden rounded-xl bg-[#1e3a5f]">
         <Image src={foto} alt="" fill className="object-cover object-[center_18%]" sizes="400px" unoptimized />
         <div className="absolute inset-0 bg-gradient-to-t from-[#12275c]/95 via-[#12275c]/35 to-transparent" />

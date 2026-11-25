@@ -7,7 +7,7 @@ import { enlaceWhatsApp } from "@/lib/format";
 export function PublicidadFarmaciaEjemplo() {
   const whatsapp = "3743000500";
   return (
-    <TarjetaPublicidad variante="skyscraper" ejemplo>
+    <TarjetaPublicidad variante="skyscraper" ejemplo compacto>
       <div className="relative aspect-[2/1] overflow-hidden rounded-xl bg-[#0d9488]">
         <Image
           src="/ejemplos/publicidad-farmacia-promo.svg"
