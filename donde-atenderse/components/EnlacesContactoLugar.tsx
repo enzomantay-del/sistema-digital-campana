@@ -2,47 +2,46 @@ import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { MENSAJE_WHATSAPP } from "@/lib/constants";
 import { enlaceTelefono, enlaceWhatsApp } from "@/lib/format";
 
-/** WhatsApp y teléfono del centro, igual criterio que la ficha del lugar. */
+/** WhatsApp y teléfono con botones compactos, proporcionales al texto de la ficha. */
 export function EnlacesContactoLugar({
   whatsapp,
   telefono,
   ejemplo = false,
-  anchoCompletoMovil = true,
+  etiquetaWhatsapp = "WhatsApp",
+  etiquetaTelefono = "Teléfono fijo",
 }: {
   whatsapp?: string;
   telefono?: string;
   ejemplo?: boolean;
-  /** En fichas con varias sedes, los botones ocupan todo el ancho en celular. */
-  anchoCompletoMovil?: boolean;
+  etiquetaWhatsapp?: string;
+  etiquetaTelefono?: string;
 }) {
   if (!whatsapp?.trim() && !telefono?.trim()) return null;
 
-  const ancho = anchoCompletoMovil ? "w-full sm:w-fit" : "w-fit";
+  const boton =
+    "inline-flex items-center justify-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-white hover:bg-accent-dark";
+  const botonSuave =
+    "inline-flex items-center justify-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-ink hover:border-menta";
 
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
+    <div className="flex flex-wrap items-center gap-2">
       {whatsapp?.trim() ? (
         ejemplo ? (
-          <span className={`boton ${ancho} cursor-default justify-center gap-2 opacity-80`}>WhatsApp</span>
+          <span className={`${boton} cursor-default opacity-80`}>{etiquetaWhatsapp}</span>
         ) : (
-          <a
-            className={`boton ${ancho} gap-2`}
-            href={enlaceWhatsApp(whatsapp, MENSAJE_WHATSAPP)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <IconoCercalud nombre="mensaje" size={18} className="text-white/95" />
-            WhatsApp
+          <a className={boton} href={enlaceWhatsApp(whatsapp, MENSAJE_WHATSAPP)} target="_blank" rel="noopener noreferrer">
+            <IconoCercalud nombre="mensaje" size={15} className="text-white/95" />
+            {etiquetaWhatsapp}
           </a>
         )
       ) : null}
       {telefono?.trim() ? (
         ejemplo ? (
-          <span className={`boton-suave ${ancho} cursor-default justify-center gap-2 opacity-80`}>Teléfono fijo</span>
+          <span className={`${botonSuave} cursor-default opacity-80`}>{etiquetaTelefono}</span>
         ) : (
-          <a className={`boton-suave ${ancho} gap-2`} href={enlaceTelefono(telefono)}>
-            <IconoCercalud nombre="telefono" size={18} className="text-link" />
-            Teléfono fijo
+          <a className={botonSuave} href={enlaceTelefono(telefono)}>
+            <IconoCercalud nombre="telefono" size={15} className="text-link" />
+            {etiquetaTelefono}
           </a>
         )
       ) : null}

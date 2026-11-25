@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 
-/** Video de aviso sin controles visibles (refuerza CSS ante controles nativos del navegador). */
 export function PublicidadVideo({
   src,
   etiquetaAccesible,
@@ -10,7 +9,6 @@ export function PublicidadVideo({
 }: {
   src: string;
   etiquetaAccesible: string;
-  /** Bandas horizontales: altura del archivo, sin caja aspect que deje hueco abajo. */
   alturaNatural?: boolean;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -24,23 +22,23 @@ export function PublicidadVideo({
       video.removeAttribute("controls");
     };
 
-    video.setAttribute("playsinline", "");
-    video.setAttribute("webkit-playsinline", "true");
     sinControles();
     video.addEventListener("loadedmetadata", sinControles);
     video.addEventListener("play", sinControles);
     video.addEventListener("playing", sinControles);
-    video.addEventListener("timeupdate", sinControles);
 
     return () => {
       video.removeEventListener("loadedmetadata", sinControles);
       video.removeEventListener("play", sinControles);
       video.removeEventListener("playing", sinControles);
-      video.removeEventListener("timeupdate", sinControles);
     };
   }, [src]);
 
   const attrs = {
+    ref,
+    className: alturaNatural
+      ? "video-publicidad video-publicidad--fila block h-auto w-full max-w-full"
+      : "video-publicidad video-publicidad--vertical block h-full w-full object-contain object-top",
     src,
     autoPlay: true,
     muted: true,
@@ -56,16 +54,12 @@ export function PublicidadVideo({
   };
 
   if (alturaNatural) {
-    return (
-      <div className="publicidad-video-envoltorio publicidad-video-envoltorio--fila relative w-full overflow-hidden bg-black leading-[0]">
-        <video ref={ref} className="video-publicidad video-publicidad--fila block h-auto w-full max-w-full" {...attrs} />
-      </div>
-    );
+    return <video {...attrs} />;
   }
 
   return (
-    <div className="publicidad-video-envoltorio publicidad-video-recorte absolute inset-0 overflow-hidden bg-black">
-      <video ref={ref} className="video-publicidad video-publicidad--vertical" {...attrs} />
+    <div className="publicidad-video-recorte absolute inset-0 overflow-hidden">
+      <video {...attrs} />
     </div>
   );
 }

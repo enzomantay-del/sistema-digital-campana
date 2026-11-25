@@ -169,12 +169,7 @@ export function FichaLugar({
             <IconoCercalud nombre="contacto-directo" size={22} className="shrink-0 text-menta" />
             Contacto
           </h2>
-          <EnlacesContactoLugar
-            whatsapp={vista.whatsapp}
-            telefono={vista.telefono}
-            ejemplo={ejemplo}
-            anchoCompletoMovil={false}
-          />
+          <EnlacesContactoLugar whatsapp={vista.whatsapp} telefono={vista.telefono} ejemplo={ejemplo} />
         </section>
       ) : null}
       <p className="text-xs text-muted">{vista.actualizacion}</p>

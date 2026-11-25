@@ -5,8 +5,6 @@ import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
 import { EnlacesContactoLugar } from "@/components/EnlacesContactoLugar";
 import { ListaHorarioTexto } from "@/components/ListaHorarioTexto";
 import { ListaObrasCompacta } from "@/components/ListaObrasCompacta";
-import { MENSAJE_WHATSAPP } from "@/lib/constants";
-import { enlaceTelefono, enlaceWhatsApp } from "@/lib/format";
 import type { VistaProfesional } from "@/lib/view";
 
 export function FichaProfesional({
@@ -185,33 +183,13 @@ export function FichaProfesional({
             Agenda del profesional
           </h2>
           <p className="text-sm text-muted">Contacto de secretaría del médico (válido para todas sus sedes).</p>
-          <div className="flex flex-wrap gap-3">
-            {vista.agendaWhatsapp ? (
-              ejemplo ? (
-                <span className="boton w-fit cursor-default opacity-80">WhatsApp agenda</span>
-              ) : (
-                <a
-                  className="boton w-fit gap-2"
-                  href={enlaceWhatsApp(vista.agendaWhatsapp, MENSAJE_WHATSAPP)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <IconoCercalud nombre="mensaje" size={18} className="text-white/95" />
-                  WhatsApp agenda
-                </a>
-              )
-            ) : null}
-            {vista.agendaTelefono ? (
-              ejemplo ? (
-                <span className="boton-suave w-fit cursor-default opacity-80">Teléfono agenda</span>
-              ) : (
-                <a className="boton-suave w-fit gap-2" href={enlaceTelefono(vista.agendaTelefono)}>
-                  <IconoCercalud nombre="telefono" size={18} className="text-link" />
-                  Teléfono agenda
-                </a>
-              )
-            ) : null}
-          </div>
+          <EnlacesContactoLugar
+            whatsapp={vista.agendaWhatsapp}
+            telefono={vista.agendaTelefono}
+            ejemplo={ejemplo}
+            etiquetaWhatsapp="WhatsApp agenda"
+            etiquetaTelefono="Teléfono agenda"
+          />
         </section>
       ) : null}
       <p className="text-xs text-muted">{vista.actualizacion}</p>

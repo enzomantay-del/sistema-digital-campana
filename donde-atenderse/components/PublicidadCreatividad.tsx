@@ -26,7 +26,7 @@ export function PublicidadCreatividad({
         <PublicidadVideo src={src} etiquetaAccesible={etiquetaAccesible} alturaNatural />
       ) : (
         <div
-          className={`publicidad-video-marco relative w-full overflow-hidden bg-black leading-[0] ${aspecto ?? "w-full"}`}
+          className={`publicidad-video-marco relative w-full overflow-hidden bg-[#0f1f33] leading-[0] ${aspecto ?? "w-full"}`}
         >
           <PublicidadVideo src={src} etiquetaAccesible={etiquetaAccesible} />
         </div>

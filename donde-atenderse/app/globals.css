@@ -79,107 +79,28 @@ button {
   @apply rounded-3xl border border-line bg-white p-6 shadow-[0_10px_30px_rgba(16,36,62,0.06)];
 }
 
-/* Avisos en video: sin barra de progreso ni controles nativos (móvil y escritorio) */
+/* Avisos en video */
 .tarjeta-publicidad-video {
   border: none !important;
   isolation: isolate;
   line-height: 0;
-  background: #000;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
 }
 
 .publicidad-video-marco {
   overflow: hidden;
   line-height: 0;
-  background: #000;
-  border-radius: 0;
   transform: translateZ(0);
+  border-radius: inherit;
 }
 
-.publicidad-video-envoltorio {
-  position: relative;
-  background: #000;
-}
-
-/* Franja inferior: tapa barra de avance en iOS/Android cuando el navegador la dibuja igual. */
-.publicidad-video-envoltorio::after {
-  pointer-events: none;
-  position: absolute;
-  z-index: 3;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: clamp(10px, 3.2vw, 22px);
-  background: #000;
-  content: "";
-}
-
-/* Verticales / skyscraper: llenan el marco (sin letterbox gris) y recorte de esquinas. */
 .publicidad-video-recorte .video-publicidad--vertical {
-  position: absolute;
-  inset: 0;
   display: block;
-  height: 100%;
-  width: 100%;
-  max-height: none;
-  border: 0;
-  object-fit: cover;
-  object-position: center top;
   pointer-events: none;
-  transform: scale(1.04);
-  transform-origin: center center;
-  -webkit-appearance: none;
-  appearance: none;
-  outline: none;
 }
 
-/* Bandas horizontales: recorte inferior responsivo. */
 .video-publicidad--fila {
   pointer-events: none;
   vertical-align: top;
-  border: 0;
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-  clip-path: inset(0 0 clamp(8px, 2.8vw, 18px) 0 round 0);
-  -webkit-clip-path: inset(0 0 clamp(8px, 2.8vw, 18px) 0 round 0);
-}
-
-.video-publicidad {
-  background: #000;
-}
-
-.video-publicidad::-webkit-media-controls {
-  display: none !important;
-  opacity: 0 !important;
-}
-
-.video-publicidad::-webkit-media-controls-enclosure {
-  display: none !important;
-  opacity: 0 !important;
-}
-
-.video-publicidad::-webkit-media-controls-panel {
-  display: none !important;
-}
-
-.video-publicidad::-webkit-media-controls-start-playback-button,
-.video-publicidad::-webkit-media-controls-overlay-enclosure,
-.video-publicidad::-webkit-media-controls-play-button,
-.video-publicidad::-webkit-media-controls-timeline,
-.video-publicidad::-webkit-media-controls-timeline-container,
-.video-publicidad::-webkit-media-controls-current-time-display,
-.video-publicidad::-webkit-media-controls-time-remaining-display,
-.video-publicidad::-webkit-media-controls-mute-button,
-.video-publicidad::-webkit-media-controls-volume-slider,
-.video-publicidad::-webkit-media-controls-fullscreen-button,
-.video-publicidad::-webkit-media-controls-overlay-play-button,
-.video-publicidad::-webkit-media-controls-transient-play-button {
-  display: none !important;
-  opacity: 0 !important;
-  appearance: none;
-  pointer-events: none !important;
 }
 
 .fila-profesional {
