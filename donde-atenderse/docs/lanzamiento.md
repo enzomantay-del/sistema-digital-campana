@@ -12,7 +12,11 @@ Orden sugerido. Vos podés avanzar hosting en paralelo; el resto es operación +
 4. El hosting asigna **Postgres** (`cursor-app.json`); en el primer `start` se crean tablas y el admin con `seed-produccion` si la base está vacía.
 5. Dominio propio: seguí [dominio-cercalud.md](./dominio-cercalud.md) (NIC → Cloudflare → pestaña **Domain** en Cursor → `CERCALUD_SITE_URL`).
 
-### Opción B — Servidor propio
+### Opción B — Netlify (cuenta paga u otra)
+
+Seguí la guía paso a paso: [netlify-migracion.md](./netlify-migracion.md) (Postgres externo, volcado desde Cursor, dominio).
+
+### Opción C — Servidor propio
 
 - [ ] Node 20+ y `npm run build` + `npm run start`.
 - [ ] `DATABASE_URL` con Postgres en producción (SQLite solo para desarrollo local).

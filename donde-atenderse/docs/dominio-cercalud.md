@@ -1,6 +1,6 @@
-# Conectar `cercalud.com.ar` a la web publicada en Cursor
+# Conectar `cercalud.com.ar` al sitio publicado
 
-La app vive hoy en **https://donde-atenderse.apps.grok.bot**. El dominio está en **NIC** y todavía no apunta a ningún lado: hay que hacer **dos cosas en orden**: pedir el dominio en Cursor y delegar/cargar el DNS (recomendado: **Cloudflare**, gratis).
+La app puede vivir en **Cursor** (`https://donde-atenderse.apps.grok.bot`) o en **Netlify** (ver [netlify-migracion.md](./netlify-migracion.md)). El dominio está en **NIC**: delegación en **Cloudflare** (gratis) y luego el CNAME que te indique **Cursor** o **Netlify**.
 
 Usá **`www.cercalud.com.ar`** como dirección principal; **`cercalud.com.ar`** (sin www) puede redirigir al www.
 

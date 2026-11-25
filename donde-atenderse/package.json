@@ -10,6 +10,7 @@
     "start": "node scripts/start-prod.mjs",
     "lint": "next lint",
     "db:push": "prisma db push",
+    "db:push:prod": "node scripts/db-push-prod.mjs",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:produccion": "tsx prisma/seed-produccion.ts",
     "test:schedule": "tsx lib/schedule.test.ts",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@netlify/plugin-nextjs": "^5.16.9",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^19",
