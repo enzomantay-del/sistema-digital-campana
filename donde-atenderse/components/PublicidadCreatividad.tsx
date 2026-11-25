@@ -19,10 +19,13 @@ export function PublicidadCreatividad({
   if (!src) return null;
   const aspecto = claseAspectoVariante(formato);
   const fila = anchoFila || formato === "banner" || formato === "leaderboard";
+  const columna =
+    formato === "skyscraper" || formato === "vertical-alto" || formato === "mpu" || formato === "cuadrado";
+  const tamanoNatural = fila || columna;
 
   return (
     <TarjetaPublicidad variante={formato} compacto anchoFila={fila} ejemplo creatividadVideo>
-      {fila ? (
+      {tamanoNatural ? (
         <PublicidadVideo src={src} etiquetaAccesible={etiquetaAccesible} alturaNatural />
       ) : (
         <div

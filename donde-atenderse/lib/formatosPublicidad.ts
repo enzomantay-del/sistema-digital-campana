@@ -33,8 +33,8 @@ export function claseAnchoVariante(variante: VariantePublicidad, anchoFila = fal
       return "mx-auto w-full max-w-[min(100%,340px)] sm:max-w-[300px]";
     case "skyscraper":
     case "vertical-alto":
-      /** Móvil y tablet: mismo ancho que la ficha; escritorio: columna 300 px. */
-      return "mx-auto w-full max-w-full xl:mx-0 xl:max-w-[300px]";
+      /** Columna IAB 300 px; en móvil ocupa el ancho útil de la ficha. */
+      return "mx-auto w-full max-w-[300px]";
     default:
       return "w-full";
   }
