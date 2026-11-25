@@ -17,7 +17,7 @@ export function TarjetaPublicidad({
   /** Banner / leaderboard ocupan todo el ancho del contenedor (sin bandas vacías a los lados). */
   anchoFila?: boolean;
 }) {
-  const rotulo = ejemplo ? "Publicidad · ejemplo" : "Publicidad";
+  const rotulo = ejemplo ? "Publicidad ejemplo" : "Publicidad";
   const ancho = claseAnchoVariante(variante, anchoFila);
   const gap = compacto ? "gap-0.5" : "gap-1";
   const rotuloClass = compacto

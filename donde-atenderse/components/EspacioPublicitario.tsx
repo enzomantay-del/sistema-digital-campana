@@ -9,7 +9,7 @@ import {
 
 type Props = {
   formato: Exclude<VariantePublicidad, "contenido">;
-  /** Texto breve bajo “Espacio comercial”. */
+  /** Texto breve bajo “Espacio comercial disponible”. */
   descripcion?: string;
   anchoFila?: boolean;
 };
@@ -36,7 +36,7 @@ export function EspacioPublicitario({ formato, descripcion, anchoFila = false }:
           <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-line bg-paper text-link">
             <IconoCercalud nombre="ficha" size={22} />
           </div>
-          <p className="text-xs font-bold text-ink">Espacio comercial</p>
+          <p className="text-xs font-bold text-ink">Espacio comercial disponible</p>
           <p className="text-[10px] leading-snug text-muted">
             {descripcion ??
               `${medida.nombre} · ${medida.ancho}×${medida.alto} px. Farmacias y profesionales de la zona.`}
