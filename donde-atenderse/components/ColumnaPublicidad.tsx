@@ -1,4 +1,3 @@
-import { EspacioPublicitario } from "@/components/EspacioPublicitario";
 import { PublicidadCreatividad } from "@/components/PublicidadCreatividad";
 
 type Perfil = "ficha" | "listado" | "farmacia";
@@ -8,7 +7,7 @@ export function ColumnaPublicidad({ perfil = "ficha" }: { perfil?: Perfil }) {
     return (
       <aside className="grid w-full gap-1" aria-label="Espacios publicitarios">
         <PublicidadCreatividad formato="vertical-alto" />
-        <EspacioPublicitario formato="skyscraper" />
+        <PublicidadCreatividad formato="skyscraper" />
       </aside>
     );
   }
@@ -16,14 +15,14 @@ export function ColumnaPublicidad({ perfil = "ficha" }: { perfil?: Perfil }) {
   if (perfil === "farmacia") {
     return (
       <aside className="grid w-full gap-1" aria-label="Espacios publicitarios">
-        <EspacioPublicitario formato="skyscraper" descripcion="Formato 300×600 · ideal para farmacias del corredor." />
+        <PublicidadCreatividad formato="skyscraper" />
       </aside>
     );
   }
 
   return (
     <aside className="grid w-full gap-1" aria-label="Espacios publicitarios">
-      <EspacioPublicitario formato="skyscraper" descripcion="Columna lateral en listados de búsqueda." />
+      <PublicidadCreatividad formato="skyscraper" />
     </aside>
   );
 }

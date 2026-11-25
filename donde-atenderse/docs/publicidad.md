@@ -48,10 +48,8 @@ Referencia visual: portales de noticias — aviso **dentro del flujo**, etiqueta
 |---------|--------|-------------|
 | `leaderboard-970x250.mp4` | **970 × 250** | Inicio (bajo buscador) |
 | `banner-728x90.mp4` | **728 × 90** | Búsqueda y farmacia (banda superior) |
-| `vertical-300x400.mp4` | **300 × 400** | Columna en fichas de profesional/lugar |
-| *(a contratar)* | **300 × 600** | Columna **skyscraper** en búsqueda, farmacia y listados (espacio remarcado) |
-
-El vertical de 400 px de alto puede usarse en skyscraper con `object-fit: cover` (se recorta un poco); lo ideal para vender ese hueco es exportar **300×600 px**.
+| `vertical-300x400.mp4` | **300 × 400** | Columna superior en fichas de profesional/lugar |
+| `skyscraper-300x600.mp4` | **300 × 600** | Columna en búsqueda, farmacia y fichas (skyscraper) |
 
 En cada página pública queda al menos un `EspacioPublicitario` vacío para mostrar disponibilidad comercial.
 

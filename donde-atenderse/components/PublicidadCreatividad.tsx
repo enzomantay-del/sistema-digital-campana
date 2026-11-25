@@ -28,7 +28,7 @@ export function PublicidadCreatividad({
         <PublicidadVideo
           src={src}
           etiquetaAccesible={etiquetaAccesible}
-          ajuste={fila ? "contain" : "cover"}
+          ajuste="contain"
         />
       </div>
     </TarjetaPublicidad>
