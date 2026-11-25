@@ -225,6 +225,12 @@ export function iconoArea(id: string): NombreIconoCercalud {
   return ICONO_AREA[id] ?? "areas";
 }
 
+export function iconoLugar(kind: string): NombreIconoCercalud {
+  if (kind === "laboratorio" || kind === "imagenes") return "estudios";
+  if (kind === "farmacia") return "farmacia";
+  return "centro-salud";
+}
+
 export const ICONO_NAV: Record<string, NombreIconoCercalud> = {
   "/buscar": "profesional",
   "/buscar?centros=1": "centro-salud",

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { IconoCercalud, iconoLugar } from "@/components/iconos/IconoCercalud";
 import { LogoLugarListado } from "@/components/MediaListado";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
 import { etiquetaLugar } from "@/lib/format";
@@ -30,12 +31,18 @@ export function TarjetaListadoLugar({
             <h2 className="text-2xl font-bold leading-tight tracking-tight">{lugar.name}</h2>
             <InsigniaVerificacion activa={verificado} compacta />
           </div>
-          <p className="mt-0.5 text-muted">
-            {etiquetaLugar(lugar.kind)} · {lugar.locality}
-            {lugar.example ? " · Dato de ejemplo" : ""}
+          <p className="enlace-icono mt-0.5 text-muted">
+            <IconoCercalud nombre={iconoLugar(lugar.kind)} size={15} className="shrink-0 text-menta" />
+            <span>
+              {etiquetaLugar(lugar.kind)} · {lugar.locality}
+              {lugar.example ? " · Dato de ejemplo" : ""}
+            </span>
           </p>
           {lugar.studies.length > 0 ? (
-            <p className="mt-1 text-sm">{lugar.studies.map((estudio) => estudio.name).join(" · ")}</p>
+            <p className="enlace-icono mt-1 text-sm">
+              <IconoCercalud nombre="estudios" size={14} className="shrink-0 text-menta" />
+              <span>{lugar.studies.map((estudio) => estudio.name).join(" · ")}</span>
+            </p>
           ) : null}
         </div>
       </div>

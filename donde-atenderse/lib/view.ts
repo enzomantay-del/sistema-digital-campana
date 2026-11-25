@@ -20,6 +20,8 @@ export type VistaProfesional = {
   nombre: string;
   especialidad: string;
   especialidades: string[];
+  /** Código interno del área (cuerpo, mental, odontología) para íconos. */
+  areaCodigo: string;
   area: string;
   matricula: string;
   fotoUrl: string;
@@ -148,6 +150,7 @@ export function armarVistaProfesional(input: {
       especialidadesDesdeCampo(input.specialties),
       input.specialty,
     ),
+    areaCodigo: input.area,
     area: etiquetaArea(input.area),
     matricula: input.license.trim(),
     fotoUrl: input.photoUrl?.trim() ?? "",

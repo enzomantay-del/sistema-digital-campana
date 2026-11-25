@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { IconoCercalud } from "@/components/iconos/IconoCercalud";
+import { IconoCercalud, iconoArea } from "@/components/iconos/IconoCercalud";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
 import { ListaHorarioTexto } from "@/components/ListaHorarioTexto";
 import { ListaObrasCompacta } from "@/components/ListaObrasCompacta";
@@ -37,14 +37,22 @@ export function FichaProfesional({
             </div>
           ) : null}
           <div className="grid min-w-0 flex-1 gap-2">
-            <p className="text-sm font-semibold uppercase tracking-[0.08em] text-menta">
-              {vista.especialidad} · {vista.area}
+            <p className="enlace-icono text-sm font-semibold uppercase tracking-[0.08em] text-menta">
+              <IconoCercalud nombre={iconoArea(vista.areaCodigo)} size={16} className="shrink-0 text-menta" />
+              <span>
+                {vista.especialidad} · {vista.area}
+              </span>
             </p>
             <div className="flex items-start justify-between gap-3">
               <h1 className="min-w-0 text-4xl font-bold tracking-tight">{vista.nombre}</h1>
               <InsigniaVerificacion activa={vista.datosVerificados} />
             </div>
-            {vista.matricula ? <p>Matrícula {vista.matricula}</p> : null}
+            {vista.matricula ? (
+              <p className="enlace-icono text-sm text-muted">
+                <IconoCercalud nombre="sello" size={15} className="shrink-0 text-menta" />
+                Matrícula {vista.matricula}
+              </p>
+            ) : null}
           </div>
         </div>
         {ejemplo ? <p className="text-base text-warn">Dato de ejemplo.</p> : null}
@@ -54,7 +62,12 @@ export function FichaProfesional({
         <p>Todavía no cargó dónde atiende.</p>
       ) : (
         <div className={fichaDensa ? "grid gap-3" : "grid gap-6"}>
-          <h2 className={fichaDensa ? "text-xl font-semibold" : "text-2xl font-semibold"}>Dónde atiende</h2>
+          <h2
+            className={`enlace-icono ${fichaDensa ? "text-xl font-semibold" : "text-2xl font-semibold"}`}
+          >
+            <IconoCercalud nombre="ubicacion" size={fichaDensa ? 20 : 24} className="shrink-0 text-menta" />
+            Dónde atiende
+          </h2>
           {vista.bloques.map((bloque) => (
             <section key={bloque.shift} className={fichaDensa ? "grid gap-2" : "grid gap-4"}>
               {vista.bloques.length > 1 ? (
@@ -80,25 +93,49 @@ export function FichaProfesional({
                     className={fichaDensa ? "grid gap-1.5 px-3 py-2.5" : "grid gap-2 border-t border-line pt-4"}
                   >
                     <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0">
-                      {enlazar ? (
-                        <Link
-                          href={`/lugar/${linea.placeId}`}
-                          className={fichaDensa ? "text-base font-semibold text-link" : "text-xl font-semibold text-link"}
-                        >
-                          {linea.placeName}
-                        </Link>
-                      ) : (
-                        <p className={fichaDensa ? "text-base font-semibold" : "text-xl font-semibold"}>
-                          {linea.placeName}
-                        </p>
-                      )}
-                      <span className="text-xs text-muted">{linea.locality}</span>
+                      <div className="enlace-icono min-w-0">
+                        <IconoCercalud
+                          nombre="centro-salud"
+                          size={fichaDensa ? 15 : 18}
+                          className="shrink-0 text-menta"
+                        />
+                        {enlazar ? (
+                          <Link
+                            href={`/lugar/${linea.placeId}`}
+                            className={
+                              fichaDensa ? "text-base font-semibold text-link" : "text-xl font-semibold text-link"
+                            }
+                          >
+                            {linea.placeName}
+                          </Link>
+                        ) : (
+                          <p className={fichaDensa ? "text-base font-semibold" : "text-xl font-semibold"}>
+                            {linea.placeName}
+                          </p>
+                        )}
+                      </div>
+                      {linea.locality ? (
+                        <span className="enlace-icono text-xs text-muted">
+                          <IconoCercalud nombre="ubicacion" size={12} className="shrink-0 text-menta/80" />
+                          {linea.locality}
+                        </span>
+                      ) : null}
                     </div>
                     {linea.horarioLineas.length > 0 || linea.detalle ? (
-                      <ListaHorarioTexto
-                        lineas={linea.horarioLineas.length > 0 ? linea.horarioLineas : [linea.detalle]}
-                        denso={fichaDensa}
-                      />
+                      <div className="flex gap-2">
+                        <IconoCercalud
+                          nombre="reloj"
+                          size={fichaDensa ? 14 : 16}
+                          className="mt-1 shrink-0 text-menta/85"
+                          aria-hidden
+                        />
+                        <div className="min-w-0 flex-1">
+                          <ListaHorarioTexto
+                            lineas={linea.horarioLineas.length > 0 ? linea.horarioLineas : [linea.detalle]}
+                            denso={fichaDensa}
+                          />
+                        </div>
+                      </div>
                     ) : null}
                     {linea.obras.length > 0 ? (
                       <ListaObrasCompacta obras={linea.obras} etiqueta="Obras sociales en este lugar" />
@@ -157,7 +194,10 @@ export function FichaProfesional({
 
       {vista.agendaWhatsapp || vista.agendaTelefono ? (
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold">Agenda del profesional</h2>
+          <h2 className="enlace-icono text-xl font-semibold">
+            <IconoCercalud nombre="contacto-directo" size={22} className="shrink-0 text-menta" />
+            Agenda del profesional
+          </h2>
           <p className="text-sm text-muted">Contacto de secretaría del médico (válido para todas sus sedes).</p>
           <div className="flex flex-wrap gap-3">
             {vista.agendaWhatsapp ? (

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { IconoCercalud } from "@/components/iconos/IconoCercalud";
+import { IconoCercalud, iconoArea } from "@/components/iconos/IconoCercalud";
 import { AvatarProfesionalListado } from "@/components/MediaListado";
 import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
 import { ListaHorarioTexto } from "@/components/ListaHorarioTexto";
@@ -31,9 +31,12 @@ export function FichaProfesionalEnLugar({
             >
               {persona.fullName}
             </Link>
-            <p className="mt-0.5 text-xs text-menta">
-              {persona.specialty} · {etiquetaArea(persona.area)}
-              {persona.license ? ` · Mat. ${persona.license}` : ""}
+            <p className="enlace-icono mt-0.5 text-xs text-menta">
+              <IconoCercalud nombre={iconoArea(persona.area)} size={14} className="shrink-0 text-menta" />
+              <span>
+                {persona.specialty} · {etiquetaArea(persona.area)}
+                {persona.license ? ` · Mat. ${persona.license}` : ""}
+              </span>
             </p>
           </div>
           <InsigniaVerificacion activa={persona.datosVerificados} compacta />

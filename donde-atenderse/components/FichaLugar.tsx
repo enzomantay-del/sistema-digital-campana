@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { IconoCercalud } from "@/components/iconos/IconoCercalud";
+import { IconoCercalud, iconoLugar } from "@/components/iconos/IconoCercalud";
 import { HorarioLugarPublico } from "@/components/HorarioLugarPublico";
 import { ListaHorarioTexto } from "@/components/ListaHorarioTexto";
 import { ListaObrasCompacta } from "@/components/ListaObrasCompacta";
@@ -38,8 +38,11 @@ export function FichaLugar({
             </div>
           ) : null}
           <div className="grid min-w-0 flex-1 gap-2">
-            <p className="text-sm font-semibold uppercase tracking-[0.08em] text-menta">
-              {etiquetaLugar(vista.kind)} · {vista.localidad}
+            <p className="enlace-icono text-sm font-semibold uppercase tracking-[0.08em] text-menta">
+              <IconoCercalud nombre={iconoLugar(vista.kind)} size={16} className="shrink-0 text-menta" />
+              <span>
+                {etiquetaLugar(vista.kind)} · {vista.localidad}
+              </span>
             </p>
             <div className="flex items-start justify-between gap-3">
               <h1 className="min-w-0 text-4xl font-bold tracking-tight">{vista.nombre}</h1>
@@ -73,7 +76,10 @@ export function FichaLugar({
 
       {vista.cantidadProfesionales > 0 ? (
         <section className="grid gap-4">
-          <h2 className="text-2xl font-semibold">Quién atiende</h2>
+          <h2 className="enlace-icono text-2xl font-semibold">
+            <IconoCercalud nombre="profesional" size={26} className="shrink-0 text-menta" />
+            Quién atiende
+          </h2>
           <p className="text-muted">Consultá el listado completo de profesionales y especialidades en este lugar.</p>
           <div className="flex flex-wrap gap-3">
             <Link href={`/lugar/${vista.placeId}/profesionales`} className="boton-suave gap-2">
@@ -122,7 +128,10 @@ export function FichaLugar({
 
       {vista.servicios.length > 0 ? (
         <section className="grid gap-3">
-          <h2 className="text-2xl font-semibold">Servicios</h2>
+          <h2 className="enlace-icono text-2xl font-semibold">
+            <IconoCercalud nombre="areas" size={24} className="shrink-0 text-menta" />
+            Servicios
+          </h2>
           <ul className="flex flex-wrap gap-2">
             {vista.servicios.map((servicio) => (
               <li key={servicio} className="pastilla pastilla-compacta pastilla-activa">
@@ -135,7 +144,10 @@ export function FichaLugar({
 
       {vista.estudios.length > 0 ? (
         <section className="grid gap-3">
-          <h2 className="text-2xl font-semibold">Estudios</h2>
+          <h2 className="enlace-icono text-2xl font-semibold">
+            <IconoCercalud nombre="estudios" size={24} className="shrink-0 text-menta" />
+            Estudios
+          </h2>
           {vista.estudios.map((estudio) => (
             <div key={estudio.nombre} className="border-t border-line pt-3">
               <p className="font-semibold">{estudio.nombre}</p>
@@ -153,7 +165,10 @@ export function FichaLugar({
 
       {vista.whatsapp || vista.telefono ? (
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold">Contacto</h2>
+          <h2 className="enlace-icono text-xl font-semibold">
+            <IconoCercalud nombre="contacto-directo" size={22} className="shrink-0 text-menta" />
+            Contacto
+          </h2>
           <div className="flex flex-wrap gap-3">
             {vista.whatsapp ? (
               ejemplo ? (

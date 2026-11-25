@@ -1,4 +1,5 @@
 import { HorarioLegible } from "@/components/HorarioLegible";
+import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { textoHorarioUnido } from "@/lib/horarioTexto";
 
 /** Presentación uniforme del horario en toda la web pública. */
@@ -20,8 +21,9 @@ export function ListaHorarioTexto({
   if (compacto) {
     const texto = textoHorarioUnido(lineas);
     return (
-      <p className="line-clamp-2 text-xs leading-snug text-muted" title={texto}>
-        {texto}
+      <p className="enlace-icono line-clamp-2 text-xs leading-snug text-muted" title={texto}>
+        <IconoCercalud nombre="reloj" size={13} className="shrink-0 text-menta/90" />
+        <span>{texto}</span>
       </p>
     );
   }
