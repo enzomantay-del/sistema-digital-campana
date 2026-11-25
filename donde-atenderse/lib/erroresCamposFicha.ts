@@ -113,7 +113,7 @@ export function erroresCamposFichaProfesional(
     if (obrasDelHorario(horario).length === 0) {
       porHorario[horario.key] = {
         ...porHorario[horario.key],
-        obras: "Marcá las obras que atendés acá o «Solo particular».",
+        obras: "Marcá las obras sociales que atendés acá o «Solo particular».",
       };
     }
   }

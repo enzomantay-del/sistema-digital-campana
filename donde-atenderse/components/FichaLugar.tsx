@@ -148,7 +148,7 @@ export function FichaLugar({
 
       {vista.obrasNota ? <p className="text-sm text-muted">{vista.obrasNota}</p> : null}
       {vista.mostrarObrasLista && vista.obras.length > 0 ? (
-        <ListaObrasCompacta obras={vista.obras} etiqueta="Obra social" />
+        <ListaObrasCompacta obras={vista.obras} etiqueta="Obras sociales" />
       ) : null}
 
       {vista.whatsapp || vista.telefono ? (

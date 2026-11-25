@@ -531,7 +531,7 @@ export function EditorProfesional({
                   catalogo={catalogo}
                   seleccionadas={horario.obras ?? []}
                   otraObra={horario.otraObra ?? ""}
-                  titulo={`Obra social en ${horario.placeName || "esta sede"}`}
+                  titulo={`Obras sociales en ${horario.placeName || "esta sede"}`}
                   avisoCampo={avisoCampo(errH?.obras)}
                   onSeleccionadas={(obras) => cambiarHorario(horario.key, { obras })}
                   onOtraObra={(otraObra) => cambiarHorario(horario.key, { otraObra })}
@@ -596,7 +596,7 @@ export function EditorProfesional({
               {bloqueHorario ? (
                 variasSedes ? (
                   <details className="grid gap-2 rounded-xl border border-line px-3 py-2" open={indiceHorario === 0}>
-                    <summary className="cursor-pointer text-sm font-semibold">Horario y obras</summary>
+                    <summary className="cursor-pointer text-sm font-semibold">Horario y obras sociales</summary>
                     {bloqueHorario}
                   </details>
                 ) : (

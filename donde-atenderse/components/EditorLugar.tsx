@@ -208,7 +208,7 @@ export function EditorLugar({
           <fieldset className="grid gap-3">
             <legend className="font-semibold">Obras sociales</legend>
             <label className="grid gap-1">
-              Cómo publicar las obras
+              Cómo publicar las obras sociales
               <select
                 className="campo"
                 value={borrador.obrasMode}
@@ -223,13 +223,15 @@ export function EditorLugar({
             </label>
             <p className="text-sm text-muted">{MODOS_OBRAS_LUGAR.find((item) => item.id === borrador.obrasMode)?.descripcion}</p>
             {borrador.obrasMode === "por_profesional" ? (
-              <p className="text-sm text-muted">No hace falta marcar obras acá. Cada profesional las carga en su ficha.</p>
+              <p className="text-sm text-muted">
+                No hace falta marcar obras sociales acá. Cada profesional las carga en su ficha.
+              </p>
             ) : (
               <SelectorObras
                 catalogo={catalogo}
                 seleccionadas={borrador.obras}
                 otraObra={borrador.otraObra}
-                titulo="Obras que atiende el lugar"
+                titulo="Obras sociales que atiende el lugar"
                 onSeleccionadas={(obras) => cambiar({ obras })}
                 onOtraObra={(otraObra) => cambiar({ otraObra })}
               />

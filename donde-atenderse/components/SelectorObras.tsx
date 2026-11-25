@@ -13,14 +13,14 @@ type Props = {
   avisoCampo?: string | null;
 };
 
-/** Catálogo de obras en panel acotado, con búsqueda y pastillas chicas. */
+/** Catálogo de obras sociales en panel acotado, con búsqueda y pastillas chicas. */
 export function SelectorObras({
   catalogo,
   seleccionadas,
   otraObra,
   onSeleccionadas,
   onOtraObra,
-  titulo = "Obra social",
+  titulo = "Obras sociales",
   avisoCampo,
 }: Props) {
   const [filtro, setFiltro] = useState("");
@@ -108,7 +108,7 @@ export function SelectorObras({
       </details>
       <input
         className="campo py-2 text-sm"
-        placeholder="Otra obra (texto libre)"
+        placeholder="Otra obra social (texto libre)"
         value={otraObra}
         onChange={(event) => onOtraObra(event.target.value)}
       />

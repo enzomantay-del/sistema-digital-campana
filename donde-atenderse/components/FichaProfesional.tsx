@@ -101,7 +101,7 @@ export function FichaProfesional({
                       />
                     ) : null}
                     {linea.obras.length > 0 ? (
-                      <ListaObrasCompacta obras={linea.obras} etiqueta="Obras en este lugar" />
+                      <ListaObrasCompacta obras={linea.obras} etiqueta="Obras sociales en este lugar" />
                     ) : null}
                     {linea.placeWhatsapp || linea.placePhone ? (
                       <div className="flex flex-wrap items-center gap-2">

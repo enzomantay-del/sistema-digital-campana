@@ -2,12 +2,12 @@ export const MODOS_OBRAS_LUGAR = [
   {
     id: "por_profesional",
     label: "Por profesional",
-    descripcion: "Cada médico carga sus obras. En la ficha del lugar no se lista un padrón único.",
+    descripcion: "Cada médico carga sus obras sociales. En la ficha del lugar no se lista un padrón único.",
   },
   {
     id: "del_lugar",
     label: "Del lugar",
-    descripcion: "El centro publica un listado único de obras (hospital, laboratorio, etc.).",
+    descripcion: "El centro publica un listado único de obras sociales (hospital, laboratorio, etc.).",
   },
   {
     id: "mixto",
@@ -38,7 +38,10 @@ export function presentacionObrasLugar(modo: ObrasModoLugar, obras: string[]) {
   if (modo === "mixto") {
     return {
       mostrarLista: obras.length > 0,
-      nota: obras.length > 0 ? "Listado del lugar. Algún profesional puede atender otras obras: confirmá en su ficha." : null,
+      nota:
+        obras.length > 0
+          ? "Listado del lugar. Algún profesional puede atender otras obras sociales: confirmá en su ficha."
+          : null,
     };
   }
   return {

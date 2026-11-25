@@ -44,7 +44,7 @@ const PREGUNTAS = [
   ],
   [
     "¿Puedo buscar por obra social?",
-    "Sí. Elegís tu obra social en el buscador y ves quién la atiende. Están las que se usan en Misiones. Si una ficha no tiene la tuya, ese profesional todavía no la cargó.",
+    "Sí. Elegís tu obra social en el buscador y ves quién la atiende. Están las que se usan en Misiones. Si una ficha no tiene tu obra social cargada, ese profesional todavía no la registró.",
   ],
   ["¿Cercalud saca turnos?", "No. Muestra los datos para que le escribas al profesional o al lugar."],
   [

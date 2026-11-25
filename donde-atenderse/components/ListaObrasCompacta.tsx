@@ -4,10 +4,10 @@ import { useId, useState } from "react";
 
 const MAX_VISIBLES = 5;
 
-/** Obras en una línea chica; expande si hay muchas. */
+/** Obras sociales en una línea chica; expande si hay muchas. */
 export function ListaObrasCompacta({
   obras,
-  etiqueta = "Obras",
+  etiqueta = "Obras sociales",
   maxVisibles = MAX_VISIBLES,
 }: {
   obras: string[];

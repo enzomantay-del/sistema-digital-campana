@@ -39,7 +39,7 @@ export function PanelProfesionalShell({
           <li className="rounded-2xl border border-line bg-white/90 px-4 py-3">
             <span className="font-semibold text-menta">2 · Dónde atendés</span>
             <p className="mt-1 text-muted">
-              Agregá cada sede (hospital, consultorio…), el horario y las obras en ese centro.
+              Agregá cada sede (hospital, consultorio…), el horario y las obras sociales en ese centro.
             </p>
           </li>
         </ol>
