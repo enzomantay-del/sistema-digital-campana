@@ -28,18 +28,23 @@ Sitio actual (referencia): **https://donde-atenderse.apps.grok.bot**
    ./scripts/backup-proyecto.sh
    ```
 
-2. **Base de datos** (necesitás la `DATABASE_URL` de **producción** del panel Secrets de Cursor):
+2. **Base de datos** (en Cursor Publish **no** se muestra `DATABASE_URL`; usá el respaldo de la app):
 
-   - Instalá cliente Postgres (`pg_dump`) **o** usá el panel de tu proveedor (Neon, Supabase, etc.).
-   - En tu máquina, con la URL de producción (no la subas a Git):
+   - Republicá la app con la versión que incluye **Administración → Descargar respaldo (.json.gz)**.
+   - Entrá como **admin** → panel **Administración** → **Descargar respaldo**.
+   - Guardá el archivo en tu PC (no lo subas a redes sociales ni a Git).
 
-     ```bash
-     export DATABASE_URL="postgresql://..."
-     chmod +x scripts/exportar-postgres.sh
-     ./scripts/exportar-postgres.sh cercalud-antes-netlify.sql
-     ```
+   Importar en **Neon** (base vacía, con la URL `postgresql://…` en tu bloc):
 
-   Si no tenés `pg_dump`, en Cursor pedí ayuda para exportar o usá **Neon**: crear proyecto → **Import** desde connection string de Cursor cuando tengas acceso.
+   ```bash
+   cd donde-atenderse
+   export DATABASE_URL="postgresql://…"   # la de Neon; no la pegues en chats públicos
+   npm run db:restaurar-respaldo -- ~/Descargas/cercalud-respaldo-YYYY-MM-DD.json.gz
+   ```
+
+   Si no usás terminal, adjuntá el `.json.gz` en el chat del agente y cargá la URL de Neon como secret personal **`MIGRACION_DATABASE_URL`** (Cursor → configuración → Secrets).
+
+   Alternativa técnica con `pg_dump`: `scripts/exportar-postgres.sh` solo si tenés la `DATABASE_URL` de origen.
 
 3. Dejá **Cursor publicado** hasta el final de las pruebas en Netlify.
 

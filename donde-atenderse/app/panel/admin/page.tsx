@@ -10,6 +10,7 @@ import {
 import { GestionAdminLista, type FilaAdmin } from "@/components/GestionAdminLista";
 import { ImportarTurneroFarmacia } from "@/components/ImportarTurneroFarmacia";
 import { CrearUsuarioAdmin } from "@/components/CrearUsuarioAdmin";
+import { RespaldoBaseAdmin } from "@/components/RespaldoBaseAdmin";
 import { requiereAdmin } from "@/lib/auth";
 import { etiquetaArea, etiquetaLugar, fecha } from "@/lib/format";
 import { lugarPermiteCargaSecretaria } from "@/lib/lugarAsignacion";
@@ -209,6 +210,8 @@ export default async function PanelAdmin({
       ) : null}
 
       <CrearUsuarioAdmin lugares={lugares.filter((lugar) => lugarPermiteCargaSecretaria(lugar.kind))} />
+
+      <RespaldoBaseAdmin />
 
       <section className="grid gap-2">
         <h2 className="text-center text-lg font-semibold">Fichas a revisar</h2>

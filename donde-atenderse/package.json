@@ -13,6 +13,7 @@
     "db:push:prod": "node scripts/db-push-prod.mjs",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:produccion": "tsx prisma/seed-produccion.ts",
+    "db:restaurar-respaldo": "tsx scripts/restaurar-respaldo.ts",
     "test:schedule": "tsx lib/schedule.test.ts",
     "postinstall": "node scripts/prisma-generate.mjs"
   },
