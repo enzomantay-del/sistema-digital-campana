@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Buscador } from "@/components/Buscador";
 import { EspacioPublicitario } from "@/components/EspacioPublicitario";
-import { PublicidadCreatividad } from "@/components/PublicidadCreatividad";
+import { PublicidadFranjaResponsive } from "@/components/PublicidadFranjaResponsive";
 import { LayoutListadoConPublicidad } from "@/components/LayoutListadoConPublicidad";
 import { IconoCercalud, type NombreIconoCercalud } from "@/components/iconos/IconoCercalud";
 import { TarjetaListadoLugar } from "@/components/TarjetaListadoLugar";
@@ -119,9 +119,7 @@ export default async function PaginaBuscar({
               : undefined
         }
       />
-      <div className="w-full py-0.5">
-        <PublicidadCreatividad formato="banner" anchoFila />
-      </div>
+      <PublicidadFranjaResponsive />
       <p className="text-muted">
         {centrosSalud && !q ? (
           <>
@@ -155,8 +153,8 @@ export default async function PaginaBuscar({
       {!soloProfesionales ? (
         <section className={`grid gap-3 ${lugaresPrimero ? "order-1" : ""}`}>{filasLugares}</section>
       ) : null}
-      <div className="py-0.5 xl:hidden">
-        <EspacioPublicitario formato="mpu" />
+      <div className="w-full py-0.5 md:hidden">
+        <EspacioPublicitario formato="banner" anchoFila descripcion="Franja disponible al cierre del listado." />
       </div>
     </LayoutListadoConPublicidad>
   );

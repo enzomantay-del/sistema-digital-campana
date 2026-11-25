@@ -32,7 +32,7 @@ export function claseAnchoVariante(variante: VariantePublicidad, anchoFila = fal
     case "cuadrado":
     case "skyscraper":
     case "vertical-alto":
-      return "mx-auto w-full max-w-[300px]";
+      return "mx-auto w-full max-w-[min(100%,340px)] sm:max-w-[300px]";
     default:
       return "w-full";
   }

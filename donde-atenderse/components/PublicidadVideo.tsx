@@ -56,7 +56,7 @@ export function PublicidadVideo({
         aria-label={etiquetaAccesible}
       />
       {taparBarraInferior ? (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-2.5 bg-[#0f1f33]" aria-hidden />
+        <div className="publicidad-tapa-barra pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-[#0f1f33]" aria-hidden />
       ) : null}
     </>
   );

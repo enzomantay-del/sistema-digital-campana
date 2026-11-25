@@ -96,6 +96,19 @@ button {
   pointer-events: none;
 }
 
+/* Tapa la barra nativa del navegador sin cubrir el aviso (1 px en móvil). */
+.publicidad-tapa-barra {
+  height: 1px;
+  max-height: 1px;
+}
+
+@media (min-width: 768px) {
+  .publicidad-tapa-barra {
+    height: 2px;
+    max-height: 2px;
+  }
+}
+
 .video-publicidad::-webkit-media-controls {
   display: none !important;
 }
