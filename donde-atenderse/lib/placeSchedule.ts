@@ -162,6 +162,11 @@ function fechaCortaIso(iso: string) {
   return `${Number(d)}/${Number(m)}/${y}`;
 }
 
+/** Texto de cuándo aplica la franja (público / avisos de solapamiento). */
+export function etiquetaPeriodicidadFranja(franja: FranjaHorarioLugar) {
+  return tituloPeriodicidad(franja);
+}
+
 function tituloPeriodicidad(franja: FranjaHorarioLugar) {
   const p = franja.periodicidad ?? periodicidadDefecto();
   if (p.tipo === "nota") return p.texto.trim();

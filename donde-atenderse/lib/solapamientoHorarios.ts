@@ -1,13 +1,14 @@
 import type { HorarioBorrador } from "@/lib/draft";
-import { DIAS } from "@/lib/constants";
 import {
+  etiquetaPeriodicidadFranja,
   franjaConDatos,
   horarioLugarParaGuardar,
   normalizarHora,
   periodicidadDefecto,
   TURNOS_HORARIO_LUGAR,
   type FranjaHorarioLugar,
-  type HorarioLugarData,
+  type OrdinalMensual,
+  type PeriodicidadFranja,
 } from "@/lib/placeSchedule";
 
 type IntervaloTiempo = {
@@ -16,11 +17,16 @@ type IntervaloTiempo = {
   guardia24: boolean;
 };
 
-type Ocurrencia =
-  | { modo: "semanal"; dia: string; tiempo: IntervaloTiempo }
-  | { modo: "fecha"; fecha: string; dia: string; tiempo: IntervaloTiempo };
+type InstanciaHorario = {
+  franja: FranjaHorarioLugar;
+  tiempo: IntervaloTiempo;
+};
+
+type FechaYmd = { y: number; m: number; d: number };
 
 const ORDEN_DIAS_JS = ["dom", "lun", "mar", "mie", "jue", "vie", "sab"] as const;
+const MESES_SIMULACION = 30;
+const EPOCH_SEMANAL = Date.UTC(1970, 0, 5);
 
 function minutosDesdeHora(valor: string): number | null {
   const normal = normalizarHora(valor);
@@ -38,7 +44,18 @@ function formatoMinutos(min: number) {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
-/** Día lun–dom para una fecha YYYY-MM-DD (mediodía UTC, coherente con el calendario del formulario). */
+function isoDe(f: FechaYmd) {
+  return `${f.y}-${String(f.m).padStart(2, "0")}-${String(f.d).padStart(2, "0")}`;
+}
+
+function fechaCortaDesdeIso(iso: string) {
+  const match = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return iso;
+  const [, y, m, d] = match;
+  return `${Number(d)}/${Number(m)}/${y}`;
+}
+
+/** Día lun–dom para una fecha YYYY-MM-DD (mediodía UTC). */
 export function diaSemanaDesdeIso(iso: string): string | null {
   const match = iso.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!match) return null;
@@ -47,15 +64,79 @@ export function diaSemanaDesdeIso(iso: string): string | null {
   const d = Number(match[3]);
   if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return null;
   const fecha = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
-  const js = fecha.getUTCDay();
-  return ORDEN_DIAS_JS[js] ?? null;
+  return ORDEN_DIAS_JS[fecha.getUTCDay()] ?? null;
 }
 
-function fechaCortaDesdeIso(iso: string) {
-  const match = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!match) return iso;
-  const [, y, m, d] = match;
-  return `${Number(d)}/${Number(m)}/${y}`;
+function idDiaSemana(f: FechaYmd) {
+  return diaSemanaDesdeIso(isoDe(f));
+}
+
+function diasEnMes(y: number, m: number) {
+  return new Date(Date.UTC(y, m, 0)).getUTCDate();
+}
+
+function semanasDesdeEpoch(f: FechaYmd) {
+  const ms = Date.UTC(f.y, f.m - 1, f.d);
+  return Math.floor((ms - EPOCH_SEMANAL) / (7 * 86_400_000));
+}
+
+function nroOcurrenciaDiaEnMes(f: FechaYmd) {
+  const dia = idDiaSemana(f);
+  if (!dia) return 0;
+  let n = 0;
+  for (let d = 1; d <= f.d; d++) {
+    if (idDiaSemana({ y: f.y, m: f.m, d }) === dia) n += 1;
+  }
+  return n;
+}
+
+function esUltimoDiaSemanaEnMes(f: FechaYmd) {
+  const dia = idDiaSemana(f);
+  if (!dia) return false;
+  const finMes = diasEnMes(f.y, f.m);
+  for (let d = f.d + 1; d <= finMes; d++) {
+    if (idDiaSemana({ y: f.y, m: f.m, d }) === dia) return false;
+  }
+  return true;
+}
+
+function coincideMensualSemana(f: FechaYmd, ordinal: OrdinalMensual, diaId: string) {
+  if (idDiaSemana(f) !== diaId) return false;
+  if (ordinal === "ultimo") return esUltimoDiaSemanaEnMes(f);
+  const objetivo = { primero: 1, segundo: 2, tercero: 3, cuarto: 4 }[ordinal];
+  return nroOcurrenciaDiaEnMes(f) === objetivo;
+}
+
+function franjaAplicaEnFecha(franja: FranjaHorarioLugar, f: FechaYmd): boolean {
+  if (!franjaConDatos(franja) || franja.cerrado) return false;
+  const p: PeriodicidadFranja = franja.periodicidad ?? periodicidadDefecto();
+
+  if (p.tipo === "fechas") {
+    return p.fechas.some((item) => item.trim() === isoDe(f));
+  }
+
+  if (p.tipo === "mensual_dia") {
+    if (p.diaDelMes < 1 || p.diaDelMes > 31) return false;
+    if (p.diaDelMes > diasEnMes(f.y, f.m)) return false;
+    return f.d === p.diaDelMes;
+  }
+
+  if (p.tipo === "mensual_semana") {
+    if (!p.dia) return false;
+    return coincideMensualSemana(f, p.ordinal, p.dia);
+  }
+
+  if (p.tipo === "nota") return false;
+
+  if (p.tipo === "semanal") {
+    const dia = idDiaSemana(f);
+    if (!dia || !franja.dias.includes(dia)) return false;
+    const cada = p.cadaSemanas && p.cadaSemanas > 1 ? p.cadaSemanas : 1;
+    if (cada === 1) return true;
+    return semanasDesdeEpoch(f) % cada === 0;
+  }
+
+  return false;
 }
 
 function tiemposDeFranja(franja: FranjaHorarioLugar): IntervaloTiempo[] {
@@ -75,42 +156,13 @@ function tiemposDeFranja(franja: FranjaHorarioLugar): IntervaloTiempo[] {
   return out;
 }
 
-function ocurrenciasDeFranja(franja: FranjaHorarioLugar): Ocurrencia[] {
-  if (!franjaConDatos(franja) || franja.cerrado) return [];
-  const tiempos = tiemposDeFranja(franja);
-  if (tiempos.length === 0) return [];
-
-  const p = franja.periodicidad ?? periodicidadDefecto();
-  const out: Ocurrencia[] = [];
-
-  if (p.tipo === "semanal" || p.tipo === undefined) {
-    for (const dia of franja.dias) {
-      for (const tiempo of tiempos) out.push({ modo: "semanal", dia, tiempo });
-    }
-    return out;
+function instanciasEnFecha(franjas: FranjaHorarioLugar[], f: FechaYmd): InstanciaHorario[] {
+  const out: InstanciaHorario[] = [];
+  for (const franja of franjas) {
+    if (!franjaAplicaEnFecha(franja, f)) continue;
+    for (const tiempo of tiemposDeFranja(franja)) out.push({ franja, tiempo });
   }
-
-  if (p.tipo === "fechas") {
-    for (const raw of p.fechas) {
-      const fecha = raw.trim();
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) continue;
-      const dia = diaSemanaDesdeIso(fecha);
-      if (!dia) continue;
-      for (const tiempo of tiempos) out.push({ modo: "fecha", fecha, dia, tiempo });
-    }
-    return out;
-  }
-
-  if (p.tipo === "mensual_semana" && p.dia) {
-    for (const tiempo of tiempos) out.push({ modo: "semanal", dia: p.dia, tiempo });
-    return out;
-  }
-
   return out;
-}
-
-function ocurrenciasDeHorario(data: HorarioLugarData): Ocurrencia[] {
-  return data.franjas.flatMap(ocurrenciasDeFranja);
 }
 
 function tiemposSeSolapan(a: IntervaloTiempo, b: IntervaloTiempo) {
@@ -118,17 +170,55 @@ function tiemposSeSolapan(a: IntervaloTiempo, b: IntervaloTiempo) {
   return a.inicioMin < b.finMin && b.inicioMin < a.finMin;
 }
 
-function ocurrenciasSeSolapan(a: Ocurrencia, b: Ocurrencia) {
-  if (!tiemposSeSolapan(a.tiempo, b.tiempo)) return false;
-  if (a.modo === "semanal" && b.modo === "semanal") return a.dia === b.dia;
-  if (a.modo === "fecha" && b.modo === "fecha") return a.fecha === b.fecha;
-  if (a.modo === "semanal" && b.modo === "fecha") return a.dia === b.dia;
-  if (a.modo === "fecha" && b.modo === "semanal") return a.dia === b.dia;
-  return false;
+function parsearIso(fecha: string): FechaYmd | null {
+  const match = fecha.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  return { y: Number(match[1]), m: Number(match[2]), d: Number(match[3]) };
 }
 
-function etiquetaDia(id: string) {
-  return DIAS.find((dia) => dia.id === id)?.label.toLowerCase() ?? id;
+function inicioSimulacion(horarios: HorarioBorrador[]): FechaYmd {
+  const hoy = new Date();
+  let minMs = Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate());
+  for (const h of horarios) {
+    const data = horarioLugarParaGuardar(h.schedule);
+    for (const franja of data.franjas) {
+      const p = franja.periodicidad;
+      if (p?.tipo === "fechas") {
+        for (const raw of p.fechas) {
+          const f = parsearIso(raw.trim());
+          if (f) minMs = Math.min(minMs, Date.UTC(f.y, f.m - 1, f.d));
+        }
+      }
+    }
+  }
+  const inicio = new Date(minMs);
+  return { y: inicio.getUTCFullYear(), m: inicio.getUTCMonth() + 1, d: inicio.getUTCDate() };
+}
+
+function fechasEnVentana(horarios: HorarioBorrador[]) {
+  const inicio = inicioSimulacion(horarios);
+  const lista: FechaYmd[] = [];
+  let y = inicio.y;
+  let m = inicio.m;
+  let d = inicio.d;
+  const finAbs = Date.UTC(y, m - 1 + MESES_SIMULACION, d);
+
+  while (true) {
+    const actual = Date.UTC(y, m - 1, d);
+    if (actual > finAbs) break;
+    lista.push({ y, m, d });
+    d += 1;
+    const maxD = diasEnMes(y, m);
+    if (d > maxD) {
+      d = 1;
+      m += 1;
+      if (m > 12) {
+        m = 1;
+        y += 1;
+      }
+    }
+  }
+  return lista;
 }
 
 function textoRango(tiempo: IntervaloTiempo) {
@@ -136,35 +226,56 @@ function textoRango(tiempo: IntervaloTiempo) {
   return `${formatoMinutos(tiempo.inicioMin)} a ${formatoMinutos(tiempo.finMin)}`;
 }
 
-function describeOcurrencia(o: Ocurrencia) {
-  const horario = textoRango(o.tiempo);
-  if (o.modo === "fecha") return `${etiquetaDia(o.dia)} ${fechaCortaDesdeIso(o.fecha)} (${horario})`;
-  return `${etiquetaDia(o.dia)} cada semana (${horario})`;
+function describeInstancia(instancia: InstanciaHorario) {
+  const etiqueta = etiquetaPeriodicidadFranja(instancia.franja);
+  const horario = textoRango(instancia.tiempo);
+  return etiqueta ? `${etiqueta} (${horario})` : horario;
 }
 
-/** Aviso si el mismo día y franja horaria se repite en dos sedes (semanal, fechas puntuales o ambos). */
+function primerConflicto(
+  franjasA: FranjaHorarioLugar[],
+  franjasB: FranjaHorarioLugar[],
+  ventana: FechaYmd[],
+): { fecha: string; a: InstanciaHorario; b: InstanciaHorario } | null {
+  for (const f of ventana) {
+    const listaA = instanciasEnFecha(franjasA, f);
+    if (listaA.length === 0) continue;
+    const listaB = instanciasEnFecha(franjasB, f);
+    if (listaB.length === 0) continue;
+    for (const a of listaA) {
+      for (const b of listaB) {
+        if (tiemposSeSolapan(a.tiempo, b.tiempo)) {
+          return { fecha: isoDe(f), a, b };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+/** Aviso si en el mismo día calendario hay franjas que se pisan entre dos sedes (todos los tipos de periodicidad). */
 export function mensajeSolapamientoEntreSedes(horarios: HorarioBorrador[]): string | null {
   const sedes = horarios
     .filter((h) => h.placeId)
     .map((h) => ({
       nombre: h.placeName?.trim() || "una sede",
-      ocurrencias: ocurrenciasDeHorario(horarioLugarParaGuardar(h.schedule)),
+      franjas: horarioLugarParaGuardar(h.schedule).franjas,
     }))
-    .filter((s) => s.ocurrencias.length > 0);
+    .filter((s) => s.franjas.some((f) => franjaConDatos(f) && !f.cerrado && tiemposDeFranja(f).length > 0));
 
   if (sedes.length < 2) return null;
 
+  const ventana = fechasEnVentana(horarios);
+
   for (let i = 0; i < sedes.length; i++) {
     for (let j = i + 1; j < sedes.length; j++) {
-      for (const oa of sedes[i].ocurrencias) {
-        for (const ob of sedes[j].ocurrencias) {
-          if (!ocurrenciasSeSolapan(oa, ob)) continue;
-          return (
-            `Superposición de horarios: coinciden «${sedes[i].nombre}» (${describeOcurrencia(oa)}) y ` +
-            `«${sedes[j].nombre}» (${describeOcurrencia(ob)}). No podés atender en dos lugares a la vez. Ajustá días, fechas u horarios en una de las sedes.`
-          );
-        }
-      }
+      const choque = primerConflicto(sedes[i].franjas, sedes[j].franjas, ventana);
+      if (!choque) continue;
+      const dia = fechaCortaDesdeIso(choque.fecha);
+      return (
+        `Superposición de horarios el ${dia}: «${sedes[i].nombre}» (${describeInstancia(choque.a)}) y ` +
+        `«${sedes[j].nombre}» (${describeInstancia(choque.b)}). No podés atender en dos lugares a la vez. Ajustá días, fechas u horarios en una de las sedes.`
+      );
     }
   }
   return null;

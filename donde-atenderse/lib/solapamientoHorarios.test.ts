@@ -93,4 +93,34 @@ assert.equal(
   null,
 );
 
+const franjaDia15A = franjaHorarioVacia([]);
+franjaDia15A.periodicidad = { tipo: "mensual_dia", diaDelMes: 15 };
+franjaDia15A.manana = { activo: true, desde: "09:00", hasta: "12:00" };
+
+const franjaDia15B = franjaHorarioVacia([]);
+franjaDia15B.periodicidad = { tipo: "mensual_dia", diaDelMes: 15 };
+franjaDia15B.manana = { activo: true, desde: "10:00", hasta: "13:00" };
+
+assert.ok(
+  mensajeSolapamientoEntreSedes([
+    sede("Centro A", { v: 2, franjas: [franjaDia15A] }),
+    sede("Centro B", { v: 2, franjas: [franjaDia15B] }),
+  ])?.includes("Superposición"),
+);
+
+const franjaPrimerVie = franjaHorarioVacia([]);
+franjaPrimerVie.periodicidad = { tipo: "mensual_semana", ordinal: "primero", dia: "vie" };
+franjaPrimerVie.tarde = { activo: true, desde: "16:00", hasta: "20:00" };
+
+const franjaFechaPrimerVie = franjaHorarioVacia([]);
+franjaFechaPrimerVie.periodicidad = { tipo: "fechas", fechas: ["2026-05-01"] };
+franjaFechaPrimerVie.tarde = { activo: true, desde: "16:00", hasta: "20:00" };
+
+const solapaMensual = mensajeSolapamientoEntreSedes([
+  sede("Sede mensual", { v: 2, franjas: [franjaPrimerVie] }),
+  sede("Sede fecha", { v: 2, franjas: [franjaFechaPrimerVie] }),
+]);
+assert.ok(solapaMensual?.includes("Superposición"));
+assert.ok(solapaMensual?.includes("1/5/2026"));
+
 console.log("solapamientoHorarios ok");
