@@ -8,7 +8,7 @@ Neon ya tiene los datos. Seguí este orden en **[app.netlify.com](https://app.ne
 2. Si pide permiso, autorizá el repo **`enzomantay-del/sistema-digital-campana`**.
 3. **Branch to deploy:** `cursor/donde-atenderse-77b7` (hasta mergear el PR a `main`; después podés cambiar a `main`).
 4. **Base directory:** `donde-atenderse`
-5. Build command y publish: Netlify lee **`netlify.toml`** (`npm ci && npm run build`). No cambies nada salvo que falle.
+5. Build command y publish: Netlify lee **`netlify.toml`**. En UI: **Publish directory** = `.next` (no `donde-atenderse/`; Netlify rechaza si es igual al base).
 
 Clic en **Deploy site** solo después del paso 2 (variables), o configurá variables antes del primer build en **Site configuration → Environment variables**.
 
