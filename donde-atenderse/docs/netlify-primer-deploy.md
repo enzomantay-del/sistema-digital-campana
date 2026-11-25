@@ -7,8 +7,8 @@ Neon ya tiene los datos. Seguí este orden en **[app.netlify.com](https://app.ne
 1. **Add new site** → **Import an existing project** → **GitHub**.
 2. Si pide permiso, autorizá el repo **`enzomantay-del/sistema-digital-campana`**.
 3. **Branch to deploy:** `cursor/donde-atenderse-77b7` (hasta mergear el PR a `main`; después podés cambiar a `main`).
-4. **Base directory:** `donde-atenderse`
-5. Build command y publish: Netlify lee **`netlify.toml`**. En UI: **Publish directory** = `.next` (no `donde-atenderse/`; Netlify rechaza si es igual al base).
+4. **Base directory:** vacío en la UI (el repo tiene `netlify.toml` en la raíz con `base = "donde-atenderse"` y `publish = ".next"`).
+5. Si la UI no deja editar **Publish directory**, no importa: el archivo del repo manda. Hacé un deploy del último commit de la rama.
 
 Clic en **Deploy site** solo después del paso 2 (variables), o configurá variables antes del primer build en **Site configuration → Environment variables**.
 

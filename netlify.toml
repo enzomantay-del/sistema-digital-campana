@@ -1,0 +1,11 @@
+# Monorepo: el sitio vive en `donde-atenderse/`. Dejá Base directory vacío en la UI de Netlify.
+[build]
+  base = "donde-atenderse"
+  command = "npm ci && npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
