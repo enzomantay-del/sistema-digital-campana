@@ -195,13 +195,29 @@ function inicioSimulacion(horarios: HorarioBorrador[]): FechaYmd {
   return { y: inicio.getUTCFullYear(), m: inicio.getUTCMonth() + 1, d: inicio.getUTCDate() };
 }
 
+function finSimulacion(horarios: HorarioBorrador[], inicio: FechaYmd) {
+  let finAbs = Date.UTC(inicio.y, inicio.m - 1 + MESES_SIMULACION, inicio.d);
+  for (const h of horarios) {
+    const data = horarioLugarParaGuardar(h.schedule);
+    for (const franja of data.franjas) {
+      const p = franja.periodicidad;
+      if (p?.tipo !== "fechas") continue;
+      for (const raw of p.fechas) {
+        const f = parsearIso(raw.trim());
+        if (f) finAbs = Math.max(finAbs, Date.UTC(f.y, f.m - 1, f.d));
+      }
+    }
+  }
+  return finAbs;
+}
+
 function fechasEnVentana(horarios: HorarioBorrador[]) {
   const inicio = inicioSimulacion(horarios);
   const lista: FechaYmd[] = [];
   let y = inicio.y;
   let m = inicio.m;
   let d = inicio.d;
-  const finAbs = Date.UTC(y, m - 1 + MESES_SIMULACION, d);
+  const finAbs = finSimulacion(horarios, inicio);
 
   while (true) {
     const actual = Date.UTC(y, m - 1, d);

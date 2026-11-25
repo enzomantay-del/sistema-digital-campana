@@ -37,7 +37,7 @@ export function TarjetaPublicidad({
       <div
         className={
           creatividadVideo
-            ? "tarjeta-publicidad-video overflow-hidden rounded-lg bg-black p-0 shadow-none ring-0"
+            ? "tarjeta-publicidad-video overflow-hidden rounded-lg bg-black p-0 shadow-none outline-none ring-0"
             : "overflow-hidden rounded-md border border-line/80 bg-[#f8fafc] p-0"
         }
       >
