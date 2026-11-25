@@ -81,24 +81,36 @@ button {
 
 /* Avisos en video: sin barra de progreso ni controles nativos */
 .tarjeta-publicidad-video {
-  border: none;
+  border: none !important;
   isolation: isolate;
+  line-height: 0;
 }
 
 .publicidad-video-marco {
   overflow: hidden;
   line-height: 0;
   transform: translateZ(0);
+  border-radius: inherit;
 }
 
-/* Recorta solo el borde inferior del <video> donde el navegador dibuja la barra de avance. */
-.publicidad-video-recorte .video-publicidad {
+/* Verticales: recorte inferior del elemento video (barra nativa). */
+.publicidad-video-recorte .video-publicidad--vertical {
   display: block;
-  height: calc(100% + 14px);
+  height: calc(100% + 16px);
   max-height: none;
   pointer-events: none;
   -webkit-appearance: none;
   appearance: none;
+}
+
+/* Horizontales: altura intrínseca, sin hueco bajo el cuadro. */
+.video-publicidad--fila {
+  pointer-events: none;
+  vertical-align: top;
+  -webkit-appearance: none;
+  appearance: none;
+  clip-path: inset(0 0 5px 0);
+  -webkit-clip-path: inset(0 0 5px 0);
 }
 
 .video-publicidad::-webkit-media-controls {

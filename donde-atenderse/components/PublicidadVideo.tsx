@@ -6,11 +6,12 @@ import { useEffect, useRef } from "react";
 export function PublicidadVideo({
   src,
   etiquetaAccesible,
-  ajuste = "contain",
+  alturaNatural = false,
 }: {
   src: string;
   etiquetaAccesible: string;
-  ajuste?: "contain" | "cover";
+  /** Bandas horizontales: altura del archivo, sin caja aspect que deje hueco abajo. */
+  alturaNatural?: boolean;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
 
@@ -35,13 +36,32 @@ export function PublicidadVideo({
     };
   }, [src]);
 
-  const objectClass = ajuste === "contain" ? "object-contain object-top" : "object-cover object-center";
+  if (alturaNatural) {
+    return (
+      <video
+        ref={ref}
+        className="video-publicidad video-publicidad--fila block h-auto w-full max-w-full"
+        src={src}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        controls={false}
+        controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"
+        disablePictureInPicture
+        disableRemotePlayback
+        tabIndex={-1}
+        aria-label={etiquetaAccesible}
+      />
+    );
+  }
 
   return (
     <div className="publicidad-video-recorte absolute inset-0 overflow-hidden">
       <video
         ref={ref}
-        className={`video-publicidad block w-full ${objectClass}`}
+        className="video-publicidad video-publicidad--vertical block w-full object-contain object-top"
         src={src}
         autoPlay
         muted

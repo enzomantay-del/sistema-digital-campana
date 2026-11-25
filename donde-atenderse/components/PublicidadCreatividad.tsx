@@ -22,15 +22,15 @@ export function PublicidadCreatividad({
 
   return (
     <TarjetaPublicidad variante={formato} compacto anchoFila={fila} ejemplo creatividadVideo>
-      <div
-        className={`publicidad-video-marco relative w-full overflow-hidden bg-[#0f1f33] leading-[0] ${aspecto ?? "w-full"}`}
-      >
-        <PublicidadVideo
-          src={src}
-          etiquetaAccesible={etiquetaAccesible}
-          ajuste="contain"
-        />
-      </div>
+      {fila ? (
+        <PublicidadVideo src={src} etiquetaAccesible={etiquetaAccesible} alturaNatural />
+      ) : (
+        <div
+          className={`publicidad-video-marco relative w-full overflow-hidden bg-black leading-[0] ${aspecto ?? "w-full"}`}
+        >
+          <PublicidadVideo src={src} etiquetaAccesible={etiquetaAccesible} />
+        </div>
+      )}
     </TarjetaPublicidad>
   );
 }
