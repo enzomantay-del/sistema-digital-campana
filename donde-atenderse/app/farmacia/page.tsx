@@ -49,7 +49,7 @@ export default async function PaginaFarmacia() {
           otras localidades del corredor si lo necesitás.
         </p>
       </header>
-      <PublicidadFranjaResponsive />
+      <PublicidadFranjaResponsive destinoMovil="farmacia" />
       <div className="w-full max-w-3xl">
         <FarmaciaTurnoPagina porLocalidad={porLocalidad} />
       </div>

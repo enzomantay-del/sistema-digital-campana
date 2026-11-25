@@ -5,7 +5,7 @@ export function PublicidadPortada() {
   return (
     <>
       <div className="w-full md:hidden">
-        <PublicidadCreatividad formato="skyscraper" etiquetaAccesible="Publicidad en video vertical" />
+        <PublicidadCreatividad formato="vertical-alto" etiquetaAccesible="Publicidad farmacia en video" />
       </div>
       <div className="hidden w-full md:block">
         <PublicidadCreatividad formato="leaderboard" anchoFila />

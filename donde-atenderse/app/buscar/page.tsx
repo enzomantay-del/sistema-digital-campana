@@ -119,7 +119,7 @@ export default async function PaginaBuscar({
               : undefined
         }
       />
-      <PublicidadFranjaResponsive />
+      <PublicidadFranjaResponsive destinoMovil={soloProfesionales ? "doctor" : "farmacia"} />
       <p className="text-muted">
         {centrosSalud && !q ? (
           <>
