@@ -11,7 +11,7 @@ const BENEFICIOS: { titulo: string; texto: string; icono: NombreIconoCercalud }[
   {
     titulo: "Varios pueblos, una sola guía",
     texto:
-      "Incluye Santo Pipó, Hipólito Yrigoyen, Jardín América, Ruiz de Montoya, Puerto Rico y Capioví. Si en tu pueblo no aparece lo que buscás, podés ver opciones en un pueblo vecino.",
+      "Incluye Santo Pipó, Hipólito Yrigoyen, Jardín América, Ruiz de Montoya, Capioví y Puerto Rico. Si en tu pueblo no aparece lo que buscás, podés ver opciones en un pueblo vecino.",
     icono: "corredor",
   },
   {
@@ -84,10 +84,11 @@ export default async function Inicio() {
         <div className="mx-auto grid max-w-3xl gap-6 px-4 py-10 sm:py-16">
           <div className="grid gap-3 text-center">
             <h1 className="text-4xl font-bold tracking-[-0.04em] text-balance sm:text-5xl">
-              Buscá quién atiende en tu zona
+              Médicos, centros y farmacias del corredor
             </h1>
             <p className="text-lg text-muted">
-              Santo Pipó, Hipólito Yrigoyen, Jardín América, Ruiz de Montoya, Puerto Rico y Capioví.
+              Guía de salud de Cercalud: buscá profesionales, hospitales, laboratorios y la farmacia de turno. Santo
+              Pipó, Hipólito Yrigoyen, Jardín América, Ruiz de Montoya, Capioví y Puerto Rico.
             </p>
           </div>
           <Buscador obras={obras} especialidades={especialidades} />

@@ -1,6 +1,6 @@
 # Cercalud
 
-Directorio del corredor: Santo Pipó, Hipólito Yrigoyen, Jardín América, Ruiz de Montoya, Puerto Rico y Capioví. El paciente busca sin cuenta. El profesional o la secretaria cargan la ficha.
+Directorio del corredor: Santo Pipó, Hipólito Yrigoyen, Jardín América, Ruiz de Montoya, Capioví y Puerto Rico. El paciente busca sin cuenta. El profesional o la secretaria cargan la ficha.
 
 La marca Cercalud está confirmada. El sitio usa el logo oficial, en azul y verde.
 

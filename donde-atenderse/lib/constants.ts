@@ -3,8 +3,8 @@ export const LOCALIDADES = [
   "Hipólito Yrigoyen",
   "Jardín América",
   "Ruiz de Montoya",
-  "Puerto Rico",
   "Capioví",
+  "Puerto Rico",
 ] as const;
 
 export const AREAS = [
