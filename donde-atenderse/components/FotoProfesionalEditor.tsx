@@ -9,12 +9,15 @@ export function FotoProfesionalEditor({
   onChange,
   placeIdEnfoque,
   avisoCampo,
+  enlaceDescargaAdmin,
 }: {
   professionalId: string;
   photoUrl: string;
   onChange: (photoUrl: string) => void;
   placeIdEnfoque?: string;
   avisoCampo?: string | null;
+  /** Solo administración: descarga el archivo original para retocar. */
+  enlaceDescargaAdmin?: string;
 }) {
   const entrada = useRef<HTMLInputElement>(null);
   const [mensaje, setMensaje] = useState("");
@@ -104,6 +107,11 @@ export function FotoProfesionalEditor({
             disabled={cargando}
             onChange={(event) => void elegirArchivo(event)}
           />
+          {photoUrl && enlaceDescargaAdmin ? (
+            <a href={enlaceDescargaAdmin} className="w-fit text-sm font-semibold text-link" download>
+              Descargar foto original
+            </a>
+          ) : null}
           {photoUrl ? (
             <button type="button" className="w-fit text-sm font-semibold text-accent" disabled={cargando} onClick={() => void quitar()}>
               Quitar foto

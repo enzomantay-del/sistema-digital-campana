@@ -9,6 +9,19 @@ const MIME_A_EXTENSION: Record<string, string> = {
 
 export const FOTO_MAX_BYTES = 2 * 1024 * 1024;
 
+const EXTENSION_A_MIME: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  jfif: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  gif: "image/gif",
+};
+
+export function mimeDesdeExtension(extension: string) {
+  return EXTENSION_A_MIME[extension.trim().toLowerCase()] ?? "application/octet-stream";
+}
+
 export function tipoYExtensionFoto(archivo: File): { tipoMime: string; extension: string } | null {
   const nombre = archivo.name.trim().toLowerCase();
   const tipo = archivo.type.trim().toLowerCase();

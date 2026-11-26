@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { guardarImagenEntidad, quitarImagenesEntidad } from "@/lib/almacenamientoImagen";
 import { puedeEditarProfesional, secretariaPuedeSubirFoto } from "@/lib/permisosProfesional";
-import { usuarioActual } from "@/lib/auth";
+import { esAdmin, usuarioActual } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { FOTO_MAX_BYTES, tipoYExtensionFoto } from "@/lib/validarFoto";
 
@@ -38,10 +38,18 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       formato.tipoMime,
       formato.extension,
     );
-    await prisma.professional.update({ where: { id: professionalId }, data: { photoUrl } });
+    await prisma.professional.update({
+      where: { id: professionalId },
+      data: {
+        photoUrl,
+        ...(!esAdmin(user) ? { reviewed: false, published: false } : {}),
+      },
+    });
     revalidatePath("/panel/profesional");
     revalidatePath(`/profesional/${professionalId}`);
     revalidatePath("/panel/cargas");
+    revalidatePath("/panel/admin");
+    revalidatePath(`/panel/admin/profesional/${professionalId}`);
     return NextResponse.json({ ok: true, photoUrl });
   } catch (error) {
     console.error("api/profesional/foto:", error);

@@ -322,7 +322,10 @@ export default async function PanelAdmin({
         <RespaldoBaseAdmin />
       </PanelAdminSeccion>
 
-      <PanelAdminSeccion titulo="Fichas a revisar" descripcion="Pendientes de revisión antes de publicar.">
+      <PanelAdminSeccion
+        titulo="Fichas a revisar"
+        descripcion="Lo que cargan secretarías y profesionales. Entrá a editar, descargá la foto si hace falta retocarla y publicá cuando esté lista."
+      >
         <GestionAdminLista
           filas={filasPendientes}
           vacio="No hay fichas pendientes."

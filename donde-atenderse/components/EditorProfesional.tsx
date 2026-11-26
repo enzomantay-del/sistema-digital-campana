@@ -393,6 +393,11 @@ export function EditorProfesional({
             professionalId={professionalId}
             photoUrl={borrador.photoUrl}
             placeIdEnfoque={placeIdEnfoque}
+            enlaceDescargaAdmin={
+              modoAdmin && borrador.photoUrl?.trim()
+                ? `/api/profesional/${professionalId}/foto/descargar`
+                : undefined
+            }
             avisoCampo={avisoCampo(erroresVisibles?.photo)}
             onChange={(photoUrl) => {
               marcarCambio();

@@ -395,10 +395,17 @@ export async function subirFotoProfesional(
   } catch {
     return { ok: false, error: "No se pudo guardar la imagen. Probá con otro archivo o más chico." };
   }
-  await prisma.professional.update({ where: { id: professionalId }, data: { photoUrl } });
+  await prisma.professional.update({
+    where: { id: professionalId },
+    data: {
+      photoUrl,
+      ...(!esAdmin(user) ? { reviewed: false, published: false } : {}),
+    },
+  });
   revalidatePath("/panel/profesional");
   revalidatePath(`/profesional/${professionalId}`);
   revalidatePath("/panel/cargas");
+  revalidatePath("/panel/admin");
   return { ok: true, photoUrl };
 }
 

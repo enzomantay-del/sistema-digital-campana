@@ -45,10 +45,30 @@ export default async function EditarProfesionalAdmin({
           </Link>
           <span className="text-sm text-muted">
             {persona.published ? "Publicada" : "Sin publicar"}
+            {!persona.reviewed ? " · Sin revisar" : ""}
             {persona.example ? " · Dato de ejemplo" : ""}
             {persona.user ? ` · Cuenta ${persona.user.email}` : " · Sin cuenta vinculada"}
           </span>
         </div>
+        {!persona.reviewed ? (
+          <p className="rounded-xl border border-amber-200/90 bg-amber-50 px-3 py-2 text-sm text-ink">
+            Revisá nombre, matrícula y foto. Podés{" "}
+            {persona.photoUrl?.trim() ? (
+              <>
+                <a
+                  href={`/api/profesional/${persona.id}/foto/descargar`}
+                  className="font-semibold text-link"
+                  download
+                >
+                  descargar la foto
+                </a>{" "}
+                para retocarla (brillo, fondo, etc.) y volver a subirla acá. Cuando esté lista, usá «Publicar».
+              </>
+            ) : (
+              <>pedir la foto y, cuando la suban, descargarla desde esta misma sección. Después usá «Publicar».</>
+            )}
+          </p>
+        ) : null}
         <AccionesAdmin
           compacto
           acciones={[

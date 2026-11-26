@@ -1,6 +1,9 @@
-import { mkdir, readdir, unlink, writeFile } from "fs/promises";
+import { mkdir, readdir, readFile, unlink, writeFile } from "fs/promises";
 import path from "path";
 import { prisma } from "./prisma";
+import { mimeDesdeExtension } from "./validarFoto";
+
+export type BytesImagenEntidad = { contenido: Buffer; tipoMime: string; extension: string };
 
 export type CarpetaImagen = "logos" | "profesionales";
 
@@ -65,6 +68,50 @@ function urlPublicaImagen(carpeta: CarpetaImagen, entidadId: string) {
 
 async function quitarEnBaseDatos(carpeta: CarpetaImagen, entidadId: string) {
   await prisma.imagenAlmacenada.deleteMany({ where: { carpeta, entidadId } });
+}
+
+export async function leerImagenEntidad(
+  carpeta: CarpetaImagen,
+  entidadId: string,
+): Promise<BytesImagenEntidad | null> {
+  if (almacenamientoPersistenteEnNube()) {
+    const { ListObjectsV2Command, GetObjectCommand } = await import("@aws-sdk/client-s3");
+    const cliente = await clienteS3();
+    const bucket = configS3().bucket;
+    const prefijo = `${carpeta}/${entidadId}.`;
+    const listado = await cliente.send(new ListObjectsV2Command({ Bucket: bucket, Prefix: prefijo, MaxKeys: 5 }));
+    const key = listado.Contents?.find((objeto) => objeto.Key && objeto.Key.startsWith(prefijo))?.Key;
+    if (!key) return null;
+    const extension = key.slice(prefijo.length).toLowerCase() || "jpg";
+    const objeto = await cliente.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
+    const cuerpo = await objeto.Body?.transformToByteArray();
+    if (!cuerpo) return null;
+    const tipoMime = objeto.ContentType?.trim() || mimeDesdeExtension(extension);
+    return { contenido: Buffer.from(cuerpo), tipoMime, extension };
+  }
+
+  if (almacenamientoEnBaseDatos()) {
+    const fila = await prisma.imagenAlmacenada.findUnique({
+      where: { carpeta_entidadId: { carpeta, entidadId } },
+    });
+    if (!fila) return null;
+    const bytes = fila.datos instanceof Buffer ? fila.datos : Buffer.from(fila.datos);
+    const extension =
+      fila.tipoMime.includes("png") ? "png" : fila.tipoMime.includes("webp") ? "webp" : fila.tipoMime.includes("gif") ? "gif" : "jpg";
+    return { contenido: bytes, tipoMime: fila.tipoMime, extension };
+  }
+
+  const dir = rutaLocal(carpeta);
+  try {
+    const archivos = await readdir(dir);
+    const nombre = archivos.find((item) => item.startsWith(`${entidadId}.`));
+    if (!nombre) return null;
+    const extension = nombre.slice(entidadId.length + 1).toLowerCase() || "jpg";
+    const contenido = await readFile(path.join(dir, nombre));
+    return { contenido, tipoMime: mimeDesdeExtension(extension), extension };
+  } catch {
+    return null;
+  }
 }
 
 export async function quitarImagenesEntidad(carpeta: CarpetaImagen, entidadId: string) {
