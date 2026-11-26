@@ -36,6 +36,12 @@ const BENEFICIOS: { titulo: string; texto: string; icono: NombreIconoCercalud }[
     texto: "Cercalud no saca turnos ni reserva: muestra el contacto y le escribís directo al profesional o al centro.",
     icono: "contacto-directo",
   },
+  {
+    titulo: "Entrá y buscá sin cuenta",
+    texto:
+      "No hace falta registrarte. Escribís un nombre, elegís especialidad u obra social y ves los horarios y contactos. También están laboratorios, centros de imágenes y la farmacia de turno de cada pueblo.",
+    icono: "buscar",
+  },
 ];
 
 const PREGUNTAS = [
