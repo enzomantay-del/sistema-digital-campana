@@ -32,10 +32,9 @@ Referencia visual: portales de noticias — aviso **dentro del flujo**, etiqueta
 | Página | Aviso 1 | Aviso 2 |
 |--------|---------|---------|
 | **Inicio** | Leaderboard / vertical bajo el buscador | Leaderboard (desktop) o MPU (móvil) antes del FAQ |
-| **Buscar** | MPU en flujo (debajo del buscador, &lt; XL) | Skyscraper en columna (XL) + banda al pie |
-| **Ficha** prof./lugar | Skyscraper en columna (producción) | — (solo uno) |
-| **Ficha** (demo) | Ejemplo farmacia | Ejemplo profesional |
-| **Farmacia** | MPU arriba (&lt; XL) + leaderboard al pie | Skyscraper en columna XL |
+| **Buscar** | MPU (&lt; XL) **o** skyscraper en columna (XL) | Banda al pie del listado |
+| **Ficha** prof./lugar | Un skyscraper (columna; en móvil baja debajo del contenido) | — |
+| **Farmacia** | MPU (&lt; XL) **o** skyscraper en columna (XL) | Banda al pie (&lt; XL) |
 | **Soy profesional / ingreso** | MPU (&lt; LG) o banda en ingreso | Columna skyscraper desde LG |
 
 ## Ejemplo vs producción
