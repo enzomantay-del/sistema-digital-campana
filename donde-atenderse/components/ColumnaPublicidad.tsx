@@ -1,6 +1,4 @@
 import { EspacioPublicitario } from "@/components/EspacioPublicitario";
-import { PublicidadCreatividad } from "@/components/PublicidadCreatividad";
-
 type Perfil = "ficha" | "listado" | "farmacia";
 
 export function ColumnaPublicidad({ perfil = "ficha" }: { perfil?: Perfil }) {
@@ -9,25 +7,40 @@ export function ColumnaPublicidad({ perfil = "ficha" }: { perfil?: Perfil }) {
       <aside className="grid w-full gap-3 lg:min-h-[min(100vh-7rem,920px)] lg:grid-rows-2" aria-label="Espacios publicitarios">
         <EspacioPublicitario
           formato="skyscraper"
+          destino="columna"
           rellenoVertical
-          descripcion="Columna junto a fichas de profesionales y lugares."
+          descripcion="Skyscraper junto a fichas: marca visible en todo el alto de la columna."
         />
-        <EspacioPublicitario formato="vertical-alto" rellenoVertical descripcion="Segundo bloque en la misma columna." />
+        <EspacioPublicitario
+          formato="vertical-alto"
+          destino="columna"
+          rellenoVertical
+          descripcion="Segundo bloque vertical en la misma columna."
+        />
       </aside>
     );
   }
 
-  if (perfil === "farmacia") {
-    return (
-      <aside className="grid w-full gap-1" aria-label="Espacios publicitarios">
-        <PublicidadCreatividad formato="skyscraper" />
-      </aside>
-    );
-  }
-
-  return (
-    <aside className="grid w-full gap-1" aria-label="Espacios publicitarios">
-      <PublicidadCreatividad formato="skyscraper" />
+  const columnaListado = (
+    <aside
+      className="grid w-full gap-3 lg:min-h-[min(100vh-7rem,920px)] lg:grid-rows-2"
+      aria-label="Espacios publicitarios"
+    >
+      <EspacioPublicitario
+        formato="skyscraper"
+        destino="columna"
+        rellenoVertical
+        descripcion="Columna en listados: alto visible para tu marca o servicio."
+      />
+      <EspacioPublicitario
+        formato="vertical-alto"
+        destino="columna"
+        rellenoVertical
+        descripcion="Segundo espacio vertical en búsqueda y farmacia."
+      />
     </aside>
   );
+
+  if (perfil === "farmacia") return columnaListado;
+  return columnaListado;
 }

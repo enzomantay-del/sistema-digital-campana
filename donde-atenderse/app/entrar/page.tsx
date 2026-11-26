@@ -61,17 +61,24 @@ export default async function Entrar({
 
 function LayoutEntrarConPublicidad({ children }: { children: ReactNode }) {
   return (
-    <div className="mx-auto grid w-full max-w-5xl gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(260px,300px)] lg:items-start lg:gap-10">
+    <div className="mx-auto grid w-full max-w-5xl gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(280px,340px)] lg:items-start lg:gap-10">
       <div className="grid min-w-0 gap-6">{children}</div>
       <aside className="lg:sticky lg:top-24">
         <div className="hidden lg:block">
           <EspacioPublicitario
             formato="skyscraper"
-            descripcion="Columna lateral en ingreso de profesionales y secretarías."
+            destino="columna"
+            rellenoVertical
+            descripcion="Skyscraper en ingreso: profesionales y secretarías ven tu marca al entrar."
           />
         </div>
         <div className="lg:hidden">
-          <EspacioPublicitario formato="banner" anchoFila descripcion="Franja en la página de ingreso." />
+          <EspacioPublicitario
+            destino="franja"
+            formato="leaderboard"
+            anchoFila
+            descripcion="Banda amplia en la página de ingreso (celular y tablet)."
+          />
         </div>
       </aside>
     </div>

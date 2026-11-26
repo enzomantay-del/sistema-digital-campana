@@ -19,9 +19,25 @@ export const MEDIDA_PUBLICIDAD: Record<Exclude<VariantePublicidad, "contenido">,
   "vertical-alto": { ancho: 300, alto: 400, nombre: "Vertical" },
 };
 
-export function claseAnchoVariante(variante: VariantePublicidad, anchoFila = false): string {
-  if (anchoFila && (variante === "leaderboard" || variante === "banner")) {
-    return "w-full max-w-full";
+/** Dónde se muestra el hueco vacío (define ancho y altura percibida). */
+export type DestinoHuecoPublicidad = "columna" | "franja" | "principal";
+
+export function claseAnchoVariante(
+  variante: VariantePublicidad,
+  anchoFila = false,
+  destino: DestinoHuecoPublicidad = "columna",
+): string {
+  if (destino === "principal") {
+    return "mx-auto w-full max-w-page";
+  }
+  if (destino === "franja" || anchoFila) {
+    if (variante === "leaderboard" || variante === "banner") {
+      return "w-full max-w-page";
+    }
+    return "w-full max-w-page";
+  }
+  if (destino === "columna") {
+    return "w-full min-w-0";
   }
   switch (variante) {
     case "leaderboard":
@@ -33,10 +49,38 @@ export function claseAnchoVariante(variante: VariantePublicidad, anchoFila = fal
       return "mx-auto w-full max-w-[min(100%,340px)] sm:max-w-[300px]";
     case "skyscraper":
     case "vertical-alto":
-      /** Columna IAB 300 px; en móvil ocupa el ancho útil de la ficha. */
       return "mx-auto w-full max-w-[300px]";
     default:
       return "w-full";
+  }
+}
+
+/** Marco del hueco vacío: priorizamos superficie visible para vender creatividades grandes. */
+export function claseMarcoHueco(
+  formato: Exclude<VariantePublicidad, "contenido">,
+  opts: { destino: DestinoHuecoPublicidad; rellenoVertical?: boolean },
+): string {
+  const { destino, rellenoVertical } = opts;
+  if (rellenoVertical || destino === "columna") {
+    return "h-full w-full min-h-[min(44vh,560px)]";
+  }
+  if (destino === "franja") {
+    if (formato === "leaderboard") return "aspect-[970/250] w-full min-h-[clamp(140px,22vw,280px)]";
+    return "aspect-[728/90] w-full min-h-[clamp(100px,14vw,120px)]";
+  }
+  switch (formato) {
+    case "leaderboard":
+      return "aspect-[970/250] w-full min-h-[clamp(180px,28vw,300px)]";
+    case "banner":
+      return "aspect-[728/90] w-full min-h-[clamp(120px,16vw,140px)]";
+    case "mpu":
+    case "cuadrado":
+      return "w-full min-h-[clamp(260px,52vw,420px)] sm:min-h-[340px]";
+    case "skyscraper":
+    case "vertical-alto":
+      return "mx-auto w-full max-w-[360px] min-h-[clamp(380px,72vw,560px)]";
+    default:
+      return "min-h-[280px] w-full";
   }
 }
 

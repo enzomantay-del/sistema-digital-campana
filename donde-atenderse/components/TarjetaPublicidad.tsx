@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
-import { claseAnchoVariante, type VariantePublicidad } from "@/lib/formatosPublicidad";
+import {
+  claseAnchoVariante,
+  type DestinoHuecoPublicidad,
+  type VariantePublicidad,
+} from "@/lib/formatosPublicidad";
 
 /** Presentación de avisos al estilo portal de noticias (etiqueta discreta, marco fino). */
 export function TarjetaPublicidad({
@@ -9,6 +13,7 @@ export function TarjetaPublicidad({
   compacto = false,
   anchoFila = false,
   creatividadVideo = false,
+  destino = "columna",
 }: {
   children: ReactNode;
   variante?: VariantePublicidad;
@@ -19,9 +24,10 @@ export function TarjetaPublicidad({
   anchoFila?: boolean;
   /** Sin borde gris: el video lleva el mismo fondo y esquinas en un solo recorte. */
   creatividadVideo?: boolean;
+  destino?: DestinoHuecoPublicidad;
 }) {
   const rotulo = ejemplo ? "Publicidad ejemplo" : "Publicidad";
-  const ancho = claseAnchoVariante(variante, anchoFila);
+  const ancho = claseAnchoVariante(variante, anchoFila, destino);
   const gap = compacto ? "gap-0.5" : "gap-1";
   const rotuloClass = compacto
     ? "text-[10px] font-semibold uppercase tracking-[0.14em] text-muted"

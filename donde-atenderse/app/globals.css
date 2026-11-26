@@ -103,6 +103,23 @@ button {
   vertical-align: top;
 }
 
+/* Huecos comerciales vacíos: superficie grande y vendible */
+.hueco-comercial {
+  box-sizing: border-box;
+}
+
+.hueco-comercial--principal {
+  border-radius: 1rem;
+}
+
+.hueco-comercial--franja {
+  border-radius: 0.75rem;
+}
+
+.hueco-comercial--columna {
+  border-radius: 0.75rem;
+}
+
 .fila-profesional {
   @apply rounded-2xl border border-line bg-white px-3 py-2.5 shadow-[0_4px_14px_rgba(16,36,62,0.04)] transition hover:border-link/40;
 }

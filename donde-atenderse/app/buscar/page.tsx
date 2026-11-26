@@ -154,9 +154,12 @@ export default async function PaginaBuscar({
       {!soloProfesionales ? (
         <section className={`grid gap-3 ${lugaresPrimero ? "order-1" : ""}`}>{filasLugares}</section>
       ) : null}
-      <div className="w-full py-0.5 md:hidden">
-        <EspacioPublicitario formato="banner" anchoFila descripcion="Franja disponible al cierre del listado." />
-      </div>
+      <EspacioPublicitario
+        destino="franja"
+        formato="leaderboard"
+        anchoFila
+        descripcion="Banda amplia al cierre del listado: espacio premium para anunciantes."
+      />
     </LayoutListadoConPublicidad>
   );
 }

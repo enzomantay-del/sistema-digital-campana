@@ -55,9 +55,10 @@ export default async function PaginaFarmacia() {
       </div>
       <div className="w-full xl:hidden">
         <EspacioPublicitario
+          destino="franja"
           formato="leaderboard"
           anchoFila
-          descripcion="Banda amplia al cierre de la página en celular y tablet."
+          descripcion="Banda amplia al cierre de farmacia de turno (celular y tablet)."
         />
       </div>
     </LayoutFarmaciaConPublicidad>
