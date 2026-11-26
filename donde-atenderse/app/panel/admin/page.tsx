@@ -13,7 +13,7 @@ import { CrearUsuarioAdmin } from "@/components/CrearUsuarioAdmin";
 import { PanelAdminSeccion } from "@/components/PanelAdminSeccion";
 import { RecordatoriosInsigniaAdmin } from "@/components/RecordatoriosInsigniaAdmin";
 import { RespaldoBaseAdmin } from "@/components/RespaldoBaseAdmin";
-import { filasRecordatorioInsignia } from "@/lib/recordatorioInsignia";
+import { agregarContactosSecretaria, filasRecordatorioInsignia } from "@/lib/recordatorioInsignia";
 import { requiereAdmin } from "@/lib/auth";
 import { etiquetaArea, etiquetaLugar, fecha } from "@/lib/format";
 import { lugarPermiteCargaSecretaria } from "@/lib/lugarAsignacion";
@@ -147,7 +147,8 @@ export default async function PanelAdmin({
   const cargadosN = cargados ? Number(cargados) : undefined;
   const turneroSin = turneroSinRaw ? turneroSinRaw.split("|").filter(Boolean) : undefined;
   const turneroInvalidas = turneroInvalidasRaw ? turneroInvalidasRaw.split("|").filter(Boolean) : undefined;
-  const [profesionalesPendientes, lugaresSugeridos, profesionales, lugares, profesionalesInsignia] = await Promise.all([
+  const [profesionalesPendientes, lugaresSugeridos, profesionales, lugares, profesionalesInsignia, editoresSecretaria] =
+    await Promise.all([
     prisma.professional.findMany({
       where: { reviewed: false },
       include: { user: true },
@@ -185,9 +186,20 @@ export default async function PanelAdmin({
         },
       },
     }),
+    prisma.placeEditor.findMany({
+      where: { user: { role: "secretaria" } },
+      select: {
+        placeId: true,
+        user: { select: { name: true, role: true, whatsapp: true } },
+        place: { select: { name: true } },
+      },
+    }),
   ]);
 
-  const recordatoriosInsignia = filasRecordatorioInsignia(profesionalesInsignia);
+  const recordatoriosInsignia = agregarContactosSecretaria(
+    filasRecordatorioInsignia(profesionalesInsignia),
+    editoresSecretaria,
+  );
 
   const filasPendientes: FilaAdmin[] = profesionalesPendientes.map((persona) =>
     filaProfesional(persona, `Cargada el ${fecha(persona.createdAt)}`),
@@ -204,7 +216,8 @@ export default async function PanelAdmin({
     ),
   );
 
-  const hayAvisos = ok === "usuario" || error === "usuario" || error === "correo" || error === "lugares";
+  const hayAvisos =
+    ok === "usuario" || error === "usuario" || error === "correo" || error === "lugares" || error === "whatsapp";
 
   return (
     <div className="panel-admin mx-auto grid w-full max-w-4xl gap-5 px-1 sm:gap-6 sm:px-0">
@@ -247,6 +260,9 @@ export default async function PanelAdmin({
           {error === "correo" ? <p className="text-sm text-warn">Ya existe una cuenta con ese correo.</p> : null}
           {error === "lugares" ? (
             <p className="text-sm text-warn">Las secretarias necesitan al menos un lugar asignado.</p>
+          ) : null}
+          {error === "whatsapp" ? (
+            <p className="text-sm text-warn">Las secretarias necesitan un WhatsApp válido para recordatorios.</p>
           ) : null}
         </div>
       ) : null}

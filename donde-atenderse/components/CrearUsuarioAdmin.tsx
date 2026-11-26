@@ -26,6 +26,17 @@ export function CrearUsuarioAdmin({
         <input name="password" type="text" className="campo" autoComplete="new-password" required minLength={8} />
       </label>
       <label className="grid gap-1 text-sm">
+        WhatsApp (secretaría: recordatorios de insignia; profesional: opcional)
+        <input
+          name="whatsapp"
+          type="tel"
+          className="campo"
+          autoComplete="tel"
+          inputMode="numeric"
+          placeholder="5493764…"
+        />
+      </label>
+      <label className="grid gap-1 text-sm">
         Tipo de cuenta
         <select name="role" className="campo" defaultValue="secretaria" id="rol-usuario">
           <option value="secretaria">Secretaria de lugar (carga profesionales de su/s lugar/es)</option>

@@ -12,6 +12,7 @@ model User {
   email           String        @unique
   passwordHash    String
   name            String
+  whatsapp        String         @default("")
   role            String        @default("profesional")
   createdAt       DateTime      @default(now())
   professional    Professional?

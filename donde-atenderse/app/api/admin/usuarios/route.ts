@@ -17,6 +17,7 @@ export async function POST(request: Request) {
     .toLowerCase();
   const password = String(formData.get("password") ?? "");
   const role = String(formData.get("role") ?? "profesional");
+  const whatsapp = String(formData.get("whatsapp") ?? "").replace(/\D/g, "");
   const placeIds = formData
     .getAll("placeIds")
     .map((valor) => String(valor).trim())
@@ -31,6 +32,9 @@ export async function POST(request: Request) {
   if (role === "secretaria" && placeIds.length === 0) {
     return redirigirSolicitud(request, "/panel/admin?error=lugares");
   }
+  if (role === "secretaria" && whatsapp.length < 10) {
+    return redirigirSolicitud(request, "/panel/admin?error=whatsapp");
+  }
 
   const existe = await prisma.user.findUnique({ where: { email } });
   if (existe) {
@@ -39,12 +43,18 @@ export async function POST(request: Request) {
 
   const passwordHash = await bcrypt.hash(password, 10);
   const user = await prisma.user.create({
-    data: { name, email, passwordHash, role },
+    data: { name, email, passwordHash, role, whatsapp: whatsapp.length >= 10 ? whatsapp : "" },
   });
 
   if (role === "profesional") {
     await prisma.professional.create({
-      data: { userId: user.id, fullName: name, published: false, reviewed: false },
+      data: {
+        userId: user.id,
+        fullName: name,
+        whatsapp: whatsapp.length >= 10 ? whatsapp : "",
+        published: false,
+        reviewed: false,
+      },
     });
   }
 

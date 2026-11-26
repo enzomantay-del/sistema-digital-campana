@@ -1,9 +1,9 @@
 import { urlSitioPublico } from "@/lib/config";
 import { enlaceWhatsApp } from "@/lib/format";
 import {
-  DIAS_DATOS_FRESCOS,
-  fechaMasReciente,
+  diasRestantesInsignia,
   profesionalVerificadoEnListado,
+  ultimaActualizacionProfesional,
 } from "@/lib/verificacion";
 
 /** Cuántos días antes del vencimiento muestra el aviso en administración. */
@@ -20,6 +20,13 @@ type AsistenciaRecordatorio = {
   place: { id: string; name: string; whatsapp: string; kind: string };
 };
 
+export type ContactoSecretariaInsignia = {
+  placeId: string;
+  lugarNombre: string;
+  secretariaNombre: string;
+  whatsapp: string;
+};
+
 export type FilaRecordatorioInsignia = {
   id: string;
   nombre: string;
@@ -29,21 +36,10 @@ export type FilaRecordatorioInsignia = {
   verificado: boolean;
   whatsappProfesional: string;
   contactosLugar: { placeId: string; lugarNombre: string; whatsapp: string }[];
+  contactosSecretaria: ContactoSecretariaInsignia[];
 };
 
-export function ultimaActualizacionProfesional(input: {
-  updatedAt: Date;
-  attendances: { professionalUpdatedAt: Date | null }[];
-}) {
-  return fechaMasReciente(input.updatedAt, ...input.attendances.map((fila) => fila.professionalUpdatedAt));
-}
-
-export function diasRestantesInsignia(ultima: Date | null | undefined, ahora = new Date()) {
-  if (!ultima) return -DIAS_DATOS_FRESCOS;
-  const transcurridoMs = ahora.getTime() - ultima.getTime();
-  const transcurridoDias = transcurridoMs / (24 * 60 * 60 * 1000);
-  return Math.ceil(DIAS_DATOS_FRESCOS - transcurridoDias);
-}
+export { diasRestantesInsignia, ultimaActualizacionProfesional } from "@/lib/verificacion";
 
 export function adminDebeRecordarInsignia(diasRestantes: number) {
   if (diasRestantes > AVISO_INSIGNIA_DIAS_ANTES) return false;
@@ -107,10 +103,50 @@ export function filasRecordatorioInsignia(
       verificado,
       whatsappProfesional: whatsappProfesional(persona),
       contactosLugar,
+      contactosSecretaria: [],
     });
   }
   filas.sort((a, b) => a.diasRestantes - b.diasRestantes || a.nombre.localeCompare(b.nombre, "es"));
   return filas;
+}
+
+/** Agrega WhatsApp de cuentas secretaría asignadas a cada sede (prioridad sobre el del lugar). */
+export function agregarContactosSecretaria(
+  filas: FilaRecordatorioInsignia[],
+  editores: {
+    placeId: string;
+    user: { name: string; role: string; whatsapp: string };
+    place: { name: string };
+  }[],
+): FilaRecordatorioInsignia[] {
+  const porLugar = new Map<string, ContactoSecretariaInsignia[]>();
+  for (const fila of editores) {
+    if (fila.user.role !== "secretaria") continue;
+    const wa = fila.user.whatsapp.trim();
+    if (wa.length < 10) continue;
+    const item: ContactoSecretariaInsignia = {
+      placeId: fila.placeId,
+      lugarNombre: fila.place.name,
+      secretariaNombre: fila.user.name,
+      whatsapp: wa,
+    };
+    const lista = porLugar.get(fila.placeId) ?? [];
+    if (!lista.some((otro) => otro.whatsapp === wa)) lista.push(item);
+    porLugar.set(fila.placeId, lista);
+  }
+  return filas.map((persona) => {
+    const secretarias: ContactoSecretariaInsignia[] = [];
+    const vistos = new Set<string>();
+    for (const sede of persona.contactosLugar) {
+      for (const contacto of porLugar.get(sede.placeId) ?? []) {
+        const clave = `${contacto.placeId}:${contacto.whatsapp}`;
+        if (vistos.has(clave)) continue;
+        vistos.add(clave);
+        secretarias.push(contacto);
+      }
+    }
+    return { ...persona, contactosSecretaria: secretarias };
+  });
 }
 
 function textoVencimiento(diasRestantes: number) {
@@ -125,7 +161,7 @@ export function mensajeRecordatorioProfesional(fila: Pick<FilaRecordatorioInsign
   const url = `${urlSitioPublico()}/entrar`;
   const nombre = fila.nombre.trim().split(/\s+/)[0] ?? "";
   const saludo = nombre ? `Hola, ${nombre}.` : "Hola.";
-  return `${saludo} ${MENSAJE_RECORDATORIO_INSIGNIA_PREFIJO} Tu ficha ${textoVencimiento(fila.diasRestantes)}. Entrá a ${url}, revisá horarios y contacto y tocá «Guardar ficha». Si atendés en un centro, la secretaría también puede actualizar tu horario en el panel de cargas. Gracias.`;
+  return `${saludo} ${MENSAJE_RECORDATORIO_INSIGNIA_PREFIJO} Tu ficha ${textoVencimiento(fila.diasRestantes)}. Entrá a ${url}, revisá horarios y contacto y tocá «Confirmo que sigue vigente» (o guardá la ficha si cambiaste algo). Gracias.`;
 }
 
 export function mensajeRecordatorioSecretaria(
@@ -140,7 +176,7 @@ export function mensajeRecordatorioSecretaria(
       : fila.diasRestantes === 1
         ? "pierde la insignia mañana"
         : `pierde la insignia en ${fila.diasRestantes} días`;
-  return `Hola, te escribo desde Cercalud. La ficha de ${fila.nombre.trim()} ${estado} en el directorio. Si los datos siguen bien, entrá a ${url}, abrí la ficha del profesional y guardá (aunque no cambies el horario). Gracias.`;
+  return `Hola, te escribo desde Cercalud. La ficha de ${fila.nombre.trim()} ${estado} en el directorio. Si los datos siguen bien, entrá a ${url}, abrí la ficha y tocá «Confirmo que sigue vigente» (o guardá si hubo cambios). Gracias.`;
 }
 
 export function enlaceRecordatorioProfesional(fila: Pick<FilaRecordatorioInsignia, "nombre" | "diasRestantes" | "whatsappProfesional">) {
@@ -156,4 +192,15 @@ export function enlaceRecordatorioSecretaria(
   const wa = lugar.whatsapp.trim();
   if (wa.length < 10) return null;
   return enlaceWhatsApp(wa, mensajeRecordatorioSecretaria(fila, lugar.lugarNombre, lugar.placeId));
+}
+
+export function enlaceRecordatorioCuentaSecretaria(
+  fila: Pick<FilaRecordatorioInsignia, "nombre" | "diasRestantes">,
+  contacto: ContactoSecretariaInsignia,
+) {
+  return enlaceRecordatorioSecretaria(fila, {
+    placeId: contacto.placeId,
+    lugarNombre: contacto.lugarNombre,
+    whatsapp: contacto.whatsapp,
+  });
 }

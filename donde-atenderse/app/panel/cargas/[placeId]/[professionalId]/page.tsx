@@ -1,5 +1,7 @@
 import { notFound, redirect } from "next/navigation";
+import { ConfirmarInsigniaBanner } from "@/components/ConfirmarInsigniaBanner";
 import { EditorProfesional } from "@/components/EditorProfesional";
+import { estadoInsigniaProfesional } from "@/lib/estadoInsigniaPanel";
 import { AvisoFotosHosting } from "@/components/AvisoFotosHosting";
 import { esSecretaria, usuarioActual } from "@/lib/auth";
 import { secretariaPuedeTrabajarFichaEnLugar } from "@/lib/permisosProfesional";
@@ -44,6 +46,12 @@ export default async function EditarFichaEnLugar({
     borrador = { ...borrador, horarios: [horarioBorradorParaLugar(lugar)] };
   }
 
+  const insignia = estadoInsigniaProfesional({
+    updatedAt: completo.updatedAt,
+    published: completo.published,
+    attendances: completo.attendances.map((fila) => ({ professionalUpdatedAt: fila.professionalUpdatedAt })),
+  });
+
   return (
     <div className="grid gap-4">
       <AvisoFotosHosting />
@@ -51,6 +59,17 @@ export default async function EditarFichaEnLugar({
         Editás la ficha de <strong>{completo.fullName}</strong> y el horario en <strong>{lugar.name}</strong>. Los
         horarios en otros lugares los carga cada secretaría de ese lugar.
       </p>
+      {insignia.mostrarAviso ? (
+        <ConfirmarInsigniaBanner
+          modo="secretaria"
+          diasRestantes={insignia.diasRestantes}
+          verificado={insignia.verificado}
+          nombreProfesional={completo.fullName}
+          lugarNombre={lugar.name}
+          professionalId={completo.id}
+          placeId={placeId}
+        />
+      ) : null}
       <EditorProfesional
         professionalId={completo.id}
         modoSecretaria

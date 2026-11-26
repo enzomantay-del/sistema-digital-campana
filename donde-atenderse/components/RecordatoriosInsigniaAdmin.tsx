@@ -1,5 +1,6 @@
 import Link from "next/link";
 import {
+  enlaceRecordatorioCuentaSecretaria,
   enlaceRecordatorioProfesional,
   enlaceRecordatorioSecretaria,
   type FilaRecordatorioInsignia,
@@ -24,6 +25,7 @@ export function RecordatoriosInsigniaAdmin({ filas }: { filas: FilaRecordatorioI
       <ul className="grid gap-2">
         {filas.map((fila) => {
           const linkPro = enlaceRecordatorioProfesional(fila);
+          const lugaresConSecretaria = new Set(fila.contactosSecretaria.map((item) => item.placeId));
           const etiquetaDias =
             fila.diasRestantes <= 0
               ? `Venció hace ${Math.abs(fila.diasRestantes)} día${Math.abs(fila.diasRestantes) === 1 ? "" : "s"}`
@@ -61,22 +63,42 @@ export function RecordatoriosInsigniaAdmin({ filas }: { filas: FilaRecordatorioI
                 ) : (
                   <span className="text-xs text-warn">Sin WhatsApp en la ficha</span>
                 )}
-                {fila.contactosLugar.map((lugar) => {
-                  const linkSec = enlaceRecordatorioSecretaria(fila, lugar);
-                  if (!linkSec) return null;
+                {fila.contactosSecretaria.map((contacto) => {
+                  const link = enlaceRecordatorioCuentaSecretaria(fila, contacto);
+                  if (!link) return null;
+                  const etiqueta = contacto.secretariaNombre.split(/\s+/)[0] ?? "Secretaría";
                   return (
                     <a
-                      key={lugar.placeId}
-                      href={linkSec}
+                      key={`${contacto.placeId}:${contacto.whatsapp}`}
+                      href={link}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="boton-suave !py-1.5 !text-xs"
-                      title={`Contacto del lugar: ${lugar.lugarNombre}`}
+                      title={`${contacto.lugarNombre} · ${contacto.secretariaNombre}`}
                     >
-                      WhatsApp {lugar.lugarNombre.length > 22 ? `${lugar.lugarNombre.slice(0, 20)}…` : lugar.lugarNombre}
+                      WA {etiqueta}
                     </a>
                   );
                 })}
+                {fila.contactosLugar
+                  .filter((lugar) => !lugaresConSecretaria.has(lugar.placeId))
+                  .map((lugar) => {
+                    const linkSec = enlaceRecordatorioSecretaria(fila, lugar);
+                    if (!linkSec) return null;
+                    return (
+                      <a
+                        key={lugar.placeId}
+                        href={linkSec}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="boton-suave !py-1.5 !text-xs"
+                        title={`Contacto del lugar: ${lugar.lugarNombre}`}
+                      >
+                        WA lugar{" "}
+                        {lugar.lugarNombre.length > 16 ? `${lugar.lugarNombre.slice(0, 14)}…` : lugar.lugarNombre}
+                      </a>
+                    );
+                  })}
               </div>
             </li>
           );

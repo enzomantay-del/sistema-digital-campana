@@ -2,7 +2,9 @@ import { redirect } from "next/navigation";
 import { esAdmin, esProfesional, esSecretaria } from "@/lib/auth";
 import { AvisoFotosHosting } from "@/components/AvisoFotosHosting";
 import { EditorProfesional } from "@/components/EditorProfesional";
+import { ConfirmarInsigniaBanner } from "@/components/ConfirmarInsigniaBanner";
 import { PanelProfesionalShell } from "@/components/PanelProfesionalShell";
+import { estadoInsigniaProfesional } from "@/lib/estadoInsigniaPanel";
 import { usuarioActual } from "@/lib/auth";
 import { borradorDesdeProfesional } from "@/lib/cargarBorradorProfesional";
 import { prisma } from "@/lib/prisma";
@@ -51,6 +53,11 @@ export default async function PaginaEditorProfesional() {
     catalogoObras(),
   ]);
   const propios = new Set(usuario.places.map((item) => item.placeId));
+  const insignia = estadoInsigniaProfesional({
+    updatedAt: completo.updatedAt,
+    published: completo.published,
+    attendances: completo.attendances.map((fila) => ({ professionalUpdatedAt: fila.professionalUpdatedAt })),
+  });
 
   return (
     <div className="mx-auto grid max-w-6xl gap-4">
@@ -60,6 +67,13 @@ export default async function PaginaEditorProfesional() {
         publicada={completo.published}
         revisada={completo.reviewed}
       >
+        {insignia.mostrarAviso ? (
+          <ConfirmarInsigniaBanner
+            modo="profesional"
+            diasRestantes={insignia.diasRestantes}
+            verificado={insignia.verificado}
+          />
+        ) : null}
         <EditorProfesional
           professionalId={completo.id}
           obras={obras}
