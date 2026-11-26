@@ -33,7 +33,17 @@ export async function procesarEntrada(formData: FormData): Promise<ResultadoLogi
     };
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  let user;
+  try {
+    user = await prisma.user.findUnique({ where: { email } });
+  } catch (error) {
+    console.error("login: consulta User falló (¿base sin migrar?):", error);
+    return {
+      ok: false,
+      error:
+        "El sitio está actualizando la base de datos y el ingreso no responde todavía. Esperá unos minutos y volvé a intentar; si acaban de publicar una actualización, probá de nuevo cuando termine el deploy.",
+    };
+  }
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
     await registrarFalloAuth(`login:${email}`, LIMITE_LOGIN);
     await registrarFalloAuth(`login-ip:${ip}`, { max: 30, windowMs: 15 * 60 * 1000 });

@@ -25,7 +25,7 @@ Clic en **Deploy site** solo después del paso 2 (variables), o configurá varia
 | `CERCALUD_SITE_URL` | Al probar: dejalo vacío o pondremos `https://TU-SITIO.netlify.app` tras el primer deploy |
 | `CERCALUD_CONTACTO_WHATSAPP` | Opcional, mismo valor que quieras en el sitio |
 
-**No** agregues `PRISMA_DB_PUSH=1`.
+No hace falta `PRISMA_DB_PUSH=1`: con `DATABASE_URL` en Netlify, el build alinea la base sola. Solo si querés desactivarlo: `PRISMA_DB_PUSH=0`.
 
 Opcional después: contacto email, S3 (`CERCALUD_S3_*`), ver [netlify-migracion.md](./netlify-migracion.md).
 

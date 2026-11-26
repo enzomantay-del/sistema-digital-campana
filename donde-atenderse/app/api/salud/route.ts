@@ -18,10 +18,12 @@ export async function GET() {
       console.error("salud schema Place:", schemaError);
     }
     try {
-      await prisma.user.findFirst({ select: { id: true, whatsapp: true } });
+      await prisma.user.findFirst({
+        select: { id: true, whatsapp: true, contrasenaReferencia: true, notaAcceso: true },
+      });
       usuariosListos = true;
     } catch (schemaError) {
-      console.error("salud schema User (¿falta columna whatsapp?):", schemaError);
+      console.error("salud schema User (faltan columnas del panel admin):", schemaError);
     }
     return NextResponse.json({
       ok: true,
@@ -29,6 +31,7 @@ export async function GET() {
       adminListo: admins > 0,
       lugaresListos,
       usuariosListos,
+      ingresoListo: usuariosListos,
     });
   } catch {
     return NextResponse.json({ ok: false, base: "error" }, { status: 500 });

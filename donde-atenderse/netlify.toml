@@ -8,7 +8,7 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  # El build NO hace `prisma db push` salvo que definas PRISMA_DB_PUSH=1 (ver docs/netlify-migracion.md).
+  # Con DATABASE_URL en el sitio, el build corre `prisma db push` (ver docs/netlify-migracion.md). PRISMA_DB_PUSH=0 lo desactiva.
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"

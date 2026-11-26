@@ -88,7 +88,7 @@ Pasos:
 3. Build settings (el repo ya trae `netlify.toml`):
    - Build command: `npm ci && npm run build`
    - Plugin: `@netlify/plugin-nextjs` (se instala con `npm ci`)
-4. **No** definas `PRISMA_DB_PUSH=1` en variables de build salvo que quieras empujar esquema en cada deploy (no recomendado).
+4. Con `DATABASE_URL` de Postgres en el build, **`npm run build` sincroniza el esquema solo** (columnas nuevas del panel, etc.). No hace falta `PRISMA_DB_PUSH=1`. Para desactivarlo: `PRISMA_DB_PUSH=0`.
 
 ### Variables de entorno (Site settings → Environment variables)
 
@@ -144,7 +144,7 @@ Después podés **unpublish** en Cursor o dejarlo como respaldo de solo lectura 
 
 Desde esta versión:
 
-- `npm run build` **no** ejecuta `prisma db push` salvo `PRISMA_DB_PUSH=1`.
+- `npm run build` ejecuta `prisma db push` si hay `DATABASE_URL` postgres (salvo `PRISMA_DB_PUSH=0`).
 - Alineación manual de esquema: `npm run db:push:prod` con `DATABASE_URL` cargada.
 - El arranque tipo `npm run start` (servidor propio) solo hace push si `PRISMA_DB_PUSH_ON_START=1`.
 
