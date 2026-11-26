@@ -4,7 +4,7 @@ import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 const PASOS = [
   {
     titulo: "Cercalud te crea la cuenta",
-    texto: "No hay registro abierto: escribís a la administración, validamos matrícula y datos, y te damos acceso al panel.",
+    texto: "No hay registro abierto: pedís acceso por WhatsApp, validamos matrícula y datos, y te damos usuario y contraseña.",
     icono: "sello" as const,
   },
   {

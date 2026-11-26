@@ -11,12 +11,16 @@ export function mostrarDatosEjemplo() {
   return process.env.NODE_ENV !== "production";
 }
 
+/** @deprecated Contacto público: usar WhatsApp (contactoWhatsApp / lib/contactoCercalud). */
 export function contactoEmail() {
   return process.env.CERCALUD_CONTACTO_EMAIL?.trim() || "contacto@cercalud.com.ar";
 }
 
+/** WhatsApp institucional de Cercalud. Override con CERCALUD_CONTACTO_WHATSAPP. */
 export function contactoWhatsApp() {
-  return process.env.CERCALUD_CONTACTO_WHATSAPP?.trim() || "";
+  const custom = process.env.CERCALUD_CONTACTO_WHATSAPP?.trim();
+  if (custom && custom.replace(/\D/g, "").length >= 10) return custom.replace(/\D/g, "");
+  return "3743483429";
 }
 
 const AUTH_SECRET_PLANTILLA = "cambia-esta-frase-por-una-larga-y-minima-de-32-caracteres";

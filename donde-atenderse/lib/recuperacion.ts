@@ -1,19 +1,15 @@
-import { enlaceWhatsApp } from "@/lib/format";
+import { enlaceWhatsAppCercalud, numeroWhatsAppCercalud, WHATSAPP_CERCALUD_DEFECTO } from "@/lib/contactoCercalud";
 
-/** Número de Cercalud (Misiones). Podés cambiarlo con el Secret CERCALUD_CONTACTO_WHATSAPP. */
-export const WHATSAPP_RECUPERACION_DEFECTO = "3743483429";
+/** @deprecated Usá numeroWhatsAppCercalud(). */
+export const WHATSAPP_RECUPERACION_DEFECTO = WHATSAPP_CERCALUD_DEFECTO;
 
 export const MENSAJE_RECUPERACION_INGRESO =
   "Hola, olvidé mis datos de ingreso a Cercalud.";
 
 export function numeroWhatsAppRecuperacion() {
-  if (typeof process !== "undefined") {
-    const desdeSecret = process.env.CERCALUD_CONTACTO_WHATSAPP?.trim();
-    if (desdeSecret) return desdeSecret;
-  }
-  return WHATSAPP_RECUPERACION_DEFECTO;
+  return numeroWhatsAppCercalud();
 }
 
 export function enlaceRecuperacionIngreso() {
-  return enlaceWhatsApp(numeroWhatsAppRecuperacion(), MENSAJE_RECUPERACION_INGRESO);
+  return enlaceWhatsAppCercalud(MENSAJE_RECUPERACION_INGRESO);
 }

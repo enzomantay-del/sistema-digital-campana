@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { EspacioPublicitario } from "@/components/EspacioPublicitario";
 import { IconoCercalud } from "@/components/iconos/IconoCercalud";
-import { contactoEmail, contactoWhatsApp } from "@/lib/config";
-import { enlaceWhatsApp } from "@/lib/format";
+import {
+  enlaceWhatsAppCercalud,
+  MENSAJE_CONSULTA_CERCALUD,
+  numeroWhatsAppCercalud,
+} from "@/lib/contactoCercalud";
 
 export default function PaginaContacto() {
-  const mail = contactoEmail();
-  const wa = contactoWhatsApp();
+  const wa = enlaceWhatsAppCercalud(MENSAJE_CONSULTA_CERCALUD);
+  const telefono = numeroWhatsAppCercalud();
   return (
     <div className="mx-auto grid max-w-2xl gap-6">
       <header className="grid gap-2">
@@ -15,25 +18,26 @@ export default function PaginaContacto() {
           Contacto
         </h1>
         <p className="text-muted">
-          Cercalud es un directorio privado de información de salud del corredor. Para publicidad, correcciones o
-          consultas sobre una ficha, escribinos.
+          Cercalud es un directorio privado de información de salud del corredor. Para publicidad, correcciones,
+          consultas sobre una ficha o pedir acceso al panel, escribinos por WhatsApp.
         </p>
       </header>
       <section className="tarjeta grid gap-4">
         <p>
-          <span className="font-semibold">Correo: </span>
-          <a href={`mailto:${mail}`} className="font-semibold text-link hover:underline">
-            {mail}
+          <span className="font-semibold">WhatsApp: </span>
+          <a
+            href={wa}
+            className="font-semibold text-link hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {telefono}
           </a>
         </p>
-        {wa ? (
-          <p>
-            <span className="font-semibold">WhatsApp institucional: </span>
-            <a href={enlaceWhatsApp(wa, "Hola, consulto por Cercalud.")} className="font-semibold text-link hover:underline" target="_blank" rel="noopener noreferrer">
-              Escribinos por WhatsApp
-            </a>
-          </p>
-        ) : null}
+        <a href={wa} className="boton w-fit enlace-icono gap-2" target="_blank" rel="noopener noreferrer">
+          <IconoCercalud nombre="contacto-directo" size={22} className="text-white" />
+          Escribinos por WhatsApp
+        </a>
         <p className="text-sm text-muted">
           Los turnos no se gestionan desde Cercalud: contactá al profesional o al lugar desde su ficha publicada.
         </p>

@@ -1,6 +1,6 @@
 import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { TarjetaPublicidad } from "@/components/TarjetaPublicidad";
-import { contactoEmail } from "@/lib/config";
+import { mensajePublicidadCercalud, enlaceWhatsAppCercalud, numeroWhatsAppCercalud } from "@/lib/contactoCercalud";
 import {
   claseAspectoVariante,
   MEDIDA_PUBLICIDAD,
@@ -27,7 +27,7 @@ export function EspacioPublicitario({
 }: Props) {
   const medida = MEDIDA_PUBLICIDAD[formato];
   const aspecto = rellenoVertical ? "h-full w-full min-h-[220px]" : (claseAspectoVariante(formato) ?? "");
-  const mail = contactoEmail();
+  const telefono = numeroWhatsAppCercalud();
   const fila = anchoFila || FORMATO_ANCHO_FILA.has(formato);
 
   return (
@@ -49,10 +49,12 @@ export function EspacioPublicitario({
               `${medida.nombre} · ${medida.ancho}×${medida.alto} px. Farmacias y profesionales de la zona.`}
           </p>
           <a
-            href={`mailto:${mail}?subject=Publicidad%20${encodeURIComponent(medida.nombre)}%20en%20Cercalud`}
+            href={enlaceWhatsAppCercalud(mensajePublicidadCercalud(medida.nombre))}
             className="mt-0.5 text-[11px] font-semibold text-link hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            {mail}
+            WhatsApp {telefono}
           </a>
         </div>
       </div>
