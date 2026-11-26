@@ -23,6 +23,7 @@ export async function bootstrapAdminDesdeSecrets(): Promise<void> {
       name: "Administración Cercalud",
       role: "admin",
       passwordHash,
+      whatsapp: "",
     },
   });
   console.log(`bootstrapAdmin: administrador creado (${email}).`);

@@ -8,6 +8,7 @@ export async function GET() {
     await bootstrapAdminDesdeSecrets();
     const admins = await prisma.user.count({ where: { role: "admin" } });
     let lugaresListos = false;
+    let usuariosListos = false;
     try {
       await prisma.place.findFirst({
         select: { id: true, obrasMode: true, suggestionNote: true, duties: { take: 1, select: { id: true } } },
@@ -16,11 +17,18 @@ export async function GET() {
     } catch (schemaError) {
       console.error("salud schema Place:", schemaError);
     }
+    try {
+      await prisma.user.findFirst({ select: { id: true, whatsapp: true } });
+      usuariosListos = true;
+    } catch (schemaError) {
+      console.error("salud schema User (¿falta columna whatsapp?):", schemaError);
+    }
     return NextResponse.json({
       ok: true,
       base: "conectada",
       adminListo: admins > 0,
       lugaresListos,
+      usuariosListos,
     });
   } catch {
     return NextResponse.json({ ok: false, base: "error" }, { status: 500 });
