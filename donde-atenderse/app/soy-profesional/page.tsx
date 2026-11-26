@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { IconoCercalud } from "@/components/iconos/IconoCercalud";
+import { LayoutContenidoConColumna } from "@/components/LayoutContenidoConColumna";
 
 const PASOS = [
   {
@@ -28,7 +29,8 @@ const VE_PACIENTE = [
 
 export default function PaginaSoyProfesional() {
   return (
-    <div className="mx-auto grid max-w-2xl gap-8">
+    <LayoutContenidoConColumna>
+    <div className="grid max-w-2xl gap-8">
       <header className="grid gap-3">
         <h1 className="enlace-icono text-4xl font-bold tracking-tight">
           <IconoCercalud nombre="profesional" size={36} className="text-menta" />
@@ -91,5 +93,6 @@ export default function PaginaSoyProfesional() {
         </Link>
       </section>
     </div>
+    </LayoutContenidoConColumna>
   );
 }

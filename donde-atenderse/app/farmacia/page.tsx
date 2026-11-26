@@ -1,6 +1,5 @@
 import { IconoCercalud } from "@/components/iconos/IconoCercalud";
 import { EspacioPublicitario } from "@/components/EspacioPublicitario";
-import { PublicidadFranjaResponsive } from "@/components/PublicidadFranjaResponsive";
 import { FarmaciaTurnoPagina, type FarmaciaTurnoPorLocalidad } from "@/components/FarmaciaTurnoPagina";
 import { LayoutFarmaciaConPublicidad } from "@/components/LayoutFarmaciaConPublicidad";
 import { LOCALIDADES } from "@/lib/constants";
@@ -49,7 +48,6 @@ export default async function PaginaFarmacia() {
           otras localidades del corredor si lo necesitás.
         </p>
       </header>
-      <PublicidadFranjaResponsive destinoMovil="farmacia" />
       <div className="w-full max-w-3xl">
         <FarmaciaTurnoPagina porLocalidad={porLocalidad} />
       </div>

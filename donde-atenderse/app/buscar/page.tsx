@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Buscador } from "@/components/Buscador";
 import { EspacioPublicitario } from "@/components/EspacioPublicitario";
-import { PublicidadFranjaResponsive } from "@/components/PublicidadFranjaResponsive";
 import { LayoutListadoConPublicidad } from "@/components/LayoutListadoConPublicidad";
 import { IconoCercalud, type NombreIconoCercalud } from "@/components/iconos/IconoCercalud";
 import { TarjetaListadoLugar } from "@/components/TarjetaListadoLugar";
@@ -120,7 +119,6 @@ export default async function PaginaBuscar({
               : undefined
         }
       />
-      <PublicidadFranjaResponsive destinoMovil={soloProfesionales ? "doctor" : "farmacia"} />
       <p className="text-muted">
         {centrosSalud && !q ? (
           <>
@@ -150,10 +148,16 @@ export default async function PaginaBuscar({
       {(soloProfesionales ? personas.length === 0 : personas.length === 0 && centros.length === 0) ? (
         <p>No hay fichas con esos datos. Probá con otra palabra o con otra localidad.</p>
       ) : null}
-      <section className={`grid gap-3 ${lugaresPrimero ? "order-2" : ""}`}>{filasProfesionales}</section>
-      {!soloProfesionales ? (
-        <section className={`grid gap-3 ${lugaresPrimero ? "order-1" : ""}`}>{filasLugares}</section>
-      ) : null}
+      {lugaresPrimero ? (
+        <>
+          <section className="grid gap-3">{filasLugares}</section>
+          {filasProfesionales.length > 0 ? (
+            <section className="grid gap-3">{filasProfesionales}</section>
+          ) : null}
+        </>
+      ) : (
+        <section className="grid gap-3">{filasProfesionales}</section>
+      )}
       <EspacioPublicitario
         destino="franja"
         formato="leaderboard"
