@@ -15,6 +15,7 @@
     "db:seed:produccion": "tsx prisma/seed-produccion.ts",
     "db:restaurar-respaldo": "tsx scripts/restaurar-respaldo.ts",
     "test:schedule": "tsx lib/schedule.test.ts",
+    "test:recordatorio": "tsx lib/recordatorioInsignia.test.ts",
     "postinstall": "node scripts/prisma-generate.mjs"
   },
   "dependencies": {

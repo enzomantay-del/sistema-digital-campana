@@ -11,7 +11,9 @@ import { GestionAdminLista, type FilaAdmin } from "@/components/GestionAdminList
 import { ImportarTurneroFarmacia } from "@/components/ImportarTurneroFarmacia";
 import { CrearUsuarioAdmin } from "@/components/CrearUsuarioAdmin";
 import { PanelAdminSeccion } from "@/components/PanelAdminSeccion";
+import { RecordatoriosInsigniaAdmin } from "@/components/RecordatoriosInsigniaAdmin";
 import { RespaldoBaseAdmin } from "@/components/RespaldoBaseAdmin";
+import { filasRecordatorioInsignia } from "@/lib/recordatorioInsignia";
 import { requiereAdmin } from "@/lib/auth";
 import { etiquetaArea, etiquetaLugar, fecha } from "@/lib/format";
 import { lugarPermiteCargaSecretaria } from "@/lib/lugarAsignacion";
@@ -145,7 +147,7 @@ export default async function PanelAdmin({
   const cargadosN = cargados ? Number(cargados) : undefined;
   const turneroSin = turneroSinRaw ? turneroSinRaw.split("|").filter(Boolean) : undefined;
   const turneroInvalidas = turneroInvalidasRaw ? turneroInvalidasRaw.split("|").filter(Boolean) : undefined;
-  const [profesionalesPendientes, lugaresSugeridos, profesionales, lugares] = await Promise.all([
+  const [profesionalesPendientes, lugaresSugeridos, profesionales, lugares, profesionalesInsignia] = await Promise.all([
     prisma.professional.findMany({
       where: { reviewed: false },
       include: { user: true },
@@ -163,7 +165,29 @@ export default async function PanelAdmin({
     prisma.place.findMany({
       orderBy: [{ published: "desc" }, { locality: "asc" }, { name: "asc" }],
     }),
+    prisma.professional.findMany({
+      where: { published: true, reviewed: true, example: false },
+      select: {
+        id: true,
+        fullName: true,
+        specialty: true,
+        updatedAt: true,
+        agendaWhatsapp: true,
+        whatsapp: true,
+        published: true,
+        reviewed: true,
+        example: true,
+        attendances: {
+          select: {
+            professionalUpdatedAt: true,
+            place: { select: { id: true, name: true, whatsapp: true, kind: true } },
+          },
+        },
+      },
+    }),
   ]);
+
+  const recordatoriosInsignia = filasRecordatorioInsignia(profesionalesInsignia);
 
   const filasPendientes: FilaAdmin[] = profesionalesPendientes.map((persona) =>
     filaProfesional(persona, `Cargada el ${fecha(persona.createdAt)}`),
@@ -190,6 +214,13 @@ export default async function PanelAdmin({
             <h1 className="text-2xl font-bold tracking-tight sm:text-[1.65rem]">Administración</h1>
             <p className="text-sm text-muted">
               Hola, {admin.name}. Filtrá, seleccioná varios y publicá, bajá o eliminá de una vez.
+              {recordatoriosInsignia.length > 0 ? (
+                <span className="mt-1 block font-semibold text-amber-800">
+                  {recordatoriosInsignia.length} recordatorio
+                  {recordatoriosInsignia.length === 1 ? "" : "s"} de insignia pendiente
+                  {recordatoriosInsignia.length === 1 ? "" : "s"} (5 días o menos).
+                </span>
+              ) : null}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -219,6 +250,13 @@ export default async function PanelAdmin({
           ) : null}
         </div>
       ) : null}
+
+      <PanelAdminSeccion
+        titulo="Insignia de verificación"
+        descripcion="Fichas publicadas que vencen en 5 días o menos (o vencieron hace poco). WhatsApp con mensaje listo."
+      >
+        <RecordatoriosInsigniaAdmin filas={recordatoriosInsignia} />
+      </PanelAdminSeccion>
 
       <PanelAdminSeccion
         titulo="Crear usuario"
