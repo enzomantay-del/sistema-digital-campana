@@ -1,0 +1,193 @@
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+import { AccionesAdmin } from "@/components/AccionesAdmin";
+import { AvisoFotosHosting } from "@/components/AvisoFotosHosting";
+import { EditorLugar } from "@/components/EditorLugar";
+import { esAdmin, usuarioActual } from "@/lib/auth";
+import { fechaInput } from "@/lib/format";
+import { obrasModoEfectivo } from "@/lib/placeObras";
+import { serviciosIdsDesdeCampo } from "@/lib/placeServices";
+import { leerHorarioLugarDesdeNota } from "@/lib/placeSchedule";
+import { prisma } from "@/lib/prisma";
+import { lugarPermiteCargaSecretaria } from "@/lib/lugarAsignacion";
+import { catalogoObras } from "@/lib/search";
+
+export default async function PaginaEditorLugar({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string; ok?: string }>;
+}) {
+  const { id } = await params;
+  const { error, ok } = await searchParams;
+  const usuario = await usuarioActual();
+  if (!usuario) redirect("/entrar");
+  if (!esAdmin(usuario)) redirect("/panel");
+  const admin = true;
+
+  const lugar = await prisma.place.findUnique({
+    where: { id },
+    include: {
+      obras: { include: { obra: true } },
+      studies: true,
+      duties: { orderBy: { endsOn: "desc" }, take: 1 },
+      editors: { include: { user: true } },
+      suggestedBy: true,
+    },
+  });
+  if (!lugar) notFound();
+  const obras = await catalogoObras();
+  const turno = lugar.duties[0];
+  const horario = leerHorarioLugarDesdeNota(lugar.scheduleNote);
+
+  return (
+    <div className="grid gap-8">
+      <AvisoFotosHosting />
+      {admin ? (
+        <section className="panel-admin grid max-w-3xl gap-3 rounded-2xl border border-line bg-white p-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href="/panel/admin" className="font-semibold text-link">
+              Volver al panel
+            </Link>
+            <span className="text-muted">
+              {lugar.published ? "Publicado" : "Sin publicar"}
+              {lugar.suggestedBy ? ` · Sugerido por ${lugar.suggestedBy.name}` : ""}
+            </span>
+          </div>
+          <AccionesAdmin
+            compacto
+            acciones={[
+              {
+                label: "Publicar",
+                href: `/api/lugar/${lugar.id}/admin`,
+                accionCampo: "publicar",
+                id: lugar.id,
+                tono: "boton",
+              },
+              {
+                label: "Bajar",
+                href: `/api/lugar/${lugar.id}/admin`,
+                accionCampo: "bajar",
+                id: lugar.id,
+                tono: "suave",
+              },
+              {
+                label: "Eliminar",
+                href: `/api/lugar/${lugar.id}/admin`,
+                accionCampo: "eliminar",
+                id: lugar.id,
+                tono: "peligro",
+                confirmar: `¿Eliminar ${lugar.name}? No se puede deshacer.`,
+              },
+            ]}
+          />
+          {ok === "publicar" ? (
+            <p className="rounded-xl border border-menta bg-[#e8f7f3] px-3 py-2 text-sm font-semibold text-menta">
+              Lugar publicado en la web.
+            </p>
+          ) : null}
+          {ok === "bajar" ? <p className="text-sm text-muted">Lugar sin publicar en la web.</p> : null}
+          {error === "accion" ? <p className="text-sm text-warn">No se pudo completar la acción. Probá de nuevo.</p> : null}
+          {lugarPermiteCargaSecretaria(lugar.kind) ? (
+            <>
+              <form
+                action={`/api/lugar/${lugar.id}/editor`}
+                method="post"
+                className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end"
+              >
+                <label className="grid gap-1">
+                  Asignar editor por correo
+                  <input name="email" type="email" className="campo" placeholder="secretaria@ejemplo.com" required />
+                </label>
+                <input type="hidden" name="placeId" value={lugar.id} />
+                <button className="boton-suave" type="submit">
+                  Asignar
+                </button>
+              </form>
+              {error === "correo" ? <p className="text-warn">No hay una cuenta con ese correo.</p> : null}
+              {lugar.editors.length > 0 ? (
+                <ul className="grid gap-2">
+                  {lugar.editors.map((editor) => (
+                    <li
+                      key={editor.id}
+                      className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3"
+                    >
+                      <span>
+                        {editor.user.name} · {editor.user.email}
+                      </span>
+                      <form action={`/api/lugar/${lugar.id}/editor`} method="post">
+                        <input type="hidden" name="modo" value="quitar" />
+                        <input type="hidden" name="userId" value={editor.userId} />
+                        <button className="font-semibold text-link" type="submit">
+                          Quitar
+                        </button>
+                      </form>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-muted">
+                Las farmacias y su turnero las carga solo la administración; no se asignan secretarias nuevas.
+              </p>
+              {lugar.editors.length > 0 ? (
+                <ul className="grid gap-2">
+                  {lugar.editors.map((editor) => (
+                    <li
+                      key={editor.id}
+                      className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3"
+                    >
+                      <span>
+                        {editor.user.name} · {editor.user.email}
+                      </span>
+                      <form action={`/api/lugar/${lugar.id}/editor`} method="post">
+                        <input type="hidden" name="modo" value="quitar" />
+                        <input type="hidden" name="userId" value={editor.userId} />
+                        <button className="font-semibold text-link" type="submit">
+                          Quitar
+                        </button>
+                      </form>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </>
+          )}
+        </section>
+      ) : null}
+      <EditorLugar
+        placeId={lugar.id}
+        obras={obras}
+        inicial={{
+          name: lugar.name,
+          kind: lugar.kind,
+          locality: lugar.locality,
+          address: lugar.address,
+          logoUrl: lugar.logoUrl,
+          whatsapp: lugar.whatsapp,
+          phone: lugar.phone,
+          schedule: horario.data,
+          scheduleNote: lugar.scheduleNote,
+          scheduleLegacy: horario.legacy,
+          obrasMode: obrasModoEfectivo(lugar.kind, lugar.obrasMode),
+          obras: lugar.obras.map((item) => item.obra.name),
+          otraObra: "",
+          studies: lugar.studies.map((estudio) => ({
+            key: estudio.id,
+            id: estudio.id,
+            name: estudio.name,
+            preparation: estudio.preparation,
+            attention: estudio.attention,
+          })),
+          servicios: serviciosIdsDesdeCampo(lugar.services),
+          dutyStart: fechaInput(turno?.startsOn),
+          dutyEnd: fechaInput(turno?.endsOn),
+          dutySource: turno?.source ?? "",
+        }}
+      />
+    </div>
+  );
+}

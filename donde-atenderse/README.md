@@ -1,0 +1,44 @@
+# Cercalud
+
+Directorio del corredor: Santo Pipó, Hipólito Yrigoyen, Jardín América, Ruiz de Montoya, Capioví y Puerto Rico. El paciente busca sin cuenta. El profesional o la secretaria cargan la ficha.
+
+La marca Cercalud está confirmada. El sitio usa el logo oficial, en azul y verde.
+
+## Cómo verla
+
+```bash
+cd donde-atenderse
+npm install
+npx prisma db push
+npm run db:seed
+npm run dev
+```
+
+Abrí http://localhost:3000
+
+Si en el navegador ves **Internal Server Error** con `npm run dev`, cortá el servidor y arrancá de nuevo con caché limpia:
+
+```bash
+npm run dev:limpio
+```
+
+`npm run build` compila en **`.next`** (lo que exige el hosting). **`npm run preview`** usa **`.next-prod`** si tenés `next dev` abierto al mismo tiempo.
+
+Si igual ves **Internal Server Error**, usá `npm run dev:limpio`. Más detalle: [docs/errores-desarrollo.md](docs/errores-desarrollo.md).
+
+Para probar con un servidor más estable (por ejemplo detrás de un túnel durante horas):
+
+```bash
+npm run preview
+```
+
+Para crear una cuenta, definí `AUTH_SECRET` en el entorno con una frase larga. No la subas al repositorio.
+
+Los profesionales y lugares que aparecen al entrar son datos de ejemplo. No tienen usuario ni contraseña.
+
+## Producción (cuando tengas hosting)
+
+1. Variables: `DATABASE_URL`, `AUTH_SECRET` (32+ caracteres), `ADMIN_EMAIL`, `ADMIN_PASSWORD` nuevos.
+2. Primera base: `npx prisma db push` y **`npm run db:seed:produccion`** (no uses `db:seed`: carga el corredor de demo).
+3. Sin `CERCALUD_MOSTRAR_EJEMPLOS=1` el sitio oculta fichas `example` y muestra espacio comercial en lugar de avisos de muestra.
+4. Checklist completo: [docs/lanzamiento.md](docs/lanzamiento.md).

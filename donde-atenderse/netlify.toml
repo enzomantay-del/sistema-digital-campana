@@ -1,0 +1,14 @@
+# Cercalud — despliegue en Netlify (carpeta `donde-atenderse` del monorepo).
+# En el sitio de Netlify: Base directory = `donde-atenderse` (o conectá solo esta carpeta).
+
+[build]
+  command = "npm ci && npm run build"
+  # Relativo a base `donde-atenderse`; no puede ser igual al base directory (exige Netlify + plugin Next).
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Con DATABASE_URL en el sitio, el build corre `prisma db push` (ver docs/netlify-migracion.md). PRISMA_DB_PUSH=0 lo desactiva.
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

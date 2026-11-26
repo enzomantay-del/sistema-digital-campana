@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400" role="img" aria-label="Dr. Iván Ortiz">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <rect width="500" height="400" fill="url(#bg)"/>
+  <ellipse cx="250" cy="155" rx="78" ry="88" fill="#f1f5e9"/>
+  <ellipse cx="250" cy="178" rx="55" ry="62" fill="#fde68a"/>
+  <path fill="#475569" d="M115 400c18-95 58-145 135-145s117 50 135 145z"/>
+  <path fill="#f8fafc" d="M218 198c8-14 18-21 32-21s24 7 32 21" opacity="0.6"/>
+  <rect x="185" y="268" width="130" height="14" rx="7" fill="#0ea5e9" opacity="0.5"/>
+</svg>

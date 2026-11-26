@@ -1,0 +1,178 @@
+import Image from "next/image";
+import Link from "next/link";
+import { IconoCercalud, iconoLugar } from "@/components/iconos/IconoCercalud";
+import { HorarioLugarPublico } from "@/components/HorarioLugarPublico";
+import { ListaHorarioTexto } from "@/components/ListaHorarioTexto";
+import { ListaObrasCompacta } from "@/components/ListaObrasCompacta";
+import { EnlacesContactoLugar } from "@/components/EnlacesContactoLugar";
+import { InsigniaVerificacion } from "@/components/InsigniaVerificacion";
+import { enlaceMaps, etiquetaLugar } from "@/lib/format";
+import type { VistaLugar } from "@/lib/view";
+
+export function FichaLugar({
+  vista,
+  ejemplo = false,
+  enlazar = true,
+  mostrarProfesionalesEnFicha = false,
+}: {
+  vista: VistaLugar;
+  ejemplo?: boolean;
+  enlazar?: boolean;
+  /** En el panel se puede previsualizar el listado; en la ficha pública va solo el resumen. */
+  mostrarProfesionalesEnFicha?: boolean;
+}) {
+  return (
+    <article className="tarjeta grid gap-8">
+      <header className="grid gap-2">
+        <div className="flex flex-wrap items-start gap-4">
+          {vista.logoUrl ? (
+            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-line bg-white shadow-sm sm:h-28 sm:w-28">
+              <Image
+                src={vista.logoUrl}
+                alt={`Logo de ${vista.nombre}`}
+                fill
+                className="object-contain p-1.5"
+                sizes="(max-width: 640px) 96px, 112px"
+                unoptimized
+              />
+            </div>
+          ) : null}
+          <div className="grid min-w-0 flex-1 gap-2">
+            <p className="enlace-icono text-sm font-semibold uppercase tracking-[0.08em] text-menta">
+              <IconoCercalud nombre={iconoLugar(vista.kind)} size={16} className="shrink-0 text-menta" />
+              <span>
+                {etiquetaLugar(vista.kind)} · {vista.localidad}
+              </span>
+            </p>
+            <div className="flex items-start justify-between gap-3">
+              <h1 className="min-w-0 text-4xl font-bold tracking-tight">{vista.nombre}</h1>
+              <InsigniaVerificacion activa={vista.datosVerificados} />
+            </div>
+          </div>
+        </div>
+        {vista.direccion ? (
+          ejemplo ? (
+            <p>{vista.direccion}</p>
+          ) : (
+            <a
+              href={enlaceMaps(vista.direccion, vista.localidad, vista.nombre)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="enlace-icono w-fit font-medium text-link underline-offset-2 hover:underline"
+            >
+              <IconoCercalud nombre="ubicacion" size={18} className="text-menta" />
+              {vista.direccion}
+            </a>
+          )
+        ) : null}
+        {ejemplo ? <p className="text-base text-warn">Dato de ejemplo.</p> : null}
+      </header>
+
+      <HorarioLugarPublico
+        scheduleNote={vista.scheduleNote}
+        lineasFallback={vista.horarioLineas}
+        textoFallback={vista.horarioLugar}
+      />
+
+      {vista.cantidadProfesionales > 0 ? (
+        <section className="grid gap-4">
+          <h2 className="enlace-icono text-2xl font-semibold">
+            <IconoCercalud nombre="profesional" size={26} className="shrink-0 text-menta" />
+            Quién atiende
+          </h2>
+          <p className="text-muted">Consultá el listado completo de profesionales y especialidades en este lugar.</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href={`/lugar/${vista.placeId}/profesionales`} className="boton-suave gap-2">
+              <IconoCercalud nombre="profesional" size={18} className="text-link" />
+              Ver profesionales ({vista.cantidadProfesionales})
+            </Link>
+            {vista.especialidades.length > 0 ? (
+              <Link href={`/lugar/${vista.placeId}/especialidades`} className="boton-suave gap-2">
+                <IconoCercalud nombre="areas" size={18} className="text-link" />
+                Ver especialidades ({vista.especialidades.length})
+              </Link>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
+
+      {mostrarProfesionalesEnFicha && vista.bloques.length > 0 ? (
+        <div className="grid gap-6 border-t border-line pt-6">
+          <p className="text-sm font-semibold text-muted">Vista previa del detalle por profesional</p>
+          {vista.bloques.map((bloque) => (
+            <section key={bloque.shift} className="grid gap-4">
+              <h3 className="text-xl font-semibold">{bloque.titulo}</h3>
+              {bloque.lineas.map((linea) => (
+                <div key={linea.id} className="border-t border-line pt-4">
+                  {enlazar && linea.personaId ? (
+                    <Link href={`/profesional/${linea.personaId}`} className="text-xl font-semibold text-link">
+                      {linea.rotulo}
+                    </Link>
+                  ) : (
+                    <p className="text-xl font-semibold">{linea.rotulo}</p>
+                  )}
+                  {linea.horarioLineas.length > 0 || linea.detalle ? (
+                    <div className="mt-1">
+                      <ListaHorarioTexto
+                        lineas={linea.horarioLineas.length > 0 ? linea.horarioLineas : [linea.detalle]}
+                      />
+                    </div>
+                  ) : null}
+                  <p className="mt-2 text-xs text-muted">{linea.actualizacion}</p>
+                </div>
+              ))}
+            </section>
+          ))}
+        </div>
+      ) : null}
+
+      {vista.servicios.length > 0 ? (
+        <section className="grid gap-3">
+          <h2 className="enlace-icono text-2xl font-semibold">
+            <IconoCercalud nombre="areas" size={24} className="shrink-0 text-menta" />
+            Servicios
+          </h2>
+          <ul className="flex flex-wrap gap-2">
+            {vista.servicios.map((servicio) => (
+              <li key={servicio} className="pastilla pastilla-compacta pastilla-activa">
+                {servicio}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {vista.estudios.length > 0 ? (
+        <section className="grid gap-3">
+          <h2 className="enlace-icono text-2xl font-semibold">
+            <IconoCercalud nombre="estudios" size={24} className="shrink-0 text-menta" />
+            Estudios
+          </h2>
+          {vista.estudios.map((estudio) => (
+            <div key={estudio.nombre} className="border-t border-line pt-3">
+              <p className="font-semibold">{estudio.nombre}</p>
+              {estudio.atencion ? <p>{estudio.atencion}</p> : null}
+              {estudio.preparacion ? <p className="text-muted">{estudio.preparacion}</p> : null}
+            </div>
+          ))}
+        </section>
+      ) : null}
+
+      {vista.obrasNota ? <p className="text-sm text-muted">{vista.obrasNota}</p> : null}
+      {vista.mostrarObrasLista && vista.obras.length > 0 ? (
+        <ListaObrasCompacta obras={vista.obras} etiqueta="Obras sociales" />
+      ) : null}
+
+      {vista.whatsapp || vista.telefono ? (
+        <section className="grid gap-3">
+          <h2 className="enlace-icono text-xl font-semibold">
+            <IconoCercalud nombre="contacto-directo" size={22} className="shrink-0 text-menta" />
+            Contacto
+          </h2>
+          <EnlacesContactoLugar whatsapp={vista.whatsapp} telefono={vista.telefono} ejemplo={ejemplo} />
+        </section>
+      ) : null}
+      <p className="text-xs text-muted">{vista.actualizacion}</p>
+    </article>
+  );
+}

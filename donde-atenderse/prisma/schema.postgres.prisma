@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String        @id @default(cuid())
+  email           String        @unique
+  passwordHash    String
+  name            String
+  whatsapp        String         @default("")
+  contrasenaReferencia String    @default("")
+  notaAcceso      String         @default("")
+  role            String        @default("profesional")
+  createdAt       DateTime      @default(now())
+  professional    Professional?
+  places          PlaceEditor[]
+  suggestedPlaces Place[]       @relation("PlaceSuggestions")
+}
+
+model Professional {
+  id             String             @id @default(cuid())
+  userId         String?            @unique
+  user           User?              @relation(fields: [userId], references: [id])
+  fullName       String
+  license        String             @default("")
+  licenseKey     String?            @unique
+  area           String             @default("cuerpo")
+  specialty      String             @default("")
+  specialties    String             @default("")
+  photoUrl       String             @default("")
+  whatsapp       String             @default("")
+  phone          String             @default("")
+  agendaWhatsapp String             @default("")
+  agendaPhone    String             @default("")
+  price          String             @default("")
+  priceUpdatedAt DateTime?
+  example        Boolean            @default(false)
+  reviewed       Boolean            @default(false)
+  published      Boolean            @default(false)
+  updatedAt      DateTime           @updatedAt
+  createdAt      DateTime           @default(now())
+  obras          ProfessionalObra[]
+  attendances    Attendance[]
+}
+
+model Place {
+  id            String         @id @default(cuid())
+  name          String
+  kind          String
+  locality      String
+  address       String         @default("")
+  logoUrl       String         @default("")
+  whatsapp      String         @default("")
+  phone         String         @default("")
+  scheduleNote  String         @default("")
+  services      String         @default("")
+  specialties   String         @default("")
+  obrasMode     String         @default("del_lugar")
+  example       Boolean        @default(false)
+  published     Boolean        @default(false)
+  suggestedById String?
+  suggestedBy   User?          @relation("PlaceSuggestions", fields: [suggestedById], references: [id])
+  suggestionNote String        @default("")
+  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime       @default(now())
+  editors       PlaceEditor[]
+  obras         PlaceObra[]
+  studies       Study[]
+  attendances   Attendance[]
+  duties        PharmacyDuty[]
+}
+
+model PlaceEditor {
+  id      String @id @default(cuid())
+  userId  String
+  placeId String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place   Place  @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, placeId])
+}
+
+model ObraSocial {
+  id            String             @id @default(cuid())
+  name          String             @unique
+  professionals ProfessionalObra[]
+  places        PlaceObra[]
+  attendances   AttendanceObra[]
+}
+
+model ProfessionalObra {
+  professionalId String
+  obraId         String
+  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  obra           ObraSocial   @relation(fields: [obraId], references: [id], onDelete: Cascade)
+
+  @@id([professionalId, obraId])
+}
+
+model PlaceObra {
+  placeId String
+  obraId  String
+  place   Place      @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  obra    ObraSocial @relation(fields: [obraId], references: [id], onDelete: Cascade)
+
+  @@id([placeId, obraId])
+}
+
+model Attendance {
+  id                     String       @id @default(cuid())
+  professionalId         String
+  placeId                String
+  professionalDays       String       @default("")
+  professionalTime       String       @default("")
+  professionalShift      String       @default("")
+  professionalScheduleNote String     @default("")
+  professionalUpdatedAt  DateTime?
+  placeDays              String       @default("")
+  placeTime              String       @default("")
+  placeShift             String       @default("")
+  placeUpdatedAt         DateTime?
+  professional           Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  place                  Place        @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  obras                  AttendanceObra[]
+}
+
+model AttendanceObra {
+  attendanceId String
+  obraId       String
+  attendance   Attendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
+  obra         ObraSocial @relation(fields: [obraId], references: [id], onDelete: Cascade)
+
+  @@id([attendanceId, obraId])
+}
+
+model Study {
+  id          String @id @default(cuid())
+  placeId     String
+  name        String
+  preparation String @default("")
+  attention   String @default("")
+  place       Place  @relation(fields: [placeId], references: [id], onDelete: Cascade)
+}
+
+model PharmacyDuty {
+  id        String   @id @default(cuid())
+  placeId   String
+  startsOn  DateTime
+  endsOn    DateTime
+  source    String   @default("")
+  updatedAt DateTime @updatedAt
+  place     Place    @relation(fields: [placeId], references: [id], onDelete: Cascade)
+}
+
+model AuthRateLimit {
+  key       String   @id
+  attempts  Int      @default(0)
+  resetAt   DateTime
+}
+
+model ImagenAlmacenada {
+  id        String   @id @default(cuid())
+  carpeta   String
+  entidadId String
+  tipoMime  String
+  datos     Bytes
+  updatedAt DateTime @updatedAt
+
+  @@unique([carpeta, entidadId])
+}
