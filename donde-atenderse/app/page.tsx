@@ -90,11 +90,12 @@ export default async function Inicio() {
         <div className="mx-auto grid max-w-3xl gap-6 px-4 py-10 sm:py-16">
           <div className="grid gap-3 text-center">
             <h1 className="text-4xl font-bold tracking-[-0.04em] text-balance sm:text-5xl">
-              Médicos, centros y farmacias del corredor
+              Profesionales, centros de salud y todo lo referido a la atención médica
             </h1>
             <p className="text-lg text-muted">
-              Guía de salud de Cercalud: buscá profesionales, hospitales, laboratorios y la farmacia de turno. Santo
-              Pipó, Hipólito Yrigoyen, Jardín América, Ruiz de Montoya, Capioví y Puerto Rico.
+              Cercalud te ayuda a buscar profesionales, hospitales, laboratorios, centros de diagnóstico por imagen y la
+              farmacia de turno en Santo Pipó, Hipólito Yrigoyen, Jardín América, Ruiz de Montoya, Capioví y Puerto
+              Rico.
             </p>
           </div>
           <Buscador obras={obras} especialidades={especialidades} />
