@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Buscador } from "@/components/Buscador";
 import { PublicidadPortada } from "@/components/PublicidadPortada";
-import { EspacioPublicitario } from "@/components/EspacioPublicitario";
+import { PublicidadFranjaOmpuResponsive } from "@/components/PublicidadFranjaOmpuResponsive";
 import { IconoCercalud, iconoArea, type NombreIconoCercalud } from "@/components/iconos/IconoCercalud";
 import { mostrarDatosEjemplo } from "@/lib/config";
 import { AREAS } from "@/lib/constants";
@@ -133,11 +133,9 @@ export default async function Inicio() {
 
       <section aria-label="Publicidad" className="border-t border-line bg-white px-1 py-1">
         <div className="mx-auto w-full max-w-page">
-          <EspacioPublicitario
-            destino="franja"
-            formato="leaderboard"
-            anchoFila
-            descripcion="Banda principal en inicio: máxima visibilidad antes de las preguntas frecuentes."
+          <PublicidadFranjaOmpuResponsive
+            descripcionDesktop="Banda principal en inicio: máxima visibilidad antes de las preguntas frecuentes."
+            descripcionMovil="Segundo espacio en inicio (celular): mismo anunciante que la banda en PC, formato 300×250."
           />
         </div>
       </section>

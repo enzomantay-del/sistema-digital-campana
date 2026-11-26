@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Buscador } from "@/components/Buscador";
 import { EspacioPublicitario } from "@/components/EspacioPublicitario";
 import { LayoutListadoConPublicidad } from "@/components/LayoutListadoConPublicidad";
+import { PublicidadMovilEquivalenteColumna } from "@/components/PublicidadMovilEquivalenteColumna";
 import { IconoCercalud, type NombreIconoCercalud } from "@/components/iconos/IconoCercalud";
 import { TarjetaListadoLugar } from "@/components/TarjetaListadoLugar";
 import { TarjetaListadoProfesional } from "@/components/TarjetaListadoProfesional";
@@ -119,6 +120,7 @@ export default async function PaginaBuscar({
               : undefined
         }
       />
+      <PublicidadMovilEquivalenteColumna perfil="listado" />
       <p className="text-muted">
         {centrosSalud && !q ? (
           <>

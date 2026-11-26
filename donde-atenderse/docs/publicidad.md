@@ -23,17 +23,20 @@ Referencia visual: portales de noticias — aviso **dentro del flujo**, etiqueta
 - **`TarjetaPublicidad`**: marco + rótulo. Prop `compacto` para menos aire.
 - **`EspacioPublicitario`**: hueco a la venta con silueta del formato y mail de contacto.
 - **`PublicidadPortada`**: leaderboard en inicio (ejemplo en demo, hueco en producción).
+- **`PublicidadMovilEquivalenteColumna`**: MPU en el flujo cuando la columna lateral solo va en pantallas XL/LG.
+- **`PublicidadFranjaOmpuResponsive`**: leaderboard en desktop y MPU en la misma zona de la página en móvil.
 - **`ColumnaPublicidad`**: un solo slot en producción (skyscraper); en demo de ficha, hasta dos ejemplos.
 
 ## Dos avisos por página (implementación actual)
 
 | Página | Aviso 1 | Aviso 2 |
 |--------|---------|---------|
-| **Inicio** | Leaderboard bajo el buscador | Banner ancho antes del FAQ |
-| **Buscar** | Banner bajo filtros | Skyscraper en columna (XL) **o** MPU al pie en móvil |
+| **Inicio** | Leaderboard / vertical bajo el buscador | Leaderboard (desktop) o MPU (móvil) antes del FAQ |
+| **Buscar** | MPU en flujo (debajo del buscador, &lt; XL) | Skyscraper en columna (XL) + banda al pie |
 | **Ficha** prof./lugar | Skyscraper en columna (producción) | — (solo uno) |
 | **Ficha** (demo) | Ejemplo farmacia | Ejemplo profesional |
-| **Farmacia** | Banner a todo el ancho bajo título | Skyscraper (300×600) en columna XL **o** leaderboard ancho al pie en móvil |
+| **Farmacia** | MPU arriba (&lt; XL) + leaderboard al pie | Skyscraper en columna XL |
+| **Soy profesional / ingreso** | MPU (&lt; LG) o banda en ingreso | Columna skyscraper desde LG |
 
 ## Ejemplo vs producción
 
