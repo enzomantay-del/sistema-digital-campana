@@ -12,6 +12,7 @@ import { ImportarTurneroFarmacia } from "@/components/ImportarTurneroFarmacia";
 import { CrearUsuarioAdmin } from "@/components/CrearUsuarioAdmin";
 import { PanelAdminSeccion } from "@/components/PanelAdminSeccion";
 import { RecordatoriosInsigniaAdmin } from "@/components/RecordatoriosInsigniaAdmin";
+import { RegistroAccesosAdmin, type FilaAccesoAdmin } from "@/components/RegistroAccesosAdmin";
 import { RespaldoBaseAdmin } from "@/components/RespaldoBaseAdmin";
 import { agregarContactosSecretaria, filasRecordatorioInsignia } from "@/lib/recordatorioInsignia";
 import { requiereAdmin } from "@/lib/auth";
@@ -147,8 +148,15 @@ export default async function PanelAdmin({
   const cargadosN = cargados ? Number(cargados) : undefined;
   const turneroSin = turneroSinRaw ? turneroSinRaw.split("|").filter(Boolean) : undefined;
   const turneroInvalidas = turneroInvalidasRaw ? turneroInvalidasRaw.split("|").filter(Boolean) : undefined;
-  const [profesionalesPendientes, lugaresSugeridos, profesionales, lugares, profesionalesInsignia, editoresSecretaria] =
-    await Promise.all([
+  const [
+    profesionalesPendientes,
+    lugaresSugeridos,
+    profesionales,
+    lugares,
+    profesionalesInsignia,
+    editoresSecretaria,
+    usuariosPanel,
+  ] = await Promise.all([
     prisma.professional.findMany({
       where: { reviewed: false },
       include: { user: true },
@@ -194,7 +202,29 @@ export default async function PanelAdmin({
         place: { select: { name: true } },
       },
     }),
+    prisma.user.findMany({
+      where: { role: { in: ["secretaria", "profesional"] } },
+      include: {
+        places: { include: { place: { select: { name: true, locality: true, kind: true } } } },
+        professional: { select: { id: true, fullName: true } },
+      },
+      orderBy: [{ createdAt: "desc" }],
+    }),
   ]);
+
+  const filasAccesos: FilaAccesoAdmin[] = usuariosPanel.map((cuenta) => ({
+    id: cuenta.id,
+    name: cuenta.name,
+    email: cuenta.email,
+    role: cuenta.role,
+    whatsapp: cuenta.whatsapp,
+    contrasenaReferencia: cuenta.contrasenaReferencia,
+    notaAcceso: cuenta.notaAcceso,
+    createdAt: cuenta.createdAt,
+    lugares: cuenta.places.map((item) => item.place),
+    professionalId: cuenta.professional?.id ?? null,
+    professionalName: cuenta.professional?.fullName ?? null,
+  }));
 
   const recordatoriosInsignia = agregarContactosSecretaria(
     filasRecordatorioInsignia(profesionalesInsignia),
@@ -279,6 +309,13 @@ export default async function PanelAdmin({
         descripcion="Cuentas para secretarias (cargan profesionales del lugar) o profesionales (solo su ficha)."
       >
         <CrearUsuarioAdmin lugares={lugares.filter((lugar) => lugarPermiteCargaSecretaria(lugar.kind))} />
+      </PanelAdminSeccion>
+
+      <PanelAdminSeccion
+        titulo="Accesos entregados"
+        descripcion="Correos y contraseñas de referencia para cuando alguien olvida cómo entrar. Solo visible acá."
+      >
+        <RegistroAccesosAdmin filas={filasAccesos} />
       </PanelAdminSeccion>
 
       <PanelAdminSeccion titulo="Respaldo para migrar">

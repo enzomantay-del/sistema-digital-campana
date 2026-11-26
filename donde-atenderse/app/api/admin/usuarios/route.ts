@@ -43,7 +43,18 @@ export async function POST(request: Request) {
 
   const passwordHash = await bcrypt.hash(password, 10);
   const user = await prisma.user.create({
-    data: { name, email, passwordHash, role, whatsapp: whatsapp.length >= 10 ? whatsapp : "" },
+    data: {
+      name,
+      email,
+      passwordHash,
+      role,
+      whatsapp: whatsapp.length >= 10 ? whatsapp : "",
+      contrasenaReferencia: password,
+      notaAcceso:
+        role === "secretaria" && placeIds.length > 0
+          ? `Secretaría · lugares asignados al crear la cuenta`
+          : "Profesional · cuenta creada desde administración",
+    },
   });
 
   if (role === "profesional") {

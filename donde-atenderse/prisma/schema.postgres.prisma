@@ -13,6 +13,8 @@ model User {
   passwordHash    String
   name            String
   whatsapp        String         @default("")
+  contrasenaReferencia String    @default("")
+  notaAcceso      String         @default("")
   role            String        @default("profesional")
   createdAt       DateTime      @default(now())
   professional    Professional?
